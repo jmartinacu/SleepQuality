@@ -3,7 +3,7 @@
   "private": "true",
   "version": "1.0.0",
   "description": "",
-  "workspaces" : [
+  "workspaces": [
     "backend"
   ],
   "main": "index.js",
@@ -12,12 +12,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "standard": "17.0.0"
-  },
-  "eslintConfig": {
-    "extends": "./node_modules/standard/eslintrc.json"
-  }
-
+  "license": "ISC"
 }
