@@ -1,0 +1,22 @@
+{
+  "name": "sleep-quality-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/server.js",
+  "scripts": {
+    "start": "node build/server.js",
+    "dev": "ts-node-dev src/server.ts",
+    "tsc": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "18.15.11",
+    "ts-node-dev": "2.0.0",
+    "typescript": "5.0.3"
+  },
+  "dependencies": {
+    "fastify": "4.15.0"
+  }
+}
