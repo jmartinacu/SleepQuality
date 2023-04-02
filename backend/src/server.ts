@@ -1,19 +1,35 @@
 import fastify from 'fastify'
 
-const server = fastify()
+const start = async () => {
+  try {
+    if (process.env.NODE_ENV !== 'production') {
+      const path = await import('node:path')
+      const dotenv = await import('dotenv')
+      dotenv.config({ path: path.resolve(__dirname, '..', '.env') })
+      console.log(process.env.PORT)
+    }
 
-server.get('/', async (_request, _reply) => {
-  return { message: 'Sleep Quality API' }
-})
+    const PORT = Number(process.env.PORT)
 
-server.get('/healthcheck', async (_request, _reply) => {
-  return { status: 'ok' }
-})
+    const server = fastify()
 
-server.listen({ port: 8080 }, (err, address) => {
-  if (err != null) {
-    console.error(err)
+    server.get('/', async (_request, _reply) => {
+      return { message: 'Sleep Quality API' }
+    })
+
+    server.get('/healthcheck', async (_request, _reply) => {
+      return { status: 'ok' }
+    })
+
+    await server.listen({ port: PORT })
+
+    const {port, address} = server.addresses()[0]
+
+    console.log(`Server listening at http://${address}:${port}`)
+  } catch (e) {
+    console.error(e)
     process.exit(1)
   }
-  console.log(`Server listening at ${address}`)
-})
+}
+
+start()
