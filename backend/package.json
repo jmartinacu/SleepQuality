@@ -20,6 +20,8 @@
     "typescript": "5.0.3"
   },
   "dependencies": {
+    "@fastify/type-provider-typebox": "3.0.0",
+    "@sinclair/typebox": "0.26.8",
     "fastify": "4.15.0"
   },
   "ts-standard": {
