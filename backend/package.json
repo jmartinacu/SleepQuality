@@ -5,7 +5,7 @@
   "main": "build/server.js",
   "scripts": {
     "start": "node build/server.js",
-    "dev": "set NODE_ENV=development&& nodemon --exec node --loader ts-node/esm src/server.ts",
+    "dev": "set NODE_ENV=development&& ts-node-dev src/server.ts",
     "tsc": "tsc",
     "lint": "ts-standard --fix"
   },
@@ -15,8 +15,6 @@
   "devDependencies": {
     "@types/node": "18.15.11",
     "dotenv": "16.0.3",
-    "nodemon": "2.0.22",
-    "ts-node": "10.9.1",
     "ts-node-dev": "2.0.0",
     "ts-standard": "12.0.2",
     "typescript": "5.0.3"
