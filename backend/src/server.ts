@@ -1,6 +1,7 @@
 import fastify from 'fastify'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import userRoutes from './modules/user/user.routes'
+import prisma from './database'
 
 const server = async (): Promise<void> => {
   try {
@@ -9,6 +10,8 @@ const server = async (): Promise<void> => {
       const dotenv = await import('dotenv')
       dotenv.config({ path: path.resolve(__dirname, '..', '.env') })
     }
+
+    await prisma.$connect
 
     const PORT = Number(process.env.PORT)
 
@@ -31,6 +34,7 @@ const server = async (): Promise<void> => {
     console.log(`Server listening at http://${address}:${port}`)
   } catch (e) {
     console.error(e)
+    await prisma.$disconnect
     process.exit(1)
   }
 }

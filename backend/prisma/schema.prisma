@@ -1,0 +1,31 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+/// Prisma needs to performs querys to a mondodb Replica Set,
+/// the best way to do it is using Mongo Atlas instead of local mongo
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  email String @unique
+  password String
+  gender Gender
+  age Int
+  height Int
+  weight Float
+  chronicDisorders String[]
+  BMI Int
+}
+
+enum Gender {
+  MASCULINE
+  FEMININE
+  NEUTER
+}

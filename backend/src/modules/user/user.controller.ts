@@ -1,16 +1,21 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { CreateUserInput, CreateUserResponseSchema } from './user.schemas'
+import { createUser } from './user.services'
 
 async function createUserHandler (
   request: FastifyRequest<{
     Body: CreateUserInput
   }>,
-  _reply: FastifyReply
-):
-  Promise<CreateUserResponseSchema> {
-  const { password, ...rest } = request.body
+  reply: FastifyReply
+): Promise<CreateUserResponseSchema> {
+  try {
+    const user = await createUser(request.body)
 
-  return { ...rest, BMI: 0, id: '0' }
+    return await reply.code(201).send(user)
+  } catch (error) {
+    console.log(error)
+    return await reply.code(500).send(error)
+  }
 }
 
 export {
