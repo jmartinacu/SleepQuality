@@ -9,7 +9,13 @@ async function createUserHandler (
   reply: FastifyReply
 ): Promise<CreateUserResponseSchema> {
   try {
-    const user = await createUser(request.body)
+    const { password, ...rest } = request.body
+
+    const passwordHash = await request.bcryptHash(password)
+
+    const user = await createUser({ ...rest, password: passwordHash })
+
+    if (typeof user === 'undefined') throw new Error('createUser failure')
 
     return await reply.code(201).send(user)
   } catch (error) {

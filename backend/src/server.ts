@@ -1,42 +1,26 @@
-import fastify from 'fastify'
+import fastify, { FastifyInstance } from 'fastify'
+import fastifyBycript from 'fastify-bcrypt'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import userRoutes from './modules/user/user.routes'
-import prisma from './database'
 
-const server = async (): Promise<void> => {
-  try {
-    if (process.env.NODE_ENV !== 'production') {
-      const path = await import('node:path')
-      const dotenv = await import('dotenv')
-      dotenv.config({ path: path.resolve(__dirname, '..', '.env') })
-    }
+const buildServer = (): FastifyInstance => {
+  const server = fastify().withTypeProvider<TypeBoxTypeProvider>()
 
-    await prisma.$connect
+  void server.register(fastifyBycript, {
+    saltWorkFactor: 12
+  })
 
-    const PORT = Number(process.env.PORT)
+  server.get('/', async (_request, _reply) => {
+    return { message: 'Sleep Quality API' }
+  })
 
-    const server = fastify().withTypeProvider<TypeBoxTypeProvider>()
+  server.get('/healthcheck', async (_request, _reply) => {
+    return { status: 'ok' }
+  })
 
-    server.get('/', async (_request, _reply) => {
-      return { message: 'Sleep Quality API' }
-    })
+  void server.register(userRoutes, { prefix: 'api/users' })
 
-    server.get('/healthcheck', async (_request, _reply) => {
-      return { status: 'ok' }
-    })
-
-    void server.register(userRoutes, { prefix: 'api/users' })
-
-    await server.listen({ port: PORT })
-
-    const { port, address } = server.addresses()[0]
-
-    console.log(`Server listening at http://${address}:${port}`)
-  } catch (e) {
-    console.error(e)
-    await prisma.$disconnect
-    process.exit(1)
-  }
+  return server
 }
 
-void server()
+export default buildServer

@@ -5,8 +5,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-/// Prisma needs to performs querys to a mondodb Replica Set,
-/// the best way to do it is using Mongo Atlas instead of local mongo
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")

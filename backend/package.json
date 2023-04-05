@@ -2,10 +2,10 @@
   "name": "sleep-quality-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "build/server.js",
+  "main": "build/app.js",
   "scripts": {
-    "start": "node build/server.js",
-    "dev": "set NODE_ENV=development&& ts-node-dev src/server.ts",
+    "start": "node build/app.js",
+    "dev": "set NODE_ENV=development&& ts-node-dev src/app.ts",
     "tsc": "tsc",
     "lint": "ts-standard"
   },
@@ -24,7 +24,8 @@
     "@fastify/type-provider-typebox": "3.0.0",
     "@prisma/client": "4.12.0",
     "@sinclair/typebox": "0.26.8",
-    "fastify": "4.15.0"
+    "fastify": "4.15.0",
+    "fastify-bcrypt": "^1.0.1"
   },
   "eslintConfig": {
     "parserOptions": {
@@ -34,8 +35,9 @@
   },
   "ts-standard": {
     "ignore": [
-      "build",
-      "prisma"
+      "backend/build",
+      "backend/prisma",
+      "node_modules"
     ]
   }
 }

@@ -1,4 +1,5 @@
 import { Static, Type } from '@sinclair/typebox'
+import { User } from '../../utils/database'
 
 const userCore = {
   age: Type.Integer({ exclusiveMinimum: 0 }),
@@ -7,7 +8,7 @@ const userCore = {
     Type.Literal('FEMININE'),
     Type.Literal('NEUTER')
   ]),
-  height: Type.Integer({ exclusiveMinimum: 0 }),
+  height: Type.Number({ exclusiveMinimum: 0 }),
   weight: Type.Number({ exclusiveMinimum: 0 }),
   chronicDisorders: Type.Array(Type.String()),
   BMI: Type.Number()
@@ -16,7 +17,7 @@ const userCore = {
 const userExtent = {
   email: Type.String({ format: 'email' }),
   password: Type.String(),
-  id: Type.String() // VOY A TENER PROBLEMAS CON ESTO PORQUE ESTO SERA EL TIPO QUE TIENE MONGODB EN SU ID.
+  id: Type.String()
 }
 
 const { email, password, id } = userExtent
@@ -37,10 +38,12 @@ const createUserResponseSchema = Type.Object({
 
 type CreateUserInput = Static<typeof createUserSchema>
 type CreateUserResponseSchema = Static<typeof createUserResponseSchema>
+type createUserResponseService = Omit<User, 'password'>
 
 export {
   createUserSchema,
   createUserResponseSchema,
   CreateUserResponseSchema,
-  CreateUserInput
+  CreateUserInput,
+  createUserResponseService
 }
