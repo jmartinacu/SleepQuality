@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { CreateUserInput, CreateUserResponseSchema } from './user.schemas'
+import { CreateUserInput, CreateUserResponseSchema, LogInUserResponseSchema } from './user.schemas'
 import { createUser } from './user.services'
 
 async function createUserHandler (
@@ -24,6 +24,14 @@ async function createUserHandler (
   }
 }
 
+function logInUserHandler (
+  _request: FastifyRequest,
+  _reply: FastifyReply
+): LogInUserResponseSchema {
+  return { token: 'Estas dentro' }
+}
+
 export {
-  createUserHandler
+  createUserHandler,
+  logInUserHandler
 }

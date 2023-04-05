@@ -16,10 +16,10 @@ model User {
   password String
   gender Gender
   age Int
-  height Int
+  height Float
   weight Float
   chronicDisorders String[]
-  BMI Int
+  BMI Float
 }
 
 enum Gender {

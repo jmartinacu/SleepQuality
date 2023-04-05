@@ -15,11 +15,9 @@ async function main (): Promise<void> {
 
     await prisma.$connect
 
-    await server.listen({ port: PORT })
+    const urlIp6 = await server.listen({ port: PORT })
 
-    const { port, address } = server.addresses()[0]
-
-    console.log(`Server listening at http://${address}:${port}`)
+    console.log(`Server listening at ${urlIp6}`)
   } catch (error) {
     console.error(error)
     await prisma.$disconnect

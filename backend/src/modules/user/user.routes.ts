@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
-import { createUserHandler } from './user.controller'
-import { createUserResponseSchema, createUserSchema } from './user.schemas'
+import { createUserHandler, logInUserHandler } from './user.controller'
+import { createUserResponseSchema, createUserSchema, logInUserResponseSchema, logInUserSchema } from './user.schemas'
 
 async function userRoutes (server: FastifyInstance): Promise<void> {
   server.post('/',
@@ -13,6 +13,18 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       }
     },
     createUserHandler
+  )
+  server.post('/login',
+    {
+      preHandler: server.auth([server.verifyEmailAndPassword]),
+      schema: {
+        body: logInUserSchema,
+        response: {
+          200: logInUserResponseSchema
+        }
+      }
+    },
+    logInUserHandler
   )
 }
 
