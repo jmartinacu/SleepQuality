@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import { createUserHandler, logInUserHandler } from './user.controller'
+import { createUserHandler, logInUserHandler } from './user.controllers'
 import { createUserResponseSchema, createUserSchema, logInUserResponseSchema, logInUserSchema } from './user.schemas'
 
 async function userRoutes (server: FastifyInstance): Promise<void> {

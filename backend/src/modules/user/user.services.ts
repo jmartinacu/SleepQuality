@@ -68,6 +68,7 @@ async function findUserUniqueOrThrow (
   }
   return user
 }
+
 export {
   createUser,
   findUserUnique,

@@ -14,9 +14,21 @@ const userCore = {
   BMI: Type.Number()
 }
 
+/*
+PASSWORD REGEX RULES:
+  Min 8 characters
+  Max 15 characters
+  At least one upper case letter
+  At least one lower case letter
+  At least one digit
+  No empty spaces
+  At least one special character
+*/
+const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])([A-Za-z\d$@$!%*?&]|[^ ]){8,15}$/
+
 const userExtent = {
   email: Type.String({ format: 'email' }),
-  password: Type.String(),
+  password: Type.RegEx(regexPassword),
   id: Type.String()
 }
 

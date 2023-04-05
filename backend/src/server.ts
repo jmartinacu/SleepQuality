@@ -3,7 +3,7 @@ import fastifyBycript from 'fastify-bcrypt'
 import fastifyAuth from '@fastify/auth'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import userRoutes from './modules/user/user.routes'
-import { verifyEmailAndPasswordHandler } from './utils/decorators.controller'
+import authPlugin from './plugins/auth/auth.plugin'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -14,8 +14,6 @@ declare module 'fastify' {
 const buildServer = (): FastifyInstance => {
   const server = fastify().withTypeProvider<TypeBoxTypeProvider>()
 
-  server.decorate('verifyEmailAndPassword', verifyEmailAndPasswordHandler)
-
   void server.register(fastifyBycript, {
     saltWorkFactor: 12
   })
@@ -23,6 +21,8 @@ const buildServer = (): FastifyInstance => {
   void server.register(fastifyAuth, {
     defaultRelation: 'and'
   })
+
+  void server.register(authPlugin)
 
   server.after(() => {
     server.get('/', async (_request, _reply) => {

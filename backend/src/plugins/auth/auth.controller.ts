@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { LogInUserInput } from '../modules/user/user.schemas'
-import { findUserUniqueOrThrow } from '../modules/user/user.services'
+import { LogInUserInput } from '../../modules/user/user.schemas'
+import { findUserUniqueOrThrow } from '../../modules/user/user.services'
 
 async function verifyEmailAndPasswordHandler (
   request: FastifyRequest<{
