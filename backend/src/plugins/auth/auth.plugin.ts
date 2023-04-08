@@ -1,5 +1,5 @@
 import fastifyPlugin from 'fastify-plugin'
-import fastifyBycript from 'fastify-bcrypt'
+import { fastifyBcrypt } from 'fastify-bcrypt'
 import fastifyAuth from '@fastify/auth'
 import fastifyJwt from '@fastify/jwt'
 import {
@@ -15,7 +15,7 @@ const pluginAuthorization: FastifyPluginAsync = async (
   fastify: FastifyInstance,
   _options: FastifyPluginOptions
 ) => {
-  void fastify.register(fastifyBycript, {
+  void fastify.register(fastifyBcrypt, {
     saltWorkFactor: 12
   })
 

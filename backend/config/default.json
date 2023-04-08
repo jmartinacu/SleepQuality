@@ -1,0 +1,14 @@
+{
+  "port": 8080,
+  "databaseUrl": "",
+  "smpt": {
+    "host": "smtp.ethereal.email",
+    "port": 587,
+    "secure": false,
+    "auth": {
+      "user": "s47cszg4kdpgpqda@ethereal.email",
+      "pass": "nmfhFxjaj9SyPxrFXg"
+    }
+
+  }
+}

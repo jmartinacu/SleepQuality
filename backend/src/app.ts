@@ -1,21 +1,20 @@
 import buildServer from './server'
+import config from 'config'
+import dotenv from 'dotenv'
 import prisma from './utils/database'
 
 const server = buildServer()
 
+export default server
+
 async function main (): Promise<void> {
   try {
-    if (process.env.NODE_ENV !== 'production') {
-      const path = await import('node:path')
-      const dotenv = await import('dotenv')
-      dotenv.config({ path: path.resolve(__dirname, '..', '.env') })
-    }
-
-    const PORT = Number(process.env.PORT)
-
+    dotenv.config()
     await prisma.$connect
 
-    const urlIp6 = await server.listen({ port: PORT })
+    const port = config.get<number>('port')
+
+    const urlIp6 = await server.listen({ port })
 
     console.log(`Server listening at ${urlIp6}`)
   } catch (error) {

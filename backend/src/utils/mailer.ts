@@ -1,12 +1,21 @@
+import config from 'config'
 import nodemailer, { SendMailOptions } from 'nodemailer'
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: 587,
-  secure: process.env.SMTP_SECURE === 'true',
+const smpt = config.get<{
+  host: string
+  port: number
+  secure: boolean
   auth: {
-    user: process.env.SMTP_USERNAME,
-    pass: process.env.SMTP_PASSWORD
+    user: string
+    pass: string
+  }
+}>('smpt')
+
+const transporter = nodemailer.createTransport({
+  ...smpt,
+  auth: {
+    user: smpt.auth.user,
+    pass: smpt.auth.pass
   }
 })
 

@@ -21,7 +21,10 @@ declare module '@fastify/jwt' {
 const buildServer = (): FastifyInstance => {
   const server = Fastify().withTypeProvider<TypeBoxTypeProvider>()
 
+  // const dir = dirname(fileURLToPath(import.meta.url))
+
   void server.register(fastifyCors)
+  // const dotenvPath = path.resolve(dir, '..', '.env')
 
   void server.register(authPlugin)
 
