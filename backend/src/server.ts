@@ -1,6 +1,5 @@
-import fastify, { FastifyInstance } from 'fastify'
-import fastifyBycript from 'fastify-bcrypt'
-import fastifyAuth from '@fastify/auth'
+import Fastify, { FastifyInstance } from 'fastify'
+import fastifyCors from '@fastify/cors'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import userRoutes from './modules/user/user.routes'
 import authPlugin from './plugins/auth/auth.plugin'
@@ -8,19 +7,21 @@ import authPlugin from './plugins/auth/auth.plugin'
 declare module 'fastify' {
   interface FastifyInstance {
     verifyEmailAndPassword: any
+    authenticate: any
+  }
+}
+
+declare module '@fastify/jwt' {
+  interface FastifyJWT {
+    payload: { id: string }
+    user: { id: string }
   }
 }
 
 const buildServer = (): FastifyInstance => {
-  const server = fastify().withTypeProvider<TypeBoxTypeProvider>()
+  const server = Fastify().withTypeProvider<TypeBoxTypeProvider>()
 
-  void server.register(fastifyBycript, {
-    saltWorkFactor: 12
-  })
-
-  void server.register(fastifyAuth, {
-    defaultRelation: 'and'
-  })
+  void server.register(fastifyCors)
 
   void server.register(authPlugin)
 

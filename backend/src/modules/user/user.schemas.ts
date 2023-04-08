@@ -50,11 +50,15 @@ const createUserResponseSchema = Type.Object({
 
 const logInUserSchema = Type.Object({
   email,
-  password
+  password: Type.String()
 })
 
 const logInUserResponseSchema = Type.Object({
   token: Type.String()
+})
+
+const findUserParamsSchema = Type.Object({
+  id: Type.String()
 })
 
 type CreateUserInput = Static<typeof createUserSchema>
@@ -62,17 +66,18 @@ type CreateUserResponseSchema = Static<typeof createUserResponseSchema>
 type CreateUserResponseService = Omit<User, 'password'>
 type LogInUserInput = Static<typeof logInUserSchema>
 type LogInUserResponseSchema = Static<typeof logInUserResponseSchema>
-type FindUserUniqueIdentifier = 'email' | 'id'
+type FindUserParamsSchema = Static<typeof findUserParamsSchema>
 
 export {
   createUserSchema,
   createUserResponseSchema,
   logInUserSchema,
   logInUserResponseSchema,
+  findUserParamsSchema,
   CreateUserResponseSchema,
   CreateUserInput,
   CreateUserResponseService,
   LogInUserInput,
   LogInUserResponseSchema,
-  FindUserUniqueIdentifier
+  FindUserParamsSchema
 }

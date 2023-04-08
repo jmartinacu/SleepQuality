@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { LogInUserInput } from '../../modules/user/user.schemas'
-import { findUserUniqueOrThrow } from '../../modules/user/user.services'
+import { findUserUnique } from '../../modules/user/user.services'
 
 async function verifyEmailAndPasswordHandler (
   request: FastifyRequest<{
@@ -10,9 +10,15 @@ async function verifyEmailAndPasswordHandler (
 ): Promise<void> {
   try {
     const { email, password } = request.body
-    const user = await findUserUniqueOrThrow('email', email)
+    const user = await findUserUnique('email', email)
+    if (user == null) {
+      return await reply.code(401).send({ message: 'Email or password wrong' })
+    }
     const passwordCheck = await request.bcryptCompare(password, user.password)
-    if (!passwordCheck) throw new Error('Wrong password')
+    if (!passwordCheck) {
+      return await reply.code(401).send({ message: 'Email or password wrong' })
+    }
+    request.user = { id: user.id }
   } catch (error) {
     return await reply.send(error)
   }

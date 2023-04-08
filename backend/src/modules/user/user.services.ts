@@ -1,8 +1,7 @@
 import prisma, { User } from '../../utils/database'
 import {
   CreateUserInput,
-  CreateUserResponseService,
-  FindUserUniqueIdentifier
+  CreateUserResponseService
 } from './user.schemas'
 
 async function createUser (
@@ -28,7 +27,7 @@ async function createUser (
 }
 
 async function findUserUnique (
-  uniqueIdentifier: FindUserUniqueIdentifier,
+  uniqueIdentifier: 'email' | 'id',
   value: string
 ): Promise<User | null> {
   let user: User | null
@@ -49,7 +48,7 @@ async function findUserUnique (
 }
 
 async function findUserUniqueOrThrow (
-  uniqueIdentifier: FindUserUniqueIdentifier,
+  uniqueIdentifier: 'email' | 'id',
   value: string
 ): Promise<User> {
   let user: User

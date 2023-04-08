@@ -1,9 +1,19 @@
 import { FastifyInstance } from 'fastify'
-import { createUserHandler, logInUserHandler } from './user.controllers'
-import { createUserResponseSchema, createUserSchema, logInUserResponseSchema, logInUserSchema } from './user.schemas'
+import { createUserHandler, logInUserHandler, getUserHandler } from './user.controllers'
+import {
+  CreateUserInput,
+  FindUserParamsSchema,
+  createUserResponseSchema,
+  createUserSchema,
+  findUserParamsSchema,
+  logInUserResponseSchema,
+  logInUserSchema
+} from './user.schemas'
 
 async function userRoutes (server: FastifyInstance): Promise<void> {
-  server.post('/',
+  server.post<{
+    Body: CreateUserInput
+  }>('/',
     {
       schema: {
         body: createUserSchema,
@@ -25,6 +35,21 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       }
     },
     logInUserHandler
+  )
+
+  server.get<{
+    Params: FindUserParamsSchema
+  }>('/:id',
+    {
+      preHandler: server.auth([server.authenticate]),
+      schema: {
+        params: findUserParamsSchema,
+        response: {
+          200: createUserResponseSchema
+        }
+      }
+    },
+    getUserHandler
   )
 }
 
