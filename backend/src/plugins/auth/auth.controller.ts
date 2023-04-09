@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { LogInUserInput } from '../../modules/user/user.schemas'
 import { findUserUnique } from '../../modules/user/user.services'
+import { User } from '@prisma/client'
 
 async function verifyEmailAndPasswordHandler (
   request: FastifyRequest<{
@@ -11,19 +12,60 @@ async function verifyEmailAndPasswordHandler (
   try {
     const { email, password } = request.body
     const user = await findUserUnique('email', email)
-    if (user == null) {
+    if (user === null) {
       return await reply.code(401).send({ message: 'Email or password wrong' })
     }
     const passwordCheck = await request.bcryptCompare(password, user.password)
     if (!passwordCheck) {
       return await reply.code(401).send({ message: 'Email or password wrong' })
     }
-    request.user = { id: user.id }
+    request.user = { userId: user.id }
   } catch (error) {
+    console.log(error)
     return await reply.send(error)
   }
 }
 
+async function userVerified (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<void> {
+  try {
+    const { userId } = request.user
+    if (typeof userId === 'undefined') {
+      return await reply.code(400).send({ message: 'Please login your account' })
+    }
+    const user = await findUserUnique('id', userId) as User
+    if (!user.verified) {
+      return await reply.code(400).send({ message: 'Please verify your account' })
+    }
+  } catch (error) {
+    console.log(error)
+    return await reply.code(500).send(error)
+  }
+}
+
+async function isAdmin (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<void> {
+  try {
+    const { userId: adminId } = request.user
+    if (typeof adminId === 'undefined') {
+      return await reply.code(400).send({ message: 'Please login your account' })
+    }
+    const user = await findUserUnique('id', adminId) as User
+    if (user.role !== 'ADMIN') {
+      return await reply.code(403).send({ message: 'Not enough privileges' })
+    }
+  } catch (error) {
+    console.log(error)
+    return await reply.code(500).send(error)
+  }
+}
+
 export {
-  verifyEmailAndPasswordHandler
+  verifyEmailAndPasswordHandler,
+  userVerified,
+  isAdmin
 }

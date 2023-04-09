@@ -1,5 +1,4 @@
 import { Static, Type } from '@sinclair/typebox'
-import { User } from '../../utils/database'
 
 const userCore = {
   age: Type.Integer({ exclusiveMinimum: 0 }),
@@ -29,6 +28,11 @@ const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])([A-Za-z\d
 const userExtent = {
   email: Type.String({ format: 'email' }),
   password: Type.RegEx(regexPassword),
+  role: Type.Optional(
+    Type.Union([
+      Type.Literal('ADMIN'),
+      Type.Literal('USER')
+    ])),
   id: Type.String()
 }
 
@@ -50,23 +54,44 @@ const createUserResponseSchema = Type.Object({
 
 const logInUserSchema = Type.Object({
   email,
-  password: Type.String()
+  password: Type.String({ minLength: 8, maxLength: 15 })
 })
 
 const logInUserResponseSchema = Type.Object({
-  token: Type.String()
+  accessToken: Type.String(),
+  refreshToken: Type.String()
 })
 
 const findUserParamsSchema = Type.Object({
   id: Type.String()
 })
 
+const verifyAccountParamsSchema = Type.Object({
+  id: Type.String(),
+  verificationCode: Type.String()
+})
+
+const updateUserSchema = Type.Object({
+  age: Type.Optional(userCoreExceptBMI.age),
+  gender: Type.Optional(userCoreExceptBMI.gender),
+  height: Type.Optional(userCoreExceptBMI.height),
+  weight: Type.Optional(userCoreExceptBMI.weight),
+  chronicDisorders: Type.Optional(userCoreExceptBMI.chronicDisorders),
+  verified: Type.Optional(Type.Boolean())
+})
+
+const verifyAccountResponseSchema = Type.Object({
+  message: Type.String()
+})
+
 type CreateUserInput = Static<typeof createUserSchema>
 type CreateUserResponseSchema = Static<typeof createUserResponseSchema>
-type CreateUserResponseService = Omit<User, 'password'>
 type LogInUserInput = Static<typeof logInUserSchema>
 type LogInUserResponseSchema = Static<typeof logInUserResponseSchema>
 type FindUserParamsSchema = Static<typeof findUserParamsSchema>
+type VerifyAccountParamsSchema = Static<typeof verifyAccountParamsSchema>
+type UpdateUserSchema = Static<typeof updateUserSchema>
+type VerifyAccountResponseSchema = Static<typeof verifyAccountResponseSchema>
 
 export {
   createUserSchema,
@@ -74,10 +99,15 @@ export {
   logInUserSchema,
   logInUserResponseSchema,
   findUserParamsSchema,
+  verifyAccountParamsSchema,
+  verifyAccountResponseSchema,
+  updateUserSchema,
   CreateUserResponseSchema,
   CreateUserInput,
-  CreateUserResponseService,
   LogInUserInput,
   LogInUserResponseSchema,
-  FindUserParamsSchema
+  FindUserParamsSchema,
+  VerifyAccountParamsSchema,
+  VerifyAccountResponseSchema,
+  UpdateUserSchema
 }

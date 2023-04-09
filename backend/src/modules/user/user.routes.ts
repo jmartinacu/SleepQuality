@@ -1,13 +1,21 @@
 import { FastifyInstance } from 'fastify'
-import { createUserHandler, logInUserHandler, getUserHandler } from './user.controllers'
+import {
+  createUserHandler,
+  logInUserHandler,
+  getUserHandler,
+  verifyAccountHandler
+} from './user.controllers'
 import {
   CreateUserInput,
   FindUserParamsSchema,
+  VerifyAccountParamsSchema,
   createUserResponseSchema,
   createUserSchema,
   findUserParamsSchema,
   logInUserResponseSchema,
-  logInUserSchema
+  logInUserSchema,
+  verifyAccountParamsSchema,
+  verifyAccountResponseSchema
 } from './user.schemas'
 
 async function userRoutes (server: FastifyInstance): Promise<void> {
@@ -26,7 +34,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
   )
   server.post('/login',
     {
-      preHandler: server.auth([server.verifyEmailAndPassword]),
+      preHandler: server.auth([server.checkEmailAndPassword]),
       schema: {
         body: logInUserSchema,
         response: {
@@ -41,7 +49,10 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     Params: FindUserParamsSchema
   }>('/:id',
     {
-      preHandler: server.auth([server.authenticate]),
+      preHandler: server.auth([
+        server.authenticate,
+        server.checkUserVerification
+      ]),
       schema: {
         params: findUserParamsSchema,
         response: {
@@ -50,6 +61,21 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       }
     },
     getUserHandler
+  )
+
+  server.get<{
+    Params: VerifyAccountParamsSchema
+  }>('/:id/:verificationCode',
+    {
+      schema: {
+        params: verifyAccountParamsSchema,
+        response: {
+          200: verifyAccountResponseSchema,
+          400: verifyAccountResponseSchema
+        }
+      }
+    },
+    verifyAccountHandler
   )
 }
 

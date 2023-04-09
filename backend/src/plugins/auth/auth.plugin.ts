@@ -2,6 +2,7 @@ import fastifyPlugin from 'fastify-plugin'
 import { fastifyBcrypt } from 'fastify-bcrypt'
 import fastifyAuth from '@fastify/auth'
 import fastifyJwt from '@fastify/jwt'
+import config from 'config'
 import {
   FastifyInstance,
   FastifyPluginAsync,
@@ -9,7 +10,7 @@ import {
   FastifyRequest,
   FastifyReply
 } from 'fastify'
-import { verifyEmailAndPasswordHandler } from './auth.controller'
+import { verifyEmailAndPasswordHandler, userVerified, isAdmin } from './auth.controller'
 
 const pluginAuthorization: FastifyPluginAsync = async (
   fastify: FastifyInstance,
@@ -19,8 +20,29 @@ const pluginAuthorization: FastifyPluginAsync = async (
     saltWorkFactor: 12
   })
 
+  const accessKey = Buffer
+    .from(config.get<string>('accessTokenKey'), 'base64')
+    .toString('ascii')
+
+  const refreshKey = Buffer
+    .from(config.get<string>('refreshTokenKey'), 'base64')
+    .toString('ascii')
+
   void fastify.register(fastifyJwt, {
-    secret: 'secreto que vendrá del .env'
+    secret: accessKey,
+    sign: {
+      expiresIn: '15m'
+    },
+    namespace: 'access',
+    jwtVerify: 'accessVerify',
+    jwtSign: 'accessSign'
+  })
+
+  void fastify.register(fastifyJwt, {
+    secret: refreshKey,
+    namespace: 'refresh',
+    jwtVerify: 'refreshVerify',
+    jwtSign: 'refreshSign'
   })
 
   void fastify.register(fastifyAuth, {
@@ -32,13 +54,17 @@ const pluginAuthorization: FastifyPluginAsync = async (
     reply: FastifyReply
   ) => {
     try {
-      await request.jwtVerify()
+      await request.accessVerify()
     } catch (error) {
       return await reply.send(error)
     }
   })
 
-  fastify.decorate('verifyEmailAndPassword', verifyEmailAndPasswordHandler)
+  fastify.decorate('checkEmailAndPassword', verifyEmailAndPasswordHandler)
+
+  fastify.decorate('checkUserVerification', userVerified)
+
+  fastify.decorate('checkAdmin', isAdmin)
 }
 
 export default fastifyPlugin(pluginAuthorization, {

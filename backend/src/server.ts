@@ -6,25 +6,32 @@ import authPlugin from './plugins/auth/auth.plugin'
 
 declare module 'fastify' {
   interface FastifyInstance {
-    verifyEmailAndPassword: any
+    checkEmailAndPassword: any
+    checkUserVerification: any
+    checkAdmin: any
     authenticate: any
+  }
+  interface FastifyRequest {
+    accessVerify: any
+    refreshVerify: any
+  }
+  interface FastifyReply {
+    accessSign: any
+    refreshSign: any
   }
 }
 
 declare module '@fastify/jwt' {
   interface FastifyJWT {
     payload: { id: string }
-    user: { id: string }
+    user: { userId?: string }
   }
 }
 
 const buildServer = (): FastifyInstance => {
   const server = Fastify().withTypeProvider<TypeBoxTypeProvider>()
 
-  // const dir = dirname(fileURLToPath(import.meta.url))
-
   void server.register(fastifyCors)
-  // const dotenvPath = path.resolve(dir, '..', '.env')
 
   void server.register(authPlugin)
 

@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { CreateUserInput, CreateUserResponseSchema, FindUserParamsSchema, LogInUserResponseSchema } from './user.schemas'
-import { createUser, findUserUnique } from './user.services'
+import { CreateUserInput, CreateUserResponseSchema, FindUserParamsSchema, LogInUserResponseSchema, VerifyAccountParamsSchema } from './user.schemas'
+import { createSession, createUser, findUserUnique, updateUser } from './user.services'
 import sendEmail from '../../utils/mailer'
 
 async function createUserHandler (
@@ -31,13 +31,24 @@ async function createUserHandler (
   }
 }
 
-function logInUserHandler (
+async function logInUserHandler (
   request: FastifyRequest,
-  _reply: FastifyReply
-): LogInUserResponseSchema {
-  const { id } = request.user
-  const server = request.server
-  return { token: server.jwt.sign({ id }) }
+  reply: FastifyReply
+): Promise<LogInUserResponseSchema> {
+  try {
+    const { userId } = request.user as { userId: string }
+    // MIRAR SI YA TIENE UNA SESIÓN CREADA EL USUARIO
+    const { id: sessionId } = await createSession(userId)
+    const accessToken = await reply.accessSign({ userId })
+    const refreshToken = await reply.refreshSign({ sessionId })
+    return {
+      accessToken,
+      refreshToken
+    }
+  } catch (error) {
+    console.log(error)
+    return await reply.code(500).send(error)
+  }
 }
 
 async function getUserHandler (
@@ -49,15 +60,42 @@ async function getUserHandler (
   try {
     const { id } = request.params
     const user = await findUserUnique('id', id)
-    return await reply.code(200).send(user)
+    return await reply.send(user)
   } catch (error) {
     console.log(error)
-    return await reply.send(error)
+    return await reply.code(500).send(error)
+  }
+}
+
+async function verifyAccountHandler (
+  request: FastifyRequest<{
+    Params: VerifyAccountParamsSchema
+  }>,
+  reply: FastifyReply
+): Promise<void> {
+  try {
+    const { id, verificationCode } = request.params
+    const user = await findUserUnique('id', id)
+    if (user === null) {
+      return await reply.code(400).send({ message: 'Not Found' })
+    }
+    if (user.verified) {
+      return await reply.send({ message: 'User already verified' })
+    }
+    if (user.verificationCode === verificationCode) {
+      await updateUser(id, { verified: true })
+      return await reply.send({ message: 'User verified' })
+    }
+    return await reply.code(400).send({ message: 'Could not verified User' })
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
   }
 }
 
 export {
   createUserHandler,
   logInUserHandler,
-  getUserHandler
+  getUserHandler,
+  verifyAccountHandler
 }
