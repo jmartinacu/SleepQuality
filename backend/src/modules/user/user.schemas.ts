@@ -13,6 +13,11 @@ const userCore = {
   BMI: Type.Number()
 }
 
+const sessionCore = {
+  valid: Type.Boolean(),
+  userId: Type.String()
+}
+
 /*
 PASSWORD REGEX RULES:
   Min 8 characters
@@ -33,10 +38,11 @@ const userExtent = {
       Type.Literal('ADMIN'),
       Type.Literal('USER')
     ])),
+  verificationCode: Type.String(),
   id: Type.String()
 }
 
-const { email, password, id } = userExtent
+const { email, password, id, verificationCode } = userExtent
 
 const { BMI, ...userCoreExceptBMI } = userCore
 
@@ -52,6 +58,13 @@ const createUserResponseSchema = Type.Object({
   id
 })
 
+const createUserResponseHandlerSchema = Type.Object({
+  ...userCore,
+  email,
+  id,
+  verificationCode
+})
+
 const logInUserSchema = Type.Object({
   email,
   password: Type.String({ minLength: 8, maxLength: 15 })
@@ -62,7 +75,10 @@ const logInUserResponseSchema = Type.Object({
   refreshToken: Type.String()
 })
 
-const findUserParamsSchema = Type.Object({
+const refreshTokenResponseSchema = Type.Object({
+  accessToken: Type.String()
+})
+const findUserSchema = Type.Object({
   id: Type.String()
 })
 
@@ -77,6 +93,7 @@ const updateUserSchema = Type.Object({
   height: Type.Optional(userCoreExceptBMI.height),
   weight: Type.Optional(userCoreExceptBMI.weight),
   chronicDisorders: Type.Optional(userCoreExceptBMI.chronicDisorders),
+  BMI: Type.Optional(BMI),
   verified: Type.Optional(Type.Boolean())
 })
 
@@ -84,30 +101,57 @@ const verifyAccountResponseSchema = Type.Object({
   message: Type.String()
 })
 
+const verificationErrorResponseSchema = Type.Object({
+  message: Type.String()
+})
+
+const updateSessionSchema = Type.Object({
+  valid: Type.Optional(sessionCore.valid),
+  userId: Type.Optional(sessionCore.userId)
+})
+
+const refreshTokenHeaderSchema = Type.Object({
+  refresh: Type.String()
+})
+
 type CreateUserInput = Static<typeof createUserSchema>
-type CreateUserResponseSchema = Static<typeof createUserResponseSchema>
+type CreateUserResponse = Static<typeof createUserResponseSchema>
+type CreateUserResponseHandler = Static<typeof createUserResponseHandlerSchema>
 type LogInUserInput = Static<typeof logInUserSchema>
-type LogInUserResponseSchema = Static<typeof logInUserResponseSchema>
-type FindUserParamsSchema = Static<typeof findUserParamsSchema>
-type VerifyAccountParamsSchema = Static<typeof verifyAccountParamsSchema>
-type UpdateUserSchema = Static<typeof updateUserSchema>
-type VerifyAccountResponseSchema = Static<typeof verifyAccountResponseSchema>
+type LogInUserResponse = Static<typeof logInUserResponseSchema>
+type FindUserInput = Static<typeof findUserSchema>
+type VerifyAccountParamsInput = Static<typeof verifyAccountParamsSchema>
+type UpdateUserInput = Static<typeof updateUserSchema>
+type VerifyAccountResponse = Static<typeof verifyAccountResponseSchema>
+type UpdateSessionInput = Static<typeof updateSessionSchema>
+type VerificationErrorResponse = Static<typeof verificationErrorResponseSchema>
+type RefreshTokenHeaderInput = Static<typeof refreshTokenHeaderSchema>
+type RefreshTokenResponse = Static<typeof refreshTokenResponseSchema>
 
 export {
   createUserSchema,
   createUserResponseSchema,
+  createUserResponseHandlerSchema,
   logInUserSchema,
   logInUserResponseSchema,
-  findUserParamsSchema,
+  findUserSchema,
   verifyAccountParamsSchema,
   verifyAccountResponseSchema,
   updateUserSchema,
-  CreateUserResponseSchema,
+  verificationErrorResponseSchema,
+  refreshTokenHeaderSchema,
+  refreshTokenResponseSchema,
+  CreateUserResponse,
   CreateUserInput,
+  CreateUserResponseHandler,
   LogInUserInput,
-  LogInUserResponseSchema,
-  FindUserParamsSchema,
-  VerifyAccountParamsSchema,
-  VerifyAccountResponseSchema,
-  UpdateUserSchema
+  LogInUserResponse,
+  FindUserInput,
+  VerifyAccountParamsInput,
+  VerifyAccountResponse,
+  UpdateUserInput,
+  UpdateSessionInput,
+  VerificationErrorResponse,
+  RefreshTokenHeaderInput,
+  RefreshTokenResponse
 }

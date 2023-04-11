@@ -1,13 +1,16 @@
 import prisma, { User, Session } from '../../utils/database'
 import { calculateBMI } from '../../utils/helpers'
 import {
-  CreateUserInput, CreateUserResponseSchema, UpdateUserSchema
+  CreateUserInput,
+  CreateUserResponseHandler,
+  UpdateSessionInput,
+  UpdateUserInput
 } from './user.schemas'
 
 async function createUser (
   userInput: CreateUserInput
 ):
-  Promise<CreateUserResponseSchema> {
+  Promise<CreateUserResponseHandler> {
   const userToCreate = {
     ...userInput,
     BMI: calculateBMI(userInput)
@@ -22,7 +25,8 @@ async function createUser (
       gender: true,
       height: true,
       id: true,
-      weight: true
+      weight: true,
+      verificationCode: true
     }
   })
   return userCreated
@@ -36,15 +40,14 @@ async function createSession (userId: string): Promise<Session> {
   })
   return session
 }
-async function updateUser (userId: string, data: UpdateUserSchema): Promise<User> {
-  let BMI
-  let dataToUpdate: object = { ...data }
+
+async function updateUser (userId: string, data: UpdateUserInput): Promise<User> {
   if (typeof data.height !== 'undefined' || typeof data.weight !== 'undefined') {
     const user = await findUserUnique('id', userId) as User
     const newHeight = typeof data.height === 'undefined' ? user.height : data.height
     const newWeight = typeof data.weight === 'undefined' ? user.weight : data.weight
-    BMI = calculateBMI({ height: newHeight, weight: newWeight })
-    dataToUpdate = { ...dataToUpdate, BMI }
+    const BMI = calculateBMI({ height: newHeight, weight: newWeight })
+    data.BMI = BMI
   }
   // HAY QUE VER SI AL UPDATE DE CHRONICLE DISORDERS añadimos las nuevas o
   // las cambiamos todas
@@ -52,7 +55,7 @@ async function updateUser (userId: string, data: UpdateUserSchema): Promise<User
     where: {
       id: userId
     },
-    data: dataToUpdate
+    data
   })
   return user
 }
@@ -99,10 +102,75 @@ async function findUserUniqueOrThrow (
   return user
 }
 
+async function findSessionUnique (
+  uniqueIdentifier: 'id' | 'userId',
+  value: string
+): Promise<Session | null> {
+  let session
+  if (uniqueIdentifier === 'id') {
+    session = await prisma.session.findUnique({
+      where: {
+        id: value
+      }
+    })
+  } else {
+    session = await prisma.session.findUnique({
+      where: {
+        userId: value
+      }
+    })
+  }
+
+  return session
+}
+
+async function findSessionAndUserUnique (
+  uniqueIdentifier: 'userId' | 'id',
+  value: string
+): Promise<Session & { user: User } | null> {
+  let sessionWithUser
+  if (uniqueIdentifier === 'userId') {
+    sessionWithUser = await prisma.session.findUnique({
+      where: {
+        userId: value
+      },
+      include: {
+        user: true
+      }
+    })
+  } else {
+    sessionWithUser = await prisma.session.findUnique({
+      where: {
+        id: value
+      },
+      include: {
+        user: true
+      }
+    })
+  }
+  return sessionWithUser
+}
+
+async function updateSession (
+  sessionId: string,
+  data: UpdateSessionInput
+): Promise<Session> {
+  const session = await prisma.session.update({
+    where: {
+      id: sessionId
+    },
+    data
+  })
+  return session
+}
+
 export {
   createUser,
   createSession,
   updateUser,
   findUserUnique,
-  findUserUniqueOrThrow
+  findUserUniqueOrThrow,
+  findSessionUnique,
+  updateSession,
+  findSessionAndUserUnique
 }

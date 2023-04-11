@@ -1,7 +1,22 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { LogInUserInput } from '../../modules/user/user.schemas'
-import { findUserUnique } from '../../modules/user/user.services'
+import {
+  findSessionUnique,
+  findUserUnique
+} from '../../modules/user/user.services'
 import { User } from '@prisma/client'
+
+async function verifyAuthorizationHeader (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<void> {
+  try {
+    await request.accessVerify()
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
 
 async function verifyEmailAndPasswordHandler (
   request: FastifyRequest<{
@@ -21,8 +36,8 @@ async function verifyEmailAndPasswordHandler (
     }
     request.user = { userId: user.id }
   } catch (error) {
-    console.log(error)
-    return await reply.send(error)
+    console.error(error)
+    return await reply.code(500).send(error)
   }
 }
 
@@ -33,14 +48,14 @@ async function userVerified (
   try {
     const { userId } = request.user
     if (typeof userId === 'undefined') {
-      return await reply.code(400).send({ message: 'Please login your account' })
+      return await reply.code(401).send({ message: 'Please login your account' })
     }
     const user = await findUserUnique('id', userId) as User
     if (!user.verified) {
-      return await reply.code(400).send({ message: 'Please verify your account' })
+      return await reply.code(401).send({ message: 'Please verify your account' })
     }
   } catch (error) {
-    console.log(error)
+    console.error(error)
     return await reply.code(500).send(error)
   }
 }
@@ -59,13 +74,37 @@ async function isAdmin (
       return await reply.code(403).send({ message: 'Not enough privileges' })
     }
   } catch (error) {
-    console.log(error)
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
+async function verifySession (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<void> {
+  try {
+    const { userId } = request.user
+    if (typeof userId === 'undefined') {
+      return await reply.code(401).send({ message: 'Please login you account' })
+    }
+    const session = await findSessionUnique('userId', userId)
+    if (session === null) {
+      return await reply.code(401).send({ message: 'Please login you account' })
+    }
+    if (!session.valid) {
+      return await reply.code(401).send({ message: 'Invalid session. Please login' })
+    }
+  } catch (error) {
+    console.error(error)
     return await reply.code(500).send(error)
   }
 }
 
 export {
+  verifyAuthorizationHeader,
   verifyEmailAndPasswordHandler,
   userVerified,
-  isAdmin
+  isAdmin,
+  verifySession
 }

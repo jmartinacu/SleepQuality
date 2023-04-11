@@ -2,20 +2,22 @@ import { FastifyInstance } from 'fastify'
 import {
   createUserHandler,
   logInUserHandler,
-  getUserHandler,
-  verifyAccountHandler
+  getMeHandler,
+  verifyAccountHandler,
+  refreshAccessTokenHandler
 } from './user.controllers'
 import {
   CreateUserInput,
-  FindUserParamsSchema,
-  VerifyAccountParamsSchema,
+  VerifyAccountParamsInput,
   createUserResponseSchema,
   createUserSchema,
-  findUserParamsSchema,
   logInUserResponseSchema,
   logInUserSchema,
   verifyAccountParamsSchema,
-  verifyAccountResponseSchema
+  verifyAccountResponseSchema,
+  verificationErrorResponseSchema,
+  refreshTokenHeaderSchema,
+  refreshTokenResponseSchema
 } from './user.schemas'
 
 async function userRoutes (server: FastifyInstance): Promise<void> {
@@ -32,51 +34,69 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     },
     createUserHandler
   )
+
+  server.post('/refresh',
+    {
+      schema: {
+        headers: refreshTokenHeaderSchema,
+        response: {
+          200: refreshTokenResponseSchema,
+          401: verificationErrorResponseSchema,
+          400: verificationErrorResponseSchema
+        }
+      }
+    },
+    refreshAccessTokenHandler
+  )
+
   server.post('/login',
     {
       preHandler: server.auth([server.checkEmailAndPassword]),
       schema: {
         body: logInUserSchema,
         response: {
-          200: logInUserResponseSchema
+          200: logInUserResponseSchema,
+          401: verificationErrorResponseSchema
         }
       }
     },
     logInUserHandler
   )
 
-  server.get<{
-    Params: FindUserParamsSchema
-  }>('/:id',
+  server.get('/',
     {
       preHandler: server.auth([
         server.authenticate,
         server.checkUserVerification
       ]),
       schema: {
-        params: findUserParamsSchema,
         response: {
-          200: createUserResponseSchema
+          200: createUserResponseSchema,
+          401: verificationErrorResponseSchema
         }
       }
     },
-    getUserHandler
+    getMeHandler
   )
 
   server.get<{
-    Params: VerifyAccountParamsSchema
-  }>('/:id/:verificationCode',
+    Params: VerifyAccountParamsInput
+  }>('/verify/:id/:verificationCode',
     {
       schema: {
         params: verifyAccountParamsSchema,
         response: {
           200: verifyAccountResponseSchema,
-          400: verifyAccountResponseSchema
+          400: verificationErrorResponseSchema
         }
       }
     },
     verifyAccountHandler
   )
+
+  // FALTA RUTA NUEVA CONTRASEÑA
+  // QUE VAN A SER DOS RUTAS UNA PARA PEDIR EL CODIGO POR EMAIL
+  // Y OTRA PARA VERIFICAR QUE ESE CODIGO ESE CORRECTO Y CAMBIAR LA CONTRASEÑA
 }
 
 export default userRoutes

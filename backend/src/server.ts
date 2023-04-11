@@ -1,4 +1,5 @@
 import Fastify, { FastifyInstance } from 'fastify'
+import { JWT } from '@fastify/jwt'
 import fastifyCors from '@fastify/cors'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import userRoutes from './modules/user/user.routes'
@@ -9,7 +10,9 @@ declare module 'fastify' {
     checkEmailAndPassword: any
     checkUserVerification: any
     checkAdmin: any
+    checkSession: any
     authenticate: any
+    jwt: JWT
   }
   interface FastifyRequest {
     accessVerify: any
@@ -25,6 +28,10 @@ declare module '@fastify/jwt' {
   interface FastifyJWT {
     payload: { id: string }
     user: { userId?: string }
+  }
+  interface JWT {
+    access: any
+    refresh: any
   }
 }
 

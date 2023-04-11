@@ -6,11 +6,15 @@ import config from 'config'
 import {
   FastifyInstance,
   FastifyPluginAsync,
-  FastifyPluginOptions,
-  FastifyRequest,
-  FastifyReply
+  FastifyPluginOptions
 } from 'fastify'
-import { verifyEmailAndPasswordHandler, userVerified, isAdmin } from './auth.controller'
+import {
+  verifyEmailAndPasswordHandler,
+  userVerified,
+  isAdmin,
+  verifySession,
+  verifyAuthorizationHeader
+} from './auth.controller'
 
 const pluginAuthorization: FastifyPluginAsync = async (
   fastify: FastifyInstance,
@@ -49,22 +53,15 @@ const pluginAuthorization: FastifyPluginAsync = async (
     defaultRelation: 'and'
   })
 
-  fastify.decorate('authenticate', async (
-    request: FastifyRequest,
-    reply: FastifyReply
-  ) => {
-    try {
-      await request.accessVerify()
-    } catch (error) {
-      return await reply.send(error)
-    }
-  })
+  fastify.decorate('authenticate', verifyAuthorizationHeader)
 
   fastify.decorate('checkEmailAndPassword', verifyEmailAndPasswordHandler)
 
   fastify.decorate('checkUserVerification', userVerified)
 
   fastify.decorate('checkAdmin', isAdmin)
+
+  fastify.decorate('checkSession', verifySession)
 }
 
 export default fastifyPlugin(pluginAuthorization, {

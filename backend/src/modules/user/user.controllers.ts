@@ -1,14 +1,31 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { CreateUserInput, CreateUserResponseSchema, FindUserParamsSchema, LogInUserResponseSchema, VerifyAccountParamsSchema } from './user.schemas'
-import { createSession, createUser, findUserUnique, updateUser } from './user.services'
+import {
+  CreateUserInput,
+  CreateUserResponse,
+  LogInUserResponse,
+  RefreshTokenHeaderInput,
+  RefreshTokenResponse,
+  VerifyAccountParamsInput
+} from './user.schemas'
+import {
+  createSession,
+  createUser,
+  findSessionAndUserUnique,
+  findSessionUnique,
+  findUserUnique,
+  updateSession,
+  updateUser
+} from './user.services'
 import sendEmail from '../../utils/mailer'
+import { Session, User } from '@prisma/client'
+import { checkTimeDiffDateUntilNow } from '../../utils/helpers'
 
 async function createUserHandler (
   request: FastifyRequest<{
     Body: CreateUserInput
   }>,
   reply: FastifyReply
-): Promise<CreateUserResponseSchema> {
+): Promise<CreateUserResponse> {
   try {
     const { password, ...rest } = request.body
 
@@ -21,12 +38,12 @@ async function createUserHandler (
     await sendEmail({
       from: 'test@example.com',
       to: user.email,
-      text: 'NodeMailer funciona en nuestra app'
+      text: `Verification Code: ${user.verificationCode}. ID: ${user.id}`
     })
 
     return await reply.code(201).send(user)
   } catch (error) {
-    console.log(error)
+    console.error(error)
     return await reply.code(500).send(error)
   }
 }
@@ -34,11 +51,18 @@ async function createUserHandler (
 async function logInUserHandler (
   request: FastifyRequest,
   reply: FastifyReply
-): Promise<LogInUserResponseSchema> {
+): Promise<LogInUserResponse> {
   try {
     const { userId } = request.user as { userId: string }
-    // MIRAR SI YA TIENE UNA SESIÓN CREADA EL USUARIO
-    const { id: sessionId } = await createSession(userId)
+    let sessionId
+    const session = await findSessionUnique('userId', userId)
+    if (session !== null) {
+      const { id } = await updateSession(session.id, { valid: true })
+      sessionId = id
+    } else {
+      const newSession = await createSession(userId)
+      sessionId = newSession.id
+    }
     const accessToken = await reply.accessSign({ userId })
     const refreshToken = await reply.refreshSign({ sessionId })
     return {
@@ -46,30 +70,28 @@ async function logInUserHandler (
       refreshToken
     }
   } catch (error) {
-    console.log(error)
+    console.error(error)
     return await reply.code(500).send(error)
   }
 }
 
-async function getUserHandler (
-  request: FastifyRequest<{
-    Params: FindUserParamsSchema
-  }>,
+async function getMeHandler (
+  request: FastifyRequest,
   reply: FastifyReply
-): Promise<CreateUserResponseSchema> {
+): Promise<CreateUserResponse> {
   try {
-    const { id } = request.params
-    const user = await findUserUnique('id', id)
+    const { userId } = request.user as { userId: string }
+    const { user } = await findSessionAndUserUnique('userId', userId) as Session & { user: User }
     return await reply.send(user)
   } catch (error) {
-    console.log(error)
+    console.error(error)
     return await reply.code(500).send(error)
   }
 }
 
 async function verifyAccountHandler (
   request: FastifyRequest<{
-    Params: VerifyAccountParamsSchema
+    Params: VerifyAccountParamsInput
   }>,
   reply: FastifyReply
 ): Promise<void> {
@@ -93,9 +115,43 @@ async function verifyAccountHandler (
   }
 }
 
+async function refreshAccessTokenHandler (
+  request: FastifyRequest<{
+    Headers: RefreshTokenHeaderInput
+  }>,
+  reply: FastifyReply
+): Promise<RefreshTokenResponse> {
+  try {
+    const jwtRefreshFunctionality = request.server.jwt.refresh
+    const { refresh } = request.headers
+    await jwtRefreshFunctionality.verify(refresh)
+    const decodedRefreshToken = jwtRefreshFunctionality.decode(refresh)
+    if (decodedRefreshToken === null) {
+      return await reply.code(401).send({ message: 'Could not refresh Access Token' })
+    }
+    const { id, valid, updatedAt, userId } = await findSessionUnique('id', decodedRefreshToken.sessionId) as Session
+    if (!valid) {
+      return await reply.code(401).send({ message: 'Could not refresh Access Token' })
+    }
+    // aquí estoy mirando si ha pasado mas de un dia desde el ultimo login
+    if (checkTimeDiffDateUntilNow(updatedAt, 1)) {
+      await updateSession(id, { valid: false })
+      return await reply.code(400).send({ message: 'Refresh Token time limit exceeded, please login' })
+    }
+    const accessToken = await reply.accessSign({ userId })
+    return {
+      accessToken
+    }
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
 export {
   createUserHandler,
   logInUserHandler,
-  getUserHandler,
-  verifyAccountHandler
+  getMeHandler,
+  verifyAccountHandler,
+  refreshAccessTokenHandler
 }

@@ -9,6 +9,13 @@ function calculateBMI ({
   return Number(BMI.toFixed(3))
 }
 
+function checkTimeDiffDateUntilNow (date: Date, timeInDays: number): boolean {
+  const millisecondsToDays = 1000 * 60 * 60 * 24
+  const timeDiff = (new Date().getTime() - date.getTime()) / millisecondsToDays
+  return timeDiff > timeInDays
+}
+
 export {
-  calculateBMI
+  calculateBMI,
+  checkTimeDiffDateUntilNow
 }
