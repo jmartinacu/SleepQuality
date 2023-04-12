@@ -4,7 +4,8 @@ import {
   logInUserHandler,
   getMeHandler,
   verifyAccountHandler,
-  refreshAccessTokenHandler
+  refreshAccessTokenHandler,
+  forgotPasswordHandler
 } from './user.controllers'
 import {
   createUserResponseSchema,
@@ -15,7 +16,8 @@ import {
   verifyAccountResponseSchema,
   verificationErrorResponseSchema,
   refreshTokenHeaderSchema,
-  refreshTokenResponseSchema
+  refreshTokenResponseSchema,
+  forgotPasswordSchema
 } from './user.schemas'
 
 async function userRoutes (server: FastifyInstance): Promise<void> {
@@ -86,6 +88,19 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       }
     },
     verifyAccountHandler
+  )
+
+  server.post('/forgotpassword',
+    {
+      schema: {
+        params: forgotPasswordSchema,
+        response: {
+          200: verifyAccountResponseSchema,
+          401: verificationErrorResponseSchema
+        }
+      }
+    },
+    forgotPasswordHandler
   )
 
   // FALTA RUTA NUEVA CONTRASEÑA

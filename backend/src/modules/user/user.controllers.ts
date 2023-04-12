@@ -1,11 +1,14 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
+import crypto from 'node:crypto'
 import {
   CreateUserInput,
   CreateUserResponse,
+  ForgotPasswordInput,
   LogInUserResponse,
   RefreshTokenHeaderInput,
   RefreshTokenResponse,
-  VerifyAccountParamsInput
+  VerifyAccountParamsInput,
+  VerifyAccountResponse
 } from './user.schemas'
 import {
   createSession,
@@ -150,10 +153,40 @@ async function refreshAccessTokenHandler (
   }
 }
 
+async function forgotPasswordHandler (
+  request: FastifyRequest<{
+    Body: ForgotPasswordInput
+  }>,
+  reply: FastifyReply): Promise<VerifyAccountResponse> {
+  try {
+    const { email } = request.body
+    const message = `If user with email equal ${email} is registered, he will received an email to reset his password`
+    const user = await findUserUnique('email', email)
+    if (user === null) {
+      return await reply.send({ message })
+    }
+    if (!user.verified) {
+      return await reply.code(401).send({ message: 'User not verify, please verify you account' })
+    }
+    const passwordResetCode = crypto.randomBytes(20).toString('hex')
+    await updateUser(user.id, { passwordResetCode })
+    await sendEmail({
+      from: 'test@example.com',
+      to: user.email,
+      text: `Password reset code: ${passwordResetCode}`
+    })
+    return await reply.send({ message })
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
 export {
   createUserHandler,
   logInUserHandler,
   getMeHandler,
   verifyAccountHandler,
-  refreshAccessTokenHandler
+  refreshAccessTokenHandler,
+  forgotPasswordHandler
 }

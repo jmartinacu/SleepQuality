@@ -94,7 +94,8 @@ const updateUserSchema = Type.Object({
   weight: Type.Optional(userCoreExceptBMI.weight),
   chronicDisorders: Type.Optional(userCoreExceptBMI.chronicDisorders),
   BMI: Type.Optional(BMI),
-  verified: Type.Optional(Type.Boolean())
+  verified: Type.Optional(Type.Boolean()),
+  passwordResetCode: Type.Optional(Type.String())
 })
 
 const verifyAccountResponseSchema = Type.Object({
@@ -114,6 +115,10 @@ const refreshTokenHeaderSchema = Type.Object({
   refresh: Type.String()
 })
 
+const forgotPasswordSchema = Type.Object({
+  email
+})
+
 type CreateUserInput = Static<typeof createUserSchema>
 type CreateUserResponse = Static<typeof createUserResponseSchema>
 type CreateUserResponseHandler = Static<typeof createUserResponseHandlerSchema>
@@ -127,6 +132,7 @@ type UpdateSessionInput = Static<typeof updateSessionSchema>
 type VerificationErrorResponse = Static<typeof verificationErrorResponseSchema>
 type RefreshTokenHeaderInput = Static<typeof refreshTokenHeaderSchema>
 type RefreshTokenResponse = Static<typeof refreshTokenResponseSchema>
+type ForgotPasswordInput = Static<typeof forgotPasswordSchema>
 
 export {
   createUserSchema,
@@ -141,6 +147,7 @@ export {
   verificationErrorResponseSchema,
   refreshTokenHeaderSchema,
   refreshTokenResponseSchema,
+  forgotPasswordSchema,
   CreateUserResponse,
   CreateUserInput,
   CreateUserResponseHandler,
@@ -153,5 +160,6 @@ export {
   UpdateSessionInput,
   VerificationErrorResponse,
   RefreshTokenHeaderInput,
-  RefreshTokenResponse
+  RefreshTokenResponse,
+  ForgotPasswordInput
 }
