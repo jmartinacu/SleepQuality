@@ -7,8 +7,6 @@ import {
   refreshAccessTokenHandler
 } from './user.controllers'
 import {
-  CreateUserInput,
-  VerifyAccountParamsInput,
   createUserResponseSchema,
   createUserSchema,
   logInUserResponseSchema,
@@ -21,9 +19,7 @@ import {
 } from './user.schemas'
 
 async function userRoutes (server: FastifyInstance): Promise<void> {
-  server.post<{
-    Body: CreateUserInput
-  }>('/',
+  server.post('/',
     {
       schema: {
         body: createUserSchema,
@@ -79,9 +75,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     getMeHandler
   )
 
-  server.get<{
-    Params: VerifyAccountParamsInput
-  }>('/verify/:id/:verificationCode',
+  server.get('/verify/:id/:verificationCode',
     {
       schema: {
         params: verifyAccountParamsSchema,

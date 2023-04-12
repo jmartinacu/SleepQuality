@@ -35,7 +35,7 @@ const pluginAuthorization: FastifyPluginAsync = async (
   void fastify.register(fastifyJwt, {
     secret: accessKey,
     sign: {
-      expiresIn: '15m'
+      expiresIn: '10m'
     },
     namespace: 'access',
     jwtVerify: 'accessVerify',

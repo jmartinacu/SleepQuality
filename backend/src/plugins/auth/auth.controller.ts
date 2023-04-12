@@ -4,7 +4,7 @@ import {
   findSessionUnique,
   findUserUnique
 } from '../../modules/user/user.services'
-import { User } from '@prisma/client'
+import { User } from '../../utils/database'
 
 async function verifyAuthorizationHeader (
   request: FastifyRequest,

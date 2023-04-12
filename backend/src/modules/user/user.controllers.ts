@@ -17,8 +17,8 @@ import {
   updateUser
 } from './user.services'
 import sendEmail from '../../utils/mailer'
-import { Session, User } from '@prisma/client'
-import { checkTimeDiffDateUntilNow } from '../../utils/helpers'
+import { Session, User } from '../../utils/database'
+import { checkTimeDiffGivenDateUntilNow } from '../../utils/helpers'
 
 async function createUserHandler (
   request: FastifyRequest<{
@@ -81,7 +81,10 @@ async function getMeHandler (
 ): Promise<CreateUserResponse> {
   try {
     const { userId } = request.user as { userId: string }
-    const { user } = await findSessionAndUserUnique('userId', userId) as Session & { user: User }
+    const { user, valid } = await findSessionAndUserUnique('userId', userId) as Session & { user: User }
+    if (!valid) {
+      return await reply.code(401).send({ message: 'Session expired, please login' })
+    }
     return await reply.send(user)
   } catch (error) {
     console.error(error)
@@ -133,8 +136,7 @@ async function refreshAccessTokenHandler (
     if (!valid) {
       return await reply.code(401).send({ message: 'Could not refresh Access Token' })
     }
-    // aquí estoy mirando si ha pasado mas de un dia desde el ultimo login
-    if (checkTimeDiffDateUntilNow(updatedAt, 1)) {
+    if (checkTimeDiffGivenDateUntilNow(updatedAt, 1)) {
       await updateSession(id, { valid: false })
       return await reply.code(400).send({ message: 'Refresh Token time limit exceeded, please login' })
     }
