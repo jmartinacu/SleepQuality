@@ -5,7 +5,8 @@ import {
   getMeHandler,
   verifyAccountHandler,
   refreshAccessTokenHandler,
-  forgotPasswordHandler
+  forgotPasswordHandler,
+  resetPasswordHandler
 } from './user.controllers'
 import {
   createUserResponseSchema,
@@ -17,9 +18,14 @@ import {
   verificationErrorResponseSchema,
   refreshTokenHeaderSchema,
   refreshTokenResponseSchema,
-  forgotPasswordSchema
+  forgotPasswordSchema,
+  resetPasswordParamsSchema,
+  resetPasswordBodySchema
 } from './user.schemas'
 
+// CUANDO NO SE LE PASA UN OBJECT ID VALIDO A PRISMA PETA CON UN 500
+// Y ENSEÑA AL USUARIO DATOS IMPORTANTES CAMBIAR ESO EN EL FUTURO
+// PARA MANDAR UN ERROR SINTÁCTICO Y DARLE AL USUARIO UN 404
 async function userRoutes (server: FastifyInstance): Promise<void> {
   server.post('/',
     {
@@ -63,10 +69,8 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
 
   server.get('/',
     {
-      preHandler: server.auth([
-        server.authenticate,
-        server.checkUserVerification
-      ]),
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkUserVerification]),
       schema: {
         response: {
           200: createUserResponseSchema,
@@ -93,7 +97,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
   server.post('/forgotpassword',
     {
       schema: {
-        params: forgotPasswordSchema,
+        body: forgotPasswordSchema,
         response: {
           200: verifyAccountResponseSchema,
           401: verificationErrorResponseSchema
@@ -103,9 +107,21 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     forgotPasswordHandler
   )
 
-  // FALTA RUTA NUEVA CONTRASEÑA
-  // QUE VAN A SER DOS RUTAS UNA PARA PEDIR EL CODIGO POR EMAIL
-  // Y OTRA PARA VERIFICAR QUE ESE CODIGO ESE CORRECTO Y CAMBIAR LA CONTRASEÑA
+  server.post('/resetpassword/:id/:passwordResetCode',
+    {
+      schema: {
+        params: resetPasswordParamsSchema,
+        body: resetPasswordBodySchema,
+        response: {
+          200: verifyAccountResponseSchema,
+          404: verificationErrorResponseSchema,
+          401: verificationErrorResponseSchema,
+          403: verificationErrorResponseSchema
+        }
+      }
+    },
+    resetPasswordHandler
+  )
 }
 
 export default userRoutes
