@@ -19,8 +19,39 @@ function random (min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
+function htmlVerifyUser (verificationLink: string): string {
+  return `
+    <div class="verify-user-card">
+      <p>Please click in the following link: </p>
+      <a href=${verificationLink}>Click here!!!</a>
+    </div>
+    <style>
+      .verify-user-card {
+        display: grid;
+        align-items: center;
+      }
+    </style>
+    `
+}
+
+function htmlResetPasswordUser (passwordResetCode: number): string {
+  return `
+    <div class="reset-user-password-card">
+      <p>Your reset code is: ${passwordResetCode}</p>
+    </div>
+    <style>
+      .reset-user-password-card {
+        display: grid;
+        align-items: center;
+      }
+    </style>
+    `
+}
+
 export {
   calculateBMI,
   checkTimeDiffGivenDateUntilNow,
-  random
+  random,
+  htmlVerifyUser,
+  htmlResetPasswordUser
 }

@@ -22,7 +22,7 @@ import {
 } from './user.services'
 import sendEmail from '../../utils/mailer'
 import { Session, User } from '../../utils/database'
-import { checkTimeDiffGivenDateUntilNow, random } from '../../utils/helpers'
+import { checkTimeDiffGivenDateUntilNow, htmlResetPasswordUser, htmlVerifyUser, random } from '../../utils/helpers'
 
 async function createUserHandler (
   request: FastifyRequest<{
@@ -32,17 +32,20 @@ async function createUserHandler (
 ): Promise<CreateUserResponse> {
   try {
     const { password, ...rest } = request.body
+    // const { server } = request
 
     const passwordHash = await request.bcryptHash(password)
 
     const user = await createUser({ ...rest, password: passwordHash })
 
-    if (typeof user === 'undefined') throw new Error('Error while creating user')
+    const verificationLink = `http://127.0.0.1:8080/api/users/verify/${user.id}/${user.verificationCode}`
+
+    const html = htmlVerifyUser(verificationLink)
 
     await sendEmail({
       from: 'test@example.com',
       to: user.email,
-      text: `Verification Code: ${user.verificationCode}. ID: ${user.id}`
+      html
     })
 
     return await reply.code(201).send(user)
@@ -161,7 +164,6 @@ async function forgotPasswordHandler (
   reply: FastifyReply): Promise<VerifyAccountResponse> {
   try {
     const { email } = request.body
-    const { server } = request
     const message = `If user with email equal ${email} is registered, he will received an email to reset his password`
     const user = await findUserUnique('email', email)
     if (user === null) {
@@ -172,10 +174,9 @@ async function forgotPasswordHandler (
     }
     const passwordResetCode = random(10000, 99999)
     await updateUser(user.id, { passwordResetCode })
-    const html = await server.view(
-      'reset-password.template.hbs',
-      { passwordResetCode }
-    )
+
+    const html = htmlResetPasswordUser(passwordResetCode)
+
     await sendEmail({
       from: 'test@example.com',
       to: user.email,
