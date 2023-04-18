@@ -44,8 +44,10 @@
   "ts-standard": {
     "ignore": [
       "build",
+      "config",
+      "node_modules",
       "prisma",
-      "node_modules"
+      "templates"
     ]
   }
 }

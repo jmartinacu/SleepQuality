@@ -87,6 +87,15 @@ const verifyAccountParamsSchema = Type.Object({
   verificationCode: Type.String()
 })
 
+const resetPasswordParamsSchema = Type.Object({
+  id: Type.String(),
+  passwordResetCode: Type.Integer()
+})
+
+const resetPasswordBodySchema = Type.Object({
+  password
+})
+
 const updateUserSchema = Type.Object({
   age: Type.Optional(userCoreExceptBMI.age),
   gender: Type.Optional(userCoreExceptBMI.gender),
@@ -94,7 +103,12 @@ const updateUserSchema = Type.Object({
   weight: Type.Optional(userCoreExceptBMI.weight),
   chronicDisorders: Type.Optional(userCoreExceptBMI.chronicDisorders),
   BMI: Type.Optional(BMI),
-  verified: Type.Optional(Type.Boolean())
+  verified: Type.Optional(Type.Boolean()),
+  passwordResetCode: Type.Optional(Type.Union([
+    Type.Integer(),
+    Type.Null()
+  ])),
+  password: Type.Optional(Type.String())
 })
 
 const verifyAccountResponseSchema = Type.Object({
@@ -114,6 +128,10 @@ const refreshTokenHeaderSchema = Type.Object({
   refresh: Type.String()
 })
 
+const forgotPasswordSchema = Type.Object({
+  email
+})
+
 type CreateUserInput = Static<typeof createUserSchema>
 type CreateUserResponse = Static<typeof createUserResponseSchema>
 type CreateUserResponseHandler = Static<typeof createUserResponseHandlerSchema>
@@ -127,6 +145,9 @@ type UpdateSessionInput = Static<typeof updateSessionSchema>
 type VerificationErrorResponse = Static<typeof verificationErrorResponseSchema>
 type RefreshTokenHeaderInput = Static<typeof refreshTokenHeaderSchema>
 type RefreshTokenResponse = Static<typeof refreshTokenResponseSchema>
+type ForgotPasswordInput = Static<typeof forgotPasswordSchema>
+type ResetPasswordParamsInput = Static<typeof resetPasswordParamsSchema>
+type ResetPasswordBodyInput = Static<typeof resetPasswordBodySchema>
 
 export {
   createUserSchema,
@@ -141,6 +162,11 @@ export {
   verificationErrorResponseSchema,
   refreshTokenHeaderSchema,
   refreshTokenResponseSchema,
+  forgotPasswordSchema,
+  resetPasswordParamsSchema,
+  resetPasswordBodySchema,
+  ResetPasswordBodyInput,
+  ResetPasswordParamsInput,
   CreateUserResponse,
   CreateUserInput,
   CreateUserResponseHandler,
@@ -153,5 +179,6 @@ export {
   UpdateSessionInput,
   VerificationErrorResponse,
   RefreshTokenHeaderInput,
-  RefreshTokenResponse
+  RefreshTokenResponse,
+  ForgotPasswordInput
 }

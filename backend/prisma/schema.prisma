@@ -20,7 +20,7 @@ model User {
   BMI Float
   role Role @default(USER)
   verificationCode String @default(uuid())
-  passwordResetCode String?
+  passwordResetCode Int?
   verified Boolean @default(false)
   session Session?
 }

@@ -2,10 +2,14 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 import {
   CreateUserInput,
   CreateUserResponse,
+  ForgotPasswordInput,
   LogInUserResponse,
   RefreshTokenHeaderInput,
   RefreshTokenResponse,
-  VerifyAccountParamsInput
+  ResetPasswordBodyInput,
+  ResetPasswordParamsInput,
+  VerifyAccountParamsInput,
+  VerifyAccountResponse
 } from './user.schemas'
 import {
   createSession,
@@ -18,7 +22,7 @@ import {
 } from './user.services'
 import sendEmail from '../../utils/mailer'
 import { Session, User } from '../../utils/database'
-import { checkTimeDiffGivenDateUntilNow } from '../../utils/helpers'
+import { checkTimeDiffGivenDateUntilNow, htmlResetPasswordUser, htmlVerifyUser, random } from '../../utils/helpers'
 
 async function createUserHandler (
   request: FastifyRequest<{
@@ -28,17 +32,20 @@ async function createUserHandler (
 ): Promise<CreateUserResponse> {
   try {
     const { password, ...rest } = request.body
+    // const { server } = request
 
     const passwordHash = await request.bcryptHash(password)
 
     const user = await createUser({ ...rest, password: passwordHash })
 
-    if (typeof user === 'undefined') throw new Error('Error while creating user')
+    const verificationLink = `http://127.0.0.1:8080/api/users/verify/${user.id}/${user.verificationCode}`
+
+    const html = htmlVerifyUser(verificationLink)
 
     await sendEmail({
       from: 'test@example.com',
       to: user.email,
-      text: `Verification Code: ${user.verificationCode}. ID: ${user.id}`
+      html
     })
 
     return await reply.code(201).send(user)
@@ -150,10 +157,72 @@ async function refreshAccessTokenHandler (
   }
 }
 
+async function forgotPasswordHandler (
+  request: FastifyRequest<{
+    Body: ForgotPasswordInput
+  }>,
+  reply: FastifyReply): Promise<VerifyAccountResponse> {
+  try {
+    const { email } = request.body
+    const message = `If user with email equal ${email} is registered, he will received an email to reset his password`
+    const user = await findUserUnique('email', email)
+    if (user === null) {
+      return await reply.send({ message })
+    }
+    if (!user.verified) {
+      return await reply.code(401).send({ message: 'User not verify, please verify you account' })
+    }
+    const passwordResetCode = random(10000, 99999)
+    await updateUser(user.id, { passwordResetCode })
+
+    const html = htmlResetPasswordUser(passwordResetCode)
+
+    await sendEmail({
+      from: 'test@example.com',
+      to: user.email,
+      html
+    })
+    return await reply.send({ message })
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
+async function resetPasswordHandler (
+  request: FastifyRequest<{
+    Params: ResetPasswordParamsInput
+    Body: ResetPasswordBodyInput
+  }>,
+  reply: FastifyReply
+): Promise<VerifyAccountResponse> {
+  try {
+    const { id, passwordResetCode } = request.params
+    const { password } = request.body
+    const user = await findUserUnique('id', id)
+    if (user === null) {
+      return await reply.code(404).send({ message: 'User not found' })
+    }
+    if (!user.verified) {
+      return await reply.code(401).send({ message: 'User not verify, please verify you account' })
+    }
+    if (user.passwordResetCode !== passwordResetCode) {
+      return await reply.code(403).send({ message: 'Reset Code invalid' })
+    }
+    await updateUser(id, { passwordResetCode: null, password })
+    return await reply.send({ message: 'Password reset' })
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
 export {
   createUserHandler,
   logInUserHandler,
   getMeHandler,
   verifyAccountHandler,
-  refreshAccessTokenHandler
+  refreshAccessTokenHandler,
+  forgotPasswordHandler,
+  resetPasswordHandler
 }
