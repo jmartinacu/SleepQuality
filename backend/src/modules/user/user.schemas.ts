@@ -39,6 +39,7 @@ const userExtent = {
       Type.Literal('USER')
     ])),
   verificationCode: Type.String(),
+  avatar: Type.Uint8Array(),
   id: Type.String()
 }
 
@@ -165,20 +166,20 @@ export {
   forgotPasswordSchema,
   resetPasswordParamsSchema,
   resetPasswordBodySchema,
-  ResetPasswordBodyInput,
-  ResetPasswordParamsInput,
-  CreateUserResponse,
-  CreateUserInput,
-  CreateUserResponseHandler,
-  LogInUserInput,
-  LogInUserResponse,
-  FindUserInput,
-  VerifyAccountParamsInput,
-  VerifyAccountResponse,
-  UpdateUserInput,
-  UpdateSessionInput,
-  VerificationErrorResponse,
-  RefreshTokenHeaderInput,
-  RefreshTokenResponse,
-  ForgotPasswordInput
+  type ResetPasswordBodyInput,
+  type ResetPasswordParamsInput,
+  type CreateUserResponse,
+  type CreateUserInput,
+  type CreateUserResponseHandler,
+  type LogInUserInput,
+  type LogInUserResponse,
+  type FindUserInput,
+  type VerifyAccountParamsInput,
+  type VerifyAccountResponse,
+  type UpdateUserInput,
+  type UpdateSessionInput,
+  type VerificationErrorResponse,
+  type RefreshTokenHeaderInput,
+  type RefreshTokenResponse,
+  type ForgotPasswordInput
 }

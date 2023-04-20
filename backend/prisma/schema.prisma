@@ -33,10 +33,27 @@ model Session {
   userId String @unique @db.ObjectId
 }
 
+model Questionnaires {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  question Json
+  createdAt DateTime @default(now())
+  updadatedAt DateTime @updatedAt
+}
+
 enum Gender {
   MASCULINE
   FEMININE
   NEUTER
+}
+
+enum QuestionTypes {
+  PRIMARY_TEXT
+  PRIMARY_NUMBER
+  PRIMARY_BOOL
+  SECONDARY_TEXT
+  SECONDARY_NUMBER
+  SECONDARY_BOOL
 }
 
 enum Role {

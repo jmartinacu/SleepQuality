@@ -1,6 +1,6 @@
-import prisma, { User, Session } from '../../utils/database'
+import prisma, { type User, type Session } from '../../utils/database'
 import { calculateBMI } from '../../utils/helpers'
-import {
+import type {
   CreateUserInput,
   CreateUserResponseHandler,
   UpdateSessionInput,

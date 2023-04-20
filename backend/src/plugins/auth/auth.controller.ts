@@ -1,10 +1,10 @@
-import { FastifyRequest, FastifyReply } from 'fastify'
-import { LogInUserInput } from '../../modules/user/user.schemas'
+import type { FastifyRequest, FastifyReply } from 'fastify'
+import type { LogInUserInput } from '../../modules/user/user.schemas'
 import {
   findSessionUnique,
   findUserUnique
 } from '../../modules/user/user.services'
-import { User } from '../../utils/database'
+import type { User } from '../../utils/database'
 
 async function verifyAuthorizationHeader (
   request: FastifyRequest,

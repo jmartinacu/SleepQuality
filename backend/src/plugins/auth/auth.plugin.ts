@@ -1,9 +1,9 @@
 import fastifyPlugin from 'fastify-plugin'
-import { fastifyBcrypt } from 'fastify-bcrypt'
+import fastifyBcrypt from 'fastify-bcrypt'
 import fastifyAuth from '@fastify/auth'
 import fastifyJwt from '@fastify/jwt'
 import config from 'config'
-import {
+import type {
   FastifyInstance,
   FastifyPluginAsync,
   FastifyPluginOptions

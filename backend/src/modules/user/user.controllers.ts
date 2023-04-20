@@ -1,5 +1,5 @@
-import { FastifyReply, FastifyRequest } from 'fastify'
-import {
+import type { FastifyReply, FastifyRequest } from 'fastify'
+import type {
   CreateUserInput,
   CreateUserResponse,
   ForgotPasswordInput,
@@ -21,8 +21,13 @@ import {
   updateUser
 } from './user.services'
 import sendEmail from '../../utils/mailer'
-import { Session, User } from '../../utils/database'
-import { checkTimeDiffGivenDateUntilNow, htmlResetPasswordUser, htmlVerifyUser, random } from '../../utils/helpers'
+import type { Session, User } from '../../utils/database'
+import {
+  checkTimeDiffGivenDateUntilNow,
+  htmlResetPasswordUser,
+  htmlVerifyUser,
+  random
+} from '../../utils/helpers'
 
 async function createUserHandler (
   request: FastifyRequest<{
@@ -32,13 +37,12 @@ async function createUserHandler (
 ): Promise<CreateUserResponse> {
   try {
     const { password, ...rest } = request.body
-    // const { server } = request
 
     const passwordHash = await request.bcryptHash(password)
 
     const user = await createUser({ ...rest, password: passwordHash })
 
-    const verificationLink = `http://127.0.0.1:8080/api/users/verify/${user.id}/${user.verificationCode}`
+    const verificationLink = `${request.protocol}://${request.hostname}/api/users/verify/${user.id}/${user.verificationCode}`
 
     const html = htmlVerifyUser(verificationLink)
 

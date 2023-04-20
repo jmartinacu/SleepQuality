@@ -1,8 +1,9 @@
-import Fastify, { FastifyInstance } from 'fastify'
-import { JWT } from '@fastify/jwt'
+import Fastify, { type FastifyInstance } from 'fastify'
+import type { JWT } from '@fastify/jwt'
 import fastifyCors from '@fastify/cors'
-import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
+import type { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import userRoutes from './modules/user/user.routes'
+import questionnaireRoutes from './modules/questionnaire/questionnaire.routes'
 import authPlugin from './plugins/auth/auth.plugin'
 
 declare module 'fastify' {
@@ -52,6 +53,7 @@ const buildServer = (): FastifyInstance => {
     })
 
     void server.register(userRoutes, { prefix: 'api/users' })
+    void server.register(questionnaireRoutes, { prefix: 'api/questionnaires' })
   })
 
   return server

@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify'
+import type { FastifyInstance } from 'fastify'
 import {
   createUserHandler,
   logInUserHandler,
@@ -24,7 +24,7 @@ import {
 } from './user.schemas'
 
 // CUANDO NO SE LE PASA UN OBJECT ID VALIDO A PRISMA PETA CON UN 500
-// Y ENSEÑA AL USUARIO DATOS IMPORTANTES CAMBIAR ESO EN EL FUTURO
+// Y ENSEÑA AL USUARIO DATOS PRISMA CAMBIAR ESO EN EL FUTURO
 // PARA MANDAR UN ERROR SINTÁCTICO Y DARLE AL USUARIO UN 404
 async function userRoutes (server: FastifyInstance): Promise<void> {
   server.post('/',
