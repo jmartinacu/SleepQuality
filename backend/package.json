@@ -5,8 +5,8 @@
   "main": "build/app.js",
   "scripts": {
     "start": "node build/app.js",
-    "dev": "dotenv -e .env.development -- ts-node-dev src/app.ts",
-    "test": "dotenv -e .env.test -- tap --node-arg=--require=ts-node/register",
+    "dev": "set NODE_ENV=development&& dotenv -e .env.development -- ts-node-dev src/app.ts",
+    "test": "set NODE_ENV=test&& dotenv -e .env.test -- tap --node-arg=--require=ts-node/register",
     "tsc": "tsc --project tsconfig.build.json",
     "lint": "ts-standard"
   },

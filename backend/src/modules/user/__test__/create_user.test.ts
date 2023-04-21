@@ -6,7 +6,7 @@ import prisma from '../../../utils/database'
 import * as userServices from '../user.services'
 import { CreateUserResponse } from '../user.schemas'
 
-void test('POST `api/users` - create user successfully with test database',
+void test('POST `api/users` - Happy Path: create user successfully with test database',
   async (t) => {
     t.teardown(async () => {
       await fastify.close()
@@ -39,7 +39,7 @@ void test('POST `api/users` - create user successfully with test database',
     t.same(typeof json.id, 'string')
   })
 
-void test('POST `api/users` - create user successfully with mock createUser',
+void test('POST `api/users` - Happy Path: create user successfully with mock createUser',
   async (t) => {
     t.teardown(async () => {
       await fastify.close()
@@ -78,4 +78,105 @@ void test('POST `api/users` - create user successfully with mock createUser',
     t.equal(json.gender, user.gender)
     t.equal(json.id, user.id)
     t.equal(json.BMI, user.BMI)
+  })
+
+void test('POST `api/users` - Edge Case: fail create user with mock createUser',
+  async (t) => {
+    t.teardown(async () => {
+      await fastify.close()
+      stub.restore()
+    })
+
+    const fastify = buildServer()
+
+    const user = fakeResponseUser({ lengthString: 12 })
+    const { id, BMI, ...rest } = user
+
+    const { email, ...restWithoutEmail } = rest
+    const { age, ...restWithoutAge } = rest
+    const { gender, ...restWithoutGender } = rest
+    const { height, ...restWithoutHeight } = rest
+    const { weight, ...restWithoutWeight } = rest
+    const { chronicDisorders, ...restWithoutChronicDisorders } = rest
+    const { password, ...restWithoutPassword } = rest
+
+    const stub = ImportMock.mockFunction(userServices, 'createUser', {
+      ...rest,
+      id,
+      BMI
+    })
+
+    const responseEmail = await fastify.inject({
+      method: 'POST',
+      url: '/api/users',
+      payload: {
+        ...restWithoutEmail
+      }
+    })
+    const responseAge = await fastify.inject({
+      method: 'POST',
+      url: '/api/users',
+      payload: {
+        ...restWithoutAge
+      }
+    })
+    const responseGender = await fastify.inject({
+      method: 'POST',
+      url: '/api/users',
+      payload: {
+        ...restWithoutGender
+      }
+    })
+    const responseHeight = await fastify.inject({
+      method: 'POST',
+      url: '/api/users',
+      payload: {
+        ...restWithoutHeight
+      }
+    })
+    const responseWeight = await fastify.inject({
+      method: 'POST',
+      url: '/api/users',
+      payload: {
+        ...restWithoutWeight
+      }
+    })
+    const responseChronicDisorders = await fastify.inject({
+      method: 'POST',
+      url: '/api/users',
+      payload: {
+        ...restWithoutChronicDisorders
+      }
+    })
+    const responsePassword = await fastify.inject({
+      method: 'POST',
+      url: '/api/users',
+      payload: {
+        ...restWithoutPassword
+      }
+    })
+
+    t.equal(responseEmail.statusCode, 400)
+    t.equal(responseAge.statusCode, 400)
+    t.equal(responseGender.statusCode, 400)
+    t.equal(responseHeight.statusCode, 400)
+    t.equal(responseWeight.statusCode, 400)
+    t.equal(responseChronicDisorders.statusCode, 400)
+    t.equal(responsePassword.statusCode, 400)
+
+    const jsonEmail = responseEmail.json()
+    const jsonAge = responseAge.json()
+    const jsonGender = responseGender.json()
+    const jsonHeight = responseHeight.json()
+    const jsonWeight = responseWeight.json()
+    const jsonChronicDisorders = responseChronicDisorders.json()
+    const jsonPassword = responsePassword.json()
+
+    t.equal(jsonEmail.message, "body must have required property 'email'")
+    t.equal(jsonAge.message, "body must have required property 'age'")
+    t.equal(jsonGender.message, "body must have required property 'gender'")
+    t.equal(jsonHeight.message, "body must have required property 'height'")
+    t.equal(jsonWeight.message, "body must have required property 'weight'")
+    t.equal(jsonChronicDisorders.message, "body must have required property 'chronicDisorders'")
+    t.equal(jsonPassword.message, "body must have required property 'password'")
   })
