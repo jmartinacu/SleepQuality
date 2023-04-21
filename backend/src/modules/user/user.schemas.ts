@@ -47,6 +47,8 @@ const { email, password, id, verificationCode } = userExtent
 
 const { BMI, ...userCoreExceptBMI } = userCore
 
+const { gender } = userCore
+
 const createUserSchema = Type.Object({
   ...userCoreExceptBMI,
   email,
@@ -149,8 +151,11 @@ type RefreshTokenResponse = Static<typeof refreshTokenResponseSchema>
 type ForgotPasswordInput = Static<typeof forgotPasswordSchema>
 type ResetPasswordParamsInput = Static<typeof resetPasswordParamsSchema>
 type ResetPasswordBodyInput = Static<typeof resetPasswordBodySchema>
+type Gender = Static<typeof gender>
 
 export {
+  regexPassword,
+  type Gender,
   createUserSchema,
   createUserResponseSchema,
   createUserResponseHandlerSchema,

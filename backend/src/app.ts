@@ -8,11 +8,6 @@ export default server
 
 async function main (): Promise<void> {
   try {
-    if (process.env.NODE_ENV !== 'production') {
-      const dotenv = await import('dotenv')
-      dotenv.config()
-    }
-
     await prisma.$connect
 
     const port = config.get<number>('port')
