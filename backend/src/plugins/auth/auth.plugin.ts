@@ -20,7 +20,7 @@ const pluginAuthorization: FastifyPluginAsync = async (
   fastify: FastifyInstance,
   _options: FastifyPluginOptions
 ) => {
-  void fastify.register(fastifyBcrypt, {
+  await fastify.register(fastifyBcrypt, {
     saltWorkFactor: 12
   })
 
@@ -32,7 +32,7 @@ const pluginAuthorization: FastifyPluginAsync = async (
     .from(config.get<string>('refreshTokenKey'), 'base64')
     .toString('ascii')
 
-  void fastify.register(fastifyJwt, {
+  await fastify.register(fastifyJwt, {
     secret: accessKey,
     sign: {
       expiresIn: '10m'
@@ -42,14 +42,14 @@ const pluginAuthorization: FastifyPluginAsync = async (
     jwtSign: 'accessSign'
   })
 
-  void fastify.register(fastifyJwt, {
+  await fastify.register(fastifyJwt, {
     secret: refreshKey,
     namespace: 'refresh',
     jwtVerify: 'refreshVerify',
     jwtSign: 'refreshSign'
   })
 
-  void fastify.register(fastifyAuth, {
+  await fastify.register(fastifyAuth, {
     defaultRelation: 'and'
   })
 

@@ -29,6 +29,7 @@ PASSWORD REGEX RULES:
   At least one special character
 */
 const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])([A-Za-z\d$@$!%*?&]|[^ ]){8,15}$/
+const regexObjectId = /^[a-fA-F0-9]{24}$/
 
 const userExtent = {
   email: Type.String({ format: 'email' }),
@@ -40,10 +41,10 @@ const userExtent = {
     ])),
   verificationCode: Type.String(),
   avatar: Type.Uint8Array(),
-  id: Type.String()
+  id: Type.RegEx(regexObjectId)
 }
 
-const { email, password, id, verificationCode } = userExtent
+const { email, password, id, verificationCode, role } = userExtent
 
 const { BMI, ...userCoreExceptBMI } = userCore
 
@@ -152,10 +153,11 @@ type ForgotPasswordInput = Static<typeof forgotPasswordSchema>
 type ResetPasswordParamsInput = Static<typeof resetPasswordParamsSchema>
 type ResetPasswordBodyInput = Static<typeof resetPasswordBodySchema>
 type Gender = Static<typeof gender>
+type Role = Static<typeof role>
 
 export {
-  regexPassword,
   type Gender,
+  type Role,
   createUserSchema,
   createUserResponseSchema,
   createUserResponseHandlerSchema,

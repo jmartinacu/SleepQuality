@@ -26,6 +26,7 @@ async function verifyEmailAndPasswordHandler (
 ): Promise<void> {
   try {
     const { email, password } = request.body
+
     const user = await findUserUnique('email', email)
     if (user === null) {
       return await reply.code(401).send({ message: 'Email or password wrong' })

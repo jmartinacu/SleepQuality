@@ -53,7 +53,7 @@
       "config",
       "node_modules",
       "prisma",
-      "templates"
+      "images"
     ]
   }
 }

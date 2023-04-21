@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { random } from './helpers'
-import type { CreateUserInput, CreateUserResponse, Gender } from '../modules/user/user.schemas'
+import type { Session, User } from './database'
+import type { CreateUserInput, CreateUserResponse, Gender, Role } from '../modules/user/user.schemas'
 
 function fakeInputUser (): CreateUserInput {
   const genders = ['MASCULINE', 'FEMININE', 'NEUTER']
@@ -37,6 +38,26 @@ function fakeResponseUser ({
   }
 }
 
+function fakeUser ({
+  lengthString = 10,
+  maxNumber = 50
+}): User {
+  const roles = ['ADMIN', 'USER']
+  const roleIndex = random(0, 1)
+  const userResponse = fakeResponseUser({ lengthString, maxNumber })
+  const verificationCode = faker.datatype.string(20)
+  const passwordResetCode = random(10000, 99999)
+  const verified = faker.datatype.boolean()
+  const role = roles.at(roleIndex) as Role
+  return {
+    ...userResponse,
+    verificationCode,
+    passwordResetCode,
+    verified,
+    role
+  }
+}
+
 function fakerString ({ length = 10 }: { length?: number }): string {
   return faker.datatype.string(length)
 }
@@ -45,9 +66,30 @@ function fakerNumber ({ max = 50 }: { max?: number }): number {
   return faker.datatype.number(max)
 }
 
+function fakerSession ({
+  lengthString = 10,
+  userId
+}: {
+  lengthString?: number
+  userId?: string
+}): Session {
+  const id = faker.datatype.string(lengthString)
+  const valid = faker.datatype.boolean()
+  if (typeof userId === 'undefined') userId = faker.datatype.string(lengthString)
+  const updatedAt = new Date()
+  return {
+    id,
+    valid,
+    updatedAt,
+    userId
+  }
+}
+
 export {
   fakeInputUser,
   fakeResponseUser,
+  fakeUser,
   fakerString,
-  fakerNumber
+  fakerNumber,
+  fakerSession
 }

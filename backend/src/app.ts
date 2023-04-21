@@ -8,7 +8,7 @@ export default server
 
 async function main (): Promise<void> {
   try {
-    await prisma.$connect
+    await prisma.$connect()
 
     const port = config.get<number>('port')
 
@@ -17,7 +17,7 @@ async function main (): Promise<void> {
     console.log(`Server listening at ${urlIp6}`)
   } catch (error) {
     console.error(error)
-    await prisma.$disconnect
+    await prisma.$disconnect()
     process.exit(1)
   }
 }
