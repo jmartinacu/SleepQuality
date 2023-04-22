@@ -83,16 +83,16 @@ const refreshTokenResponseSchema = Type.Object({
   accessToken: Type.String()
 })
 const findUserSchema = Type.Object({
-  id: Type.String()
+  id
 })
 
 const verifyAccountParamsSchema = Type.Object({
-  id: Type.String(),
+  id,
   verificationCode: Type.String()
 })
 
 const resetPasswordParamsSchema = Type.Object({
-  id: Type.String(),
+  id,
   passwordResetCode: Type.Integer()
 })
 
