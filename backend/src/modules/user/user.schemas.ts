@@ -40,11 +40,18 @@ const userExtent = {
       Type.Literal('USER')
     ])),
   verificationCode: Type.String(),
-  avatar: Type.Uint8Array(),
-  id: Type.RegEx(regexObjectId)
+  id: Type.RegEx(regexObjectId),
+  profilePicture: Type.String()
 }
 
-const { email, password, id, verificationCode, role } = userExtent
+const {
+  email,
+  password,
+  id,
+  verificationCode,
+  role,
+  profilePicture
+} = userExtent
 
 const { BMI, ...userCoreExceptBMI } = userCore
 
@@ -112,7 +119,8 @@ const updateUserSchema = Type.Object({
     Type.Integer(),
     Type.Null()
   ])),
-  password: Type.Optional(Type.String())
+  password: Type.Optional(Type.String()),
+  profilePicture: Type.Optional(profilePicture)
 })
 
 const verifyAccountResponseSchema = Type.Object({

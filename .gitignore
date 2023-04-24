@@ -4,3 +4,4 @@ backend/.env.development
 backend/.env.test
 backend/node_modules/
 backend/.nyc_output
+images/

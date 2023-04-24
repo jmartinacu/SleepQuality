@@ -1,3 +1,5 @@
+const allowedExtensions = ['jpg', 'jpeg', 'png']
+
 function calculateBMI ({
   weight,
   height
@@ -17,6 +19,15 @@ function checkTimeDiffGivenDateUntilNow (date: Date, timeInHours: number): boole
 
 function random (min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+function getFileExtension (file: string): string | undefined {
+  return file.split('.').pop()
+}
+
+function checkFileExtension (extension: string): boolean {
+  return allowedExtensions
+    .some(allowedExtension => allowedExtension === extension)
 }
 
 function htmlVerifyUser (verificationLink: string): string {
@@ -52,6 +63,8 @@ export {
   calculateBMI,
   checkTimeDiffGivenDateUntilNow,
   random,
+  getFileExtension,
+  checkFileExtension,
   htmlVerifyUser,
   htmlResetPasswordUser
 }

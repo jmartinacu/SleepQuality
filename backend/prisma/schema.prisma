@@ -23,6 +23,7 @@ model User {
   passwordResetCode Int?
   verified Boolean @default(false)
   session Session?
+  profilePicture String?
 }
 
 model Session {

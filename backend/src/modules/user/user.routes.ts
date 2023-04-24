@@ -6,7 +6,8 @@ import {
   verifyAccountHandler,
   refreshAccessTokenHandler,
   forgotPasswordHandler,
-  resetPasswordHandler
+  resetPasswordHandler,
+  addProfilePictureHandler
 } from './user.controllers'
 import {
   createUserResponseSchema,
@@ -22,10 +23,12 @@ import {
   resetPasswordParamsSchema,
   resetPasswordBodySchema
 } from './user.schemas'
+import { upload } from '../../server'
 
 // CUANDO NO SE LE PASA UN OBJECT ID VALIDO A PRISMA PETA CON UN 500
 // Y ENSEÑA AL USUARIO DATOS PRISMA CAMBIAR ESO EN EL FUTURO
 // PARA MANDAR UN ERROR SINTÁCTICO Y DARLE AL USUARIO UN 404
+// CREO QUE YA LO TENGO SOLUCIONADO CON EL REGEX PARA OBJECTID  QUEDA HACER TESTING
 async function userRoutes (server: FastifyInstance): Promise<void> {
   server.post('/',
     {
@@ -121,6 +124,33 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       }
     },
     resetPasswordHandler
+  )
+
+  server.post('/profile',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([
+        server.checkUserVerification,
+        upload.single('profilePicture')
+      ]),
+      schema: {
+        response: {
+          200: verifyAccountResponseSchema
+        }
+      }
+    },
+    addProfilePictureHandler
+  )
+
+  server.get('/profile',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkUserVerification])
+
+    },
+    () => {
+      return 'hello get profile'
+    }
   )
 }
 

@@ -1,10 +1,12 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { LogInUserInput } from '../../modules/user/user.schemas'
+import type { File, FileDestinationCallback, FileFilterCallback, FileNameCallback } from '../types.plugins'
 import {
   findSessionUnique,
   findUserUnique
 } from '../../modules/user/user.services'
 import type { User } from '../../utils/database'
+import { getFileExtension, checkFileExtension } from '../../utils/helpers'
 
 async function verifyAuthorizationHeader (
   request: FastifyRequest,
@@ -102,10 +104,45 @@ async function verifySession (
   }
 }
 
+function fileFilter (
+  _request: FastifyRequest,
+  file: File,
+  cb: FileFilterCallback
+): void {
+  const extension = getFileExtension(file.originalname)
+  if (typeof extension === 'undefined') {
+    cb(new Error('Incorrect file'))
+  } else {
+    cb(null, checkFileExtension(extension))
+  }
+}
+
+function destination (
+  _request: FastifyRequest,
+  _file: File,
+  cb: FileDestinationCallback
+): void {
+  cb(null, 'images/')
+}
+
+function filename (
+  request: FastifyRequest,
+  file: File,
+  cb: FileNameCallback
+): void {
+  const { userId } = request.user as { userId: string }
+  const { originalname, fieldname } = file
+  const extension = getFileExtension(originalname) as string
+  cb(null, `${fieldname}-${userId}-${Date.now()}.${extension}`)
+}
+
 export {
   verifyAuthorizationHeader,
   verifyEmailAndPasswordHandler,
   userVerified,
   isAdmin,
-  verifySession
+  verifySession,
+  fileFilter,
+  destination,
+  filename
 }

@@ -221,6 +221,21 @@ async function resetPasswordHandler (
   }
 }
 
+async function addProfilePictureHandler (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<VerifyAccountResponse> {
+  try {
+    const { filename: profilePicture } = request.file as { filename: string }
+    const { userId } = request.user as { userId: string }
+    await updateUser(userId, { profilePicture })
+    return await reply.send({ message: 'Profile Picture saved' })
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
 export {
   createUserHandler,
   logInUserHandler,
@@ -228,5 +243,6 @@ export {
   verifyAccountHandler,
   refreshAccessTokenHandler,
   forgotPasswordHandler,
-  resetPasswordHandler
+  resetPasswordHandler,
+  addProfilePictureHandler
 }
