@@ -49,12 +49,14 @@ function fakeUser ({
   const passwordResetCode = random(10000, 99999)
   const verified = faker.datatype.boolean()
   const role = roles.at(roleIndex) as Role
+  const profilePicture = faker.datatype.string()
   return {
     ...userResponse,
     verificationCode,
     passwordResetCode,
     verified,
-    role
+    role,
+    profilePicture
   }
 }
 
