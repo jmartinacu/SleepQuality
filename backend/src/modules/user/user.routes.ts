@@ -26,6 +26,8 @@ import {
 } from './user.schemas'
 import { upload } from '../../server'
 
+/* AÑADIR RUTA PARA HACER UPDATE DONDE HAYA UN CAMPO PARA AÑADIR ENFERMEDADES
+Y OTRO CAMPO PARA QUITAR ENFERMEDADES QUE YA TENIA EL USUARIO */
 async function userRoutes (server: FastifyInstance): Promise<void> {
   server.post('/',
     {

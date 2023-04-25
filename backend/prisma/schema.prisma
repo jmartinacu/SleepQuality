@@ -24,6 +24,8 @@ model User {
   verified Boolean @default(false)
   session Session?
   profilePicture String?
+  answerIds String[] @db.ObjectId
+  answers Answer[] @relation(fields: [answerIds], references: [id])
 }
 
 model Session {
@@ -34,12 +36,24 @@ model Session {
   userId String @unique @db.ObjectId
 }
 
-model Questionnaires {
+model Questionnaire {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
-  question Json
+  questions Json
   createdAt DateTime @default(now())
   updadatedAt DateTime @updatedAt
+  answers Answer[]
+}
+
+model Answer {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  answers Json
+  createdAt DateTime @default(now())
+  updadatedAt DateTime @updatedAt
+  userIds String[] @db.ObjectId
+  users User[] @relation(fields: [userIds], references: [id])
+  questionnaireId String @db.ObjectId
+  questionnaire Questionnaire @relation(fields: [questionnaireId], references: [id])
 }
 
 enum Gender {
