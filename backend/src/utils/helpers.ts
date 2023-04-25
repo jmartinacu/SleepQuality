@@ -23,7 +23,7 @@ function calculateBMI ({
   return Number(BMI.toFixed(3))
 }
 
-function checkTimeDiffGivenDateUntilNow (date: Date, timeInHours: number): boolean {
+function checkTimeDiffOfGivenDateUntilNow (date: Date, timeInHours: number): boolean {
   const millisecondsToHours = 1000 * 60 * 60
   const timeDiff = (new Date().getTime() - date.getTime()) / millisecondsToHours
   return timeDiff > timeInHours
@@ -79,7 +79,7 @@ function htmlResetPasswordUser (passwordResetCode: number): string {
 
 export {
   calculateBMI,
-  checkTimeDiffGivenDateUntilNow,
+  checkTimeDiffOfGivenDateUntilNow,
   random,
   getFileExtension,
   checkFileExtension,

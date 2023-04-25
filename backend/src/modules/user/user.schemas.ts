@@ -1,48 +1,80 @@
-// CAMBIAR TYPEBOX POR ZOD PROBAR
-import { Static, Type } from '@sinclair/typebox'
+import { z } from 'zod'
 
-const userCore = {
-  age: Type.Integer({ exclusiveMinimum: 0 }),
-  gender: Type.Union([
-    Type.Literal('MASCULINE'),
-    Type.Literal('FEMININE'),
-    Type.Literal('NEUTER')
-  ]),
-  height: Type.Number({ exclusiveMinimum: 0 }),
-  weight: Type.Number({ exclusiveMinimum: 0 }),
-  chronicDisorders: Type.Array(Type.String()),
-  BMI: Type.Number()
-}
-
-const sessionCore = {
-  valid: Type.Boolean(),
-  userId: Type.String()
-}
-
-/*
-PASSWORD REGEX RULES:
-  Min 8 characters
-  Max 15 characters
-  At least one upper case letter
-  At least one lower case letter
-  At least one digit
-  No empty spaces
-  At least one special character
-*/
 const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])([A-Za-z\d$@$!%*?&]|[^ ]){8,15}$/
 const regexObjectId = /^[a-fA-F0-9]{24}$/
 
+const GENDER = ['MASCULINE', 'FEMININE', 'NEUTER'] as const
+const ROLES = ['ADMIN', 'USER'] as const
+
+const userCore = {
+  age: z.number({
+    required_error: 'Age is required',
+    invalid_type_error: 'Age must be an integer'
+  }).int().nonnegative().lte(150, {
+    message: 'Age must be an integer between 0 and 150'
+  }),
+  gender: z.enum(GENDER, {
+    required_error: 'gender is required',
+    invalid_type_error: "Gender must be 'MASCULINE', 'FEMININE' or 'NEUTER'"
+  }),
+  height: z.number({
+    required_error: 'Height is required',
+    invalid_type_error: 'Height must be a number'
+  }).nonnegative().lte(3, { message: 'Height must be a number between 0 - 3' }),
+  weight: z.number({
+    required_error: 'Weight is required',
+    invalid_type_error: 'Weight must be a number'
+  }).nonnegative().lte(600, { message: 'Weight must be a number between 0 - 600' }),
+  chronicDisorders: z.array(z.string().trim(), {
+    required_error: 'ChronicDisorders is required',
+    invalid_type_error: 'ChronicDisorders must be an array of strings'
+  }),
+  BMI: z.number({
+    required_error: 'BMI is required'
+  }).nonnegative()
+}
+
+const sessionCore = {
+  valid: z.boolean({
+    required_error: 'Valid is required',
+    invalid_type_error: 'Valid must be a boolean'
+  }),
+  userId: z.string({
+    required_error: 'UserId is required',
+    invalid_type_error: 'UserId must be a string'
+  }).regex(regexObjectId)
+}
+
 const userExtent = {
-  email: Type.String({ format: 'email' }),
-  password: Type.RegEx(regexPassword),
-  role: Type.Optional(
-    Type.Union([
-      Type.Literal('ADMIN'),
-      Type.Literal('USER')
-    ])),
-  verificationCode: Type.String(),
-  id: Type.RegEx(regexObjectId),
-  profilePicture: Type.String()
+  email: z.string({
+    required_error: 'Email is required',
+    invalid_type_error: 'Email must be a string'
+  }).email({
+    message: 'Invalid email address'
+  }),
+  password: z.string({
+    required_error: 'Password is required',
+    invalid_type_error: 'Password must be a string'
+  }).regex(regexPassword),
+  role: z.enum(ROLES, {
+    required_error: 'Role is required'
+  }).default('USER'),
+  verificationCode: z.string({
+    required_error: 'VerificationCode is required',
+    invalid_type_error: 'VerificationCode must be a string'
+  }).uuid(),
+  id: z.string({
+    required_error: 'Id is required',
+    invalid_type_error: 'Id must be a valid MongoDb ObjectId'
+  }).regex(regexObjectId),
+  profilePicture: z.string({
+    required_error: 'ProfilePicture is required',
+    invalid_type_error: 'ProfilePicture must be a string'
+  }).trim(),
+  passwordResetCode: z.number({
+    required_error: 'PasswordResetCode is required',
+    invalid_type_error: 'PasswordResetCode must be an integer within a range'
+  })
 }
 
 const {
@@ -51,118 +83,139 @@ const {
   id,
   verificationCode,
   role,
-  profilePicture
+  profilePicture,
+  passwordResetCode
 } = userExtent
 
 const { BMI, ...userCoreExceptBMI } = userCore
 
 const { gender } = userCore
 
-const createUserSchema = Type.Object({
+const createUserSchema = z.object({
   ...userCoreExceptBMI,
   email,
   password
 })
 
-const createUserResponseSchema = Type.Object({
+const createUserResponseSchema = z.object({
   ...userCore,
   email,
   id
 })
 
-const createUserResponseHandlerSchema = Type.Object({
+const createUserResponseHandlerSchema = z.object({
   ...userCore,
   email,
   id,
   verificationCode
 })
 
-const logInUserSchema = Type.Object({
+const logInUserSchema = z.object({
   email,
-  password: Type.String({ minLength: 8, maxLength: 15 })
+  password: z.string({
+    required_error: 'Password is required',
+    invalid_type_error: 'Password must be a string'
+  })
+    .trim()
+    .min(8, {
+      message: 'Minimum length is 8 characters'
+    }).max(15, {
+      message: 'Maximum length is 15 characters'
+    })
 })
 
-const logInUserResponseSchema = Type.Object({
-  accessToken: Type.String(),
-  refreshToken: Type.String()
+const logInUserResponseSchema = z.object({
+  accessToken: z.string({
+    required_error: 'AccessToken is required',
+    invalid_type_error: 'AccessToken must be a string'
+  }).trim(),
+  refreshToken: z.string({
+    required_error: 'RefreshToken is required',
+    invalid_type_error: 'RefreshToken must be a string'
+  }).trim()
 })
 
-const refreshTokenResponseSchema = Type.Object({
-  accessToken: Type.String()
+const refreshTokenResponseSchema = logInUserResponseSchema.pick({ accessToken: true })
+
+const refreshTokenHeaderSchema = z.object({
+  refresh: z.string({
+    required_error: 'RefreshToken is required',
+    invalid_type_error: 'RefreshToken must be a string'
+  }).trim()
 })
-const findUserSchema = Type.Object({
+
+const findUserSchema = z.object({
   id
 })
 
-const verifyAccountParamsSchema = Type.Object({
+const verifyAccountParamsSchema = z.object({
   id,
-  verificationCode: Type.String()
+  verificationCode
 })
 
-const resetPasswordParamsSchema = Type.Object({
+const resetPasswordParamsSchema = z.object({
   id,
-  passwordResetCode: Type.Integer()
+  passwordResetCode
 })
 
-const resetPasswordBodySchema = Type.Object({
+const resetPasswordBodySchema = z.object({
   password
 })
 
-const updateUserSchema = Type.Object({
-  age: Type.Optional(userCoreExceptBMI.age),
-  gender: Type.Optional(userCoreExceptBMI.gender),
-  height: Type.Optional(userCoreExceptBMI.height),
-  weight: Type.Optional(userCoreExceptBMI.weight),
-  chronicDisorders: Type.Optional(userCoreExceptBMI.chronicDisorders),
-  BMI: Type.Optional(BMI),
-  verified: Type.Optional(Type.Boolean()),
-  passwordResetCode: Type.Optional(Type.Union([
-    Type.Integer(),
-    Type.Null()
-  ])),
-  password: Type.Optional(Type.String()),
-  profilePicture: Type.Optional(profilePicture)
+const updateUserSchema = z.object({
+  age: z.optional(userCoreExceptBMI.age),
+  gender: z.optional(userCoreExceptBMI.gender),
+  height: z.optional(userCoreExceptBMI.height),
+  weight: z.optional(userCoreExceptBMI.weight),
+  chronicDisorders: z.optional(userCoreExceptBMI.chronicDisorders),
+  BMI: z.optional(BMI),
+  verified: z.optional(z.boolean()),
+  passwordResetCode: z.optional(passwordResetCode.or(z.null())),
+  password: z.optional(password),
+  profilePicture: z.optional(profilePicture)
 })
 
-const verifyAccountResponseSchema = Type.Object({
-  message: Type.String()
+const verifyAccountResponseSchema = z.object({
+  message: z.string({
+    required_error: 'Message is required',
+    invalid_type_error: 'Message must be a string'
+  })
 })
 
-const verificationErrorResponseSchema = Type.Object({
-  message: Type.String()
+const verificationErrorResponseSchema = z.object({
+  message: z.string({
+    required_error: 'Message is required',
+    invalid_type_error: 'Message must be a string'
+  })
 })
 
-const updateSessionSchema = Type.Object({
-  valid: Type.Optional(sessionCore.valid),
-  userId: Type.Optional(sessionCore.userId)
+const updateSessionSchema = z.object({
+  valid: z.optional(sessionCore.valid),
+  userId: z.optional(sessionCore.userId)
 })
 
-const refreshTokenHeaderSchema = Type.Object({
-  refresh: Type.String()
-})
-
-const forgotPasswordSchema = Type.Object({
+const forgotPasswordSchema = z.object({
   email
 })
 
-type CreateUserInput = Static<typeof createUserSchema>
-type CreateUserResponse = Static<typeof createUserResponseSchema>
-type CreateUserResponseHandler = Static<typeof createUserResponseHandlerSchema>
-type LogInUserInput = Static<typeof logInUserSchema>
-type LogInUserResponse = Static<typeof logInUserResponseSchema>
-type FindUserInput = Static<typeof findUserSchema>
-type VerifyAccountParamsInput = Static<typeof verifyAccountParamsSchema>
-type UpdateUserInput = Static<typeof updateUserSchema>
-type VerifyAccountResponse = Static<typeof verifyAccountResponseSchema>
-type UpdateSessionInput = Static<typeof updateSessionSchema>
-type VerificationErrorResponse = Static<typeof verificationErrorResponseSchema>
-type RefreshTokenHeaderInput = Static<typeof refreshTokenHeaderSchema>
-type RefreshTokenResponse = Static<typeof refreshTokenResponseSchema>
-type ForgotPasswordInput = Static<typeof forgotPasswordSchema>
-type ResetPasswordParamsInput = Static<typeof resetPasswordParamsSchema>
-type ResetPasswordBodyInput = Static<typeof resetPasswordBodySchema>
-type Gender = Static<typeof gender>
-type Role = Static<typeof role>
+type CreateUserInput = z.infer<typeof createUserSchema>
+type CreateUserResponse = z.infer<typeof createUserResponseSchema>
+type CreateUserResponseHandler = z.infer<typeof createUserResponseHandlerSchema>
+type LogInUserInput = z.infer<typeof logInUserSchema>
+type LogInUserResponse = z.infer<typeof logInUserResponseSchema>
+type FindUserInput = z.infer<typeof findUserSchema>
+type VerifyAccountParamsInput = z.infer<typeof verifyAccountParamsSchema>
+type UpdateUserInput = z.infer<typeof updateUserSchema>
+type VerifyAccountResponse = z.infer<typeof verifyAccountResponseSchema>
+type UpdateSessionInput = z.infer<typeof updateSessionSchema>
+type VerificationErrorResponse = z.infer<typeof verificationErrorResponseSchema>
+type RefreshTokenHeaderInput = z.infer<typeof refreshTokenHeaderSchema>
+type RefreshTokenResponse = z.infer<typeof refreshTokenResponseSchema>
+type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>
+type ResetPasswordParamsInput = z.infer<typeof resetPasswordParamsSchema>
+type ResetPasswordBodyInput = z.infer<typeof resetPasswordBodySchema>
+type Gender = z.infer<typeof gender>
+type Role = z.infer<typeof role>
 
 export {
   type Gender,

@@ -25,7 +25,7 @@ import {
 import sendEmail from '../../utils/mailer'
 import type { Session, User } from '../../utils/database'
 import {
-  checkTimeDiffGivenDateUntilNow,
+  checkTimeDiffOfGivenDateUntilNow,
   getFileExtension,
   getMIMEType,
   htmlResetPasswordUser,
@@ -159,7 +159,7 @@ async function refreshAccessTokenHandler (
     if (!valid) {
       return await reply.code(401).send({ message: 'Could not refresh Access Token' })
     }
-    if (checkTimeDiffGivenDateUntilNow(updatedAt, 1)) {
+    if (checkTimeDiffOfGivenDateUntilNow(updatedAt, 1)) {
       await updateSession(id, { valid: false })
       return await reply.code(400).send({ message: 'Refresh Token time limit exceeded, please login' })
     }

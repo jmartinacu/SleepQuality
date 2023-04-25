@@ -1,6 +1,11 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { LogInUserInput } from '../../modules/user/user.schemas'
-import type { File, FileDestinationCallback, FileFilterCallback, FileNameCallback } from '../types.plugins'
+import type {
+  File,
+  FileDestinationCallback,
+  FileFilterCallback,
+  FileNameCallback
+} from '../types.plugins'
 import {
   findSessionUnique,
   findUserUnique

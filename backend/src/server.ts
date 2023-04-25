@@ -2,7 +2,12 @@ import Fastify, { type FastifyInstance } from 'fastify'
 import type { JWT } from '@fastify/jwt'
 import fastifyCors from '@fastify/cors'
 import multer from 'fastify-multer'
-import type { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
+import { ZodError } from 'zod'
+import {
+  serializerCompiler,
+  validatorCompiler,
+  ZodTypeProvider
+} from 'fastify-type-provider-zod'
 import userRoutes from './modules/user/user.routes'
 import questionnaireRoutes from './modules/questionnaire/questionnaire.routes'
 import authPlugin from './plugins/auth/auth.plugin'
@@ -51,13 +56,31 @@ export const upload = multer({
 })
 
 const buildServer = (): FastifyInstance => {
-  const server = Fastify().withTypeProvider<TypeBoxTypeProvider>()
+  const server = Fastify()
+
+  server.setValidatorCompiler(validatorCompiler)
+  server.setSerializerCompiler(serializerCompiler)
 
   void server.register(fastifyCors)
 
   void server.register(upload.contentParser)
 
   void server.register(authPlugin)
+
+  server.setErrorHandler((error, _request, reply) => {
+    if (error instanceof ZodError) {
+      console.error(error)
+      void reply.status(400).send({
+        statusCode: 400,
+        error: 'Bad Request',
+        issues: error.issues.reduce<{ [key: string]: string }>((acc, item) => {
+          const path = String(item.path[0])
+          acc[path] = item.message
+          return acc
+        }, {})
+      })
+    }
+  })
 
   server.after(() => {
     server.get('/', async (_request, _reply) => {
@@ -68,8 +91,10 @@ const buildServer = (): FastifyInstance => {
       return { status: 'ok' }
     })
 
-    void server.register(userRoutes, { prefix: 'api/users' })
-    void server.register(questionnaireRoutes, { prefix: 'api/questionnaires' })
+    void server.withTypeProvider<ZodTypeProvider>()
+      .register(userRoutes, { prefix: 'api/users' })
+    void server.withTypeProvider<ZodTypeProvider>()
+      .register(questionnaireRoutes, { prefix: 'api/questionnaires' })
   })
 
   return server
