@@ -17,7 +17,6 @@ import {
   createSession,
   createUser,
   deleteUser,
-  findSessionAndUserUnique,
   findSessionUnique,
   findUserUnique,
   updateSession,
@@ -90,8 +89,8 @@ async function logInUserHandler (
       const { id } = await updateSession(session.id, { valid: true })
       sessionId = id
     } else {
-      const newSession = await createSession(userId)
-      sessionId = newSession.id
+      const { id } = await createSession(userId)
+      sessionId = id
     }
     const accessToken = await reply.accessSign({ userId })
     const refreshToken = await reply.refreshSign({ sessionId })
@@ -111,10 +110,7 @@ async function getMeHandler (
 ): Promise<CreateUserResponse> {
   try {
     const { userId } = request.user as { userId: string }
-    const { user, valid } = await findSessionAndUserUnique('userId', userId) as Session & { user: User }
-    if (!valid) {
-      return await reply.code(401).send({ message: 'Session expired, please login' })
-    }
+    const user = await findUserUnique('id', userId) as User
     return await reply.send(user)
   } catch (error) {
     console.error(error)
@@ -132,7 +128,7 @@ async function verifyAccountHandler (
     const { id, verificationCode } = request.params
     const user = await findUserUnique('id', id)
     if (user === null) {
-      return await reply.code(400).send({ message: 'Not Found' })
+      return await reply.code(404).send({ message: 'Not Found' })
     }
     if (user.verified) {
       return await reply.send({ message: 'User already verified' })
@@ -141,7 +137,7 @@ async function verifyAccountHandler (
       await updateUser(id, { verified: true })
       return await reply.send({ message: 'User verified' })
     }
-    return await reply.code(400).send({ message: 'Could not verified User' })
+    return await reply.code(400).send({ message: 'Could not verified user' })
   } catch (error) {
     console.error(error)
     return await reply.code(500).send(error)
@@ -158,11 +154,8 @@ async function refreshAccessTokenHandler (
     const jwtRefreshFunctionality = request.server.jwt.refresh
     const { refresh } = request.headers
     await jwtRefreshFunctionality.verify(refresh)
-    const decodedRefreshToken = jwtRefreshFunctionality.decode(refresh)
-    if (decodedRefreshToken === null) {
-      return await reply.code(401).send({ message: 'Could not refresh Access Token' })
-    }
-    const { id, valid, updatedAt, userId } = await findSessionUnique('id', decodedRefreshToken.sessionId) as Session
+    const { sessionId } = jwtRefreshFunctionality.decode(refresh) as { sessionId: string }
+    const { id, valid, updatedAt, userId } = await findSessionUnique('id', sessionId) as Session
     if (!valid) {
       return await reply.code(401).send({ message: 'Could not refresh Access Token' })
     }

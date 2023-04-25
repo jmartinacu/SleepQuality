@@ -76,8 +76,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       preHandler: server.auth([server.checkUserVerification]),
       schema: {
         response: {
-          200: createUserResponseSchema,
-          401: verificationErrorResponseSchema
+          200: createUserResponseSchema
         }
       }
     },
@@ -102,7 +101,8 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
         params: verifyAccountParamsSchema,
         response: {
           200: verifyAccountResponseSchema,
-          400: verificationErrorResponseSchema
+          400: verificationErrorResponseSchema,
+          404: verificationErrorResponseSchema
         }
       }
     },
