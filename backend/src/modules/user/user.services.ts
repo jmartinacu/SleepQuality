@@ -1,3 +1,5 @@
+import fs from 'node:fs/promises'
+import path from 'node:path'
 import prisma, { type User, type Session } from '../../utils/database'
 import { calculateBMI } from '../../utils/helpers'
 import type {
@@ -58,6 +60,25 @@ async function updateUser (userId: string, data: UpdateUserInput): Promise<User>
     data
   })
   return user
+}
+
+async function deleteUser (id: string): Promise<void> {
+  const { answerIds, profilePicture } = await prisma.user.delete({
+    where: {
+      id
+    }
+  })
+  await prisma.answer.deleteMany({
+    where: {
+      id: {
+        in: answerIds
+      }
+    }
+  })
+  if (profilePicture !== null) {
+    const filePath = path.resolve(`images/${profilePicture}`)
+    await fs.unlink(filePath)
+  }
 }
 
 async function findUserUnique (
@@ -168,6 +189,7 @@ export {
   createUser,
   createSession,
   updateUser,
+  deleteUser,
   findUserUnique,
   findUserUniqueOrThrow,
   findSessionUnique,

@@ -16,6 +16,7 @@ import type {
 import {
   createSession,
   createUser,
+  deleteUser,
   findSessionAndUserUnique,
   findSessionUnique,
   findUserUnique,
@@ -57,6 +58,20 @@ async function createUserHandler (
     })
 
     return await reply.code(201).send(user)
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
+async function deleteUserHandler (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<void> {
+  try {
+    const { userId } = request.user as { userId: string }
+    await deleteUser(userId)
+    return await reply.code(204).send()
   } catch (error) {
     console.error(error)
     return await reply.code(500).send(error)
@@ -266,6 +281,7 @@ async function getProfilePictureHandler (
 
 export {
   createUserHandler,
+  deleteUserHandler,
   logInUserHandler,
   getMeHandler,
   verifyAccountHandler,

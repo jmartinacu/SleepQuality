@@ -8,7 +8,8 @@ import {
   forgotPasswordHandler,
   resetPasswordHandler,
   addProfilePictureHandler,
-  getProfilePictureHandler
+  getProfilePictureHandler,
+  deleteUserHandler
 } from './user.controllers'
 import {
   createUserResponseSchema,
@@ -81,6 +82,18 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       }
     },
     getMeHandler
+  )
+
+  server.delete('/',
+    {
+      onRequest: server.auth([server.authenticate]),
+      schema: {
+        response: {
+          204: {}
+        }
+      }
+    },
+    deleteUserHandler
   )
 
   server.get('/verify/:id/:verificationCode',
