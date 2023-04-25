@@ -1,4 +1,16 @@
-const allowedExtensions = ['jpg', 'jpeg', 'png']
+const JPEG_EXTENSIONS = [
+  'jpg',
+  'jpeg',
+  'jfif',
+  'pjpeg',
+  'pjp'
+]
+
+const ALLOWED_EXTENSIONS = [
+  ...JPEG_EXTENSIONS,
+  'png',
+  'webp'
+]
 
 function calculateBMI ({
   weight,
@@ -21,13 +33,19 @@ function random (min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
-function getFileExtension (file: string): string | undefined {
-  return file.split('.').pop()
+function getFileExtension (file: string): string {
+  return file.slice((file.lastIndexOf('.') - 1 >>> 0) + 2)
+}
+
+function getMIMEType (extension: string): 'image/png' | 'image/jpeg' | 'image/webp' {
+  if (extension === 'png') return 'image/png'
+  else if (JPEG_EXTENSIONS.includes(extension)) return 'image/jpeg'
+  else if (extension === 'webp') return 'image/webp'
+  else throw new Error('Incorrect file')
 }
 
 function checkFileExtension (extension: string): boolean {
-  return allowedExtensions
-    .some(allowedExtension => allowedExtension === extension)
+  return ALLOWED_EXTENSIONS.includes(extension)
 }
 
 function htmlVerifyUser (verificationLink: string): string {
@@ -65,6 +83,7 @@ export {
   random,
   getFileExtension,
   checkFileExtension,
+  getMIMEType,
   htmlVerifyUser,
   htmlResetPasswordUser
 }

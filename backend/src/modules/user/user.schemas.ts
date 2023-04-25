@@ -1,3 +1,4 @@
+// CAMBIAR TYPEBOX POR ZOD PROBAR
 import { Static, Type } from '@sinclair/typebox'
 
 const userCore = {

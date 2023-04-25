@@ -1,3 +1,5 @@
+import fs, { type ReadStream } from 'node:fs'
+import path from 'node:path'
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import type {
   CreateUserInput,
@@ -24,6 +26,8 @@ import sendEmail from '../../utils/mailer'
 import type { Session, User } from '../../utils/database'
 import {
   checkTimeDiffGivenDateUntilNow,
+  getFileExtension,
+  getMIMEType,
   htmlResetPasswordUser,
   htmlVerifyUser,
   random
@@ -226,10 +230,34 @@ async function addProfilePictureHandler (
   reply: FastifyReply
 ): Promise<VerifyAccountResponse> {
   try {
-    const { filename: profilePicture } = request.file as { filename: string }
+    const { file: image } = request
+    if (typeof image === 'undefined') {
+      return await reply.code(404).send({ message: 'Incorrect image' })
+    }
+    const { filename: profilePicture } = image
     const { userId } = request.user as { userId: string }
     await updateUser(userId, { profilePicture })
     return await reply.send({ message: 'Profile Picture saved' })
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+async function getProfilePictureHandler (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<ReadStream> {
+  try {
+    const { userId } = request.user as { userId: string }
+    const { profilePicture } = await findUserUnique('id', userId) as User
+    if (profilePicture === null) {
+      return await reply.code(404).send({ message: 'No Profile Picture' })
+    }
+    const extension = getFileExtension(profilePicture)
+    const MIMEType = getMIMEType(extension)
+    const filePath = path.resolve(`images/${profilePicture}`)
+    const fileStream = fs.createReadStream(filePath)
+    return await reply.type(MIMEType).send(fileStream)
   } catch (error) {
     console.error(error)
     return await reply.code(500).send(error)
@@ -244,5 +272,6 @@ export {
   refreshAccessTokenHandler,
   forgotPasswordHandler,
   resetPasswordHandler,
-  addProfilePictureHandler
+  addProfilePictureHandler,
+  getProfilePictureHandler
 }

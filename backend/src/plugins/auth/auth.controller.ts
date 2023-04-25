@@ -110,7 +110,7 @@ function fileFilter (
   cb: FileFilterCallback
 ): void {
   const extension = getFileExtension(file.originalname)
-  if (typeof extension === 'undefined') {
+  if (extension === '') {
     cb(new Error('Incorrect file'))
   } else {
     cb(null, checkFileExtension(extension))
@@ -132,7 +132,7 @@ function filename (
 ): void {
   const { userId } = request.user as { userId: string }
   const { originalname, fieldname } = file
-  const extension = getFileExtension(originalname) as string
+  const extension = getFileExtension(originalname)
   cb(null, `${fieldname}-${userId}-${Date.now()}.${extension}`)
 }
 
