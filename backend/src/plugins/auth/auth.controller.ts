@@ -1,5 +1,5 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
-import type { LogInUserInput } from '../../modules/user/user.schemas'
+import type { EmailUserInput, LogInUserInput } from '../../modules/user/user.schemas'
 import type {
   File,
   FileDestinationCallback,
@@ -43,6 +43,27 @@ async function verifyEmailAndPasswordHandler (
       return await reply.code(401).send({ message: 'Email or password wrong' })
     }
     request.user = { userId: user.id }
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
+async function userVerifiedWithoutAuthorization (
+  request: FastifyRequest<{
+    Body: EmailUserInput
+  }>,
+  reply: FastifyReply
+): Promise<void> {
+  try {
+    const { email } = request.body
+    const user = await findUserUnique('email', email)
+    if (user === null) {
+      return await reply.code(404).send({ message: 'User not found' })
+    }
+    if (!user.verified) {
+      return await reply.code(401).send({ message: 'Please verify your account' })
+    }
   } catch (error) {
     console.error(error)
     return await reply.code(500).send(error)
@@ -144,6 +165,7 @@ function filename (
 export {
   verifyAuthorizationHeader,
   verifyEmailAndPasswordHandler,
+  userVerifiedWithoutAuthorization,
   userVerified,
   isAdmin,
   verifySession,

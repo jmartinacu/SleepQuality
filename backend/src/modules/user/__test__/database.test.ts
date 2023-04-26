@@ -3,70 +3,10 @@ import buildServer from '../../../server'
 import { fakeInputUser } from '../../../utils/test.helpers'
 import prisma, { User, Session } from '../../../utils/database'
 import type { CreateUserResponse, LogInUserResponse, RefreshTokenResponse, VerifyAccountResponse } from '../user.schemas'
-import { findSessionAndUserUnique } from '../user.services'
+import { findSessionAndUserUnique, findUserUnique } from '../user.services'
 
 async function DatabaseTests (): Promise<void> {
-  const userCreate = fakeInputUser()
-
-  const fastify = buildServer()
-
-  const createUserResponse = await fastify.inject({
-    method: 'POST',
-    url: '/api/users',
-    payload: {
-      ...userCreate
-    }
-  })
-
-  const createUserBackend: CreateUserResponse = createUserResponse.json()
-
-  const loginResponse = await fastify.inject({
-    method: 'POST',
-    url: '/api/users/login',
-    payload: {
-      email: userCreate.email,
-      password: userCreate.password
-    }
-  })
-
-  const tokensBackend: LogInUserResponse = loginResponse.json()
-
-  const accessVerified = fastify.jwt.access.verify(tokensBackend.accessToken)
-  const refreshVerified = fastify.jwt.refresh.verify(tokensBackend.refreshToken)
-
-  const refreshUserResponse = await fastify.inject({
-    method: 'POST',
-    url: 'api/users/refresh',
-    headers: {
-      refresh: tokensBackend.refreshToken
-    }
-  })
-
-  const refreshBackend: RefreshTokenResponse = refreshUserResponse.json()
-
-  const accessTokenRefresh = fastify.jwt.access.verify(refreshBackend.accessToken)
-
-  const sessionWithUser = await findSessionAndUserUnique('id', refreshVerified.sessionId) as Session & { user: User }
-
-  const verifyUserResponse = await fastify.inject({
-    method: 'GET',
-    url: `api/users/verify/${createUserBackend.id}/${sessionWithUser.user.verificationCode}`,
-    headers: {
-      authorization: `Bearer ${tokensBackend.accessToken}`
-    }
-  })
-
-  const verifyUserResponseBackend: VerifyAccountResponse = verifyUserResponse.json()
-
-  const getMeResponse = await fastify.inject({
-    method: 'GET',
-    url: '/api/users',
-    headers: {
-      authorization: `Bearer ${tokensBackend.accessToken}`
-    }
-  })
-
-  const getMeBackend: CreateUserResponse = getMeResponse.json()
+  t.plan(5)
 
   t.before(async () => {
     await prisma.$connect()
@@ -80,7 +20,19 @@ async function DatabaseTests (): Promise<void> {
     await prisma.$disconnect()
   })
 
-  t.plan(5)
+  const userCreate = fakeInputUser()
+
+  const fastify = buildServer()
+
+  const createUserResponse = await fastify.inject({
+    method: 'POST',
+    url: '/api/users',
+    payload: {
+      ...userCreate
+    }
+  })
+
+  const createUserBackend: CreateUserResponse = createUserResponse.json()
 
   await t.test('POST `api/users` - Happy Path: create user successfully with test database',
     async childTest => {
@@ -96,26 +48,14 @@ async function DatabaseTests (): Promise<void> {
       childTest.same(typeof createUserBackend.id, 'string')
     })
 
-  await t.test('POST `api/users/login` - Happy Path: login user successfully with test database',
-    async childTest => {
-      childTest.equal(loginResponse.statusCode, 200)
-      childTest.equal(loginResponse.headers['content-type'], 'application/json; charset=utf-8')
+  const { verificationCode, id } = await findUserUnique('id', createUserBackend.id) as User
 
-      childTest.type(accessVerified.userId, 'string')
-      childTest.type(refreshVerified.sessionId, 'string')
+  const verifyUserResponse = await fastify.inject({
+    method: 'GET',
+    url: `api/users/verify/${id}/${verificationCode}`
+  })
 
-      childTest.equal(refreshVerified.sessionId, sessionWithUser.id)
-      childTest.equal(accessVerified.userId, sessionWithUser.user.id)
-    })
-
-  await t.test('POST `api/users/refresh` - Happy Path: refresh accessToken successfully',
-    async childTest => {
-      childTest.equal(refreshUserResponse.statusCode, 200)
-      childTest.equal(refreshUserResponse.headers['content-type'], 'application/json; charset=utf-8')
-
-      childTest.type(accessTokenRefresh.userId, 'string')
-      childTest.equal(accessTokenRefresh.userId, createUserBackend.id)
-    })
+  const verifyUserResponseBackend: VerifyAccountResponse = verifyUserResponse.json()
 
   await t.test('GET `api/users/verify/:id/:verificationCode` - Happy Path: verify user successfully',
     async childTest => {
@@ -124,6 +64,65 @@ async function DatabaseTests (): Promise<void> {
 
       childTest.equal(verifyUserResponseBackend.message, 'User verified')
     })
+
+  const loginResponse = await fastify.inject({
+    method: 'POST',
+    url: '/api/users/login',
+    payload: {
+      email: userCreate.email,
+      password: userCreate.password
+    }
+  })
+
+  const tokensBackend: LogInUserResponse = loginResponse.json()
+
+  const { id: sessionId } = await findSessionAndUserUnique('userId', id) as Session & { user: User }
+
+  await t.test('POST `api/users/login` - Happy Path: login user successfully with test database',
+    async childTest => {
+      childTest.equal(loginResponse.statusCode, 200)
+      childTest.equal(loginResponse.headers['content-type'], 'application/json; charset=utf-8')
+
+      const accessVerified = fastify.jwt.access.verify(tokensBackend.accessToken)
+      const refreshVerified = fastify.jwt.refresh.verify(tokensBackend.refreshToken)
+
+      childTest.type(accessVerified.userId, 'string')
+      childTest.type(refreshVerified.sessionId, 'string')
+
+      childTest.equal(refreshVerified.sessionId, sessionId)
+      childTest.equal(accessVerified.userId, id)
+    })
+
+  const refreshUserResponse = await fastify.inject({
+    method: 'POST',
+    url: 'api/users/refresh',
+    headers: {
+      refresh: tokensBackend.refreshToken
+    }
+  })
+
+  const refreshBackend: RefreshTokenResponse = refreshUserResponse.json()
+
+  await t.test('POST `api/users/refresh` - Happy Path: refresh accessToken successfully',
+    async childTest => {
+      childTest.equal(refreshUserResponse.statusCode, 200)
+      childTest.equal(refreshUserResponse.headers['content-type'], 'application/json; charset=utf-8')
+
+      const accessTokenRefresh = fastify.jwt.access.verify(refreshBackend.accessToken)
+
+      childTest.type(accessTokenRefresh.userId, 'string')
+      childTest.equal(accessTokenRefresh.userId, createUserBackend.id)
+    })
+
+  const getMeResponse = await fastify.inject({
+    method: 'GET',
+    url: '/api/users',
+    headers: {
+      authorization: `Bearer ${tokensBackend.accessToken}`
+    }
+  })
+
+  const getMeBackend: CreateUserResponse = getMeResponse.json()
 
   await t.test('GET `api/users` - Happy Path: get user with authorization header successfully with test database',
     async childTest => {

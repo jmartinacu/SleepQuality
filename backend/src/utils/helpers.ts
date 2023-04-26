@@ -1,16 +1,4 @@
-const JPEG_EXTENSIONS = [
-  'jpg',
-  'jpeg',
-  'jfif',
-  'pjpeg',
-  'pjp'
-]
-
-const ALLOWED_EXTENSIONS = [
-  ...JPEG_EXTENSIONS,
-  'png',
-  'webp'
-]
+import { ALLOWED_EXTENSIONS, JPEG_EXTENSIONS } from '../modules/user/user.schemas'
 
 function calculateBMI ({
   weight,

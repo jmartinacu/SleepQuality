@@ -9,7 +9,8 @@ import {
   resetPasswordHandler,
   addProfilePictureHandler,
   getProfilePictureHandler,
-  deleteUserHandler
+  deleteUserHandler,
+  updateUserHandler
 } from './user.controllers'
 import {
   createUserResponseSchema,
@@ -18,12 +19,16 @@ import {
   logInUserSchema,
   verifyAccountParamsSchema,
   verifyAccountResponseSchema,
-  verificationErrorResponseSchema,
+  errorResponseSchema,
   refreshTokenHeaderSchema,
   refreshTokenResponseSchema,
-  forgotPasswordSchema,
+  emailUserSchema,
   resetPasswordParamsSchema,
-  resetPasswordBodySchema
+  resetPasswordBodySchema,
+  getProfilePictureResponseSchema,
+  EmailUserInput,
+  updateUserSchema,
+  UpdateUserInput
 } from './user.schemas'
 import { upload } from '../../server'
 
@@ -48,8 +53,8 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
         headers: refreshTokenHeaderSchema,
         response: {
           200: refreshTokenResponseSchema,
-          401: verificationErrorResponseSchema,
-          400: verificationErrorResponseSchema
+          401: errorResponseSchema,
+          400: errorResponseSchema
         }
       }
     },
@@ -58,12 +63,15 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
 
   server.post('/login',
     {
-      preHandler: server.auth([server.checkEmailAndPassword]),
+      preHandler: server.auth([
+        server.checkUserVerificationWithoutAuthorization,
+        server.checkEmailAndPassword
+      ]),
       schema: {
         body: logInUserSchema,
         response: {
           200: logInUserResponseSchema,
-          401: verificationErrorResponseSchema
+          401: errorResponseSchema
         }
       }
     },
@@ -86,6 +94,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
   server.delete('/',
     {
       onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkUserVerification]),
       schema: {
         response: {
           204: {}
@@ -95,27 +104,46 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     deleteUserHandler
   )
 
+  server.patch<{
+    Body: UpdateUserInput
+  }>('/',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkUserVerification]),
+      schema: {
+        body: updateUserSchema,
+        response: {
+          200: verifyAccountResponseSchema
+        }
+      }
+    },
+    updateUserHandler
+  )
+
   server.get('/verify/:id/:verificationCode',
     {
       schema: {
         params: verifyAccountParamsSchema,
         response: {
           200: verifyAccountResponseSchema,
-          400: verificationErrorResponseSchema,
-          404: verificationErrorResponseSchema
+          400: errorResponseSchema,
+          404: errorResponseSchema
         }
       }
     },
     verifyAccountHandler
   )
 
-  server.post('/forgotpassword',
+  server.post<{
+    Body: EmailUserInput
+  }>('/forgotpassword',
     {
+      preHandler: server.auth([server.checkUserVerificationWithoutAuthorization]),
       schema: {
-        body: forgotPasswordSchema,
+        body: emailUserSchema,
         response: {
           200: verifyAccountResponseSchema,
-          401: verificationErrorResponseSchema
+          401: errorResponseSchema
         }
       }
     },
@@ -129,16 +157,15 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
         body: resetPasswordBodySchema,
         response: {
           200: verifyAccountResponseSchema,
-          404: verificationErrorResponseSchema,
-          401: verificationErrorResponseSchema,
-          403: verificationErrorResponseSchema
+          404: errorResponseSchema,
+          401: errorResponseSchema,
+          403: errorResponseSchema
         }
       }
     },
     resetPasswordHandler
   )
 
-  // VALIDAR EL INPUT Y EL OUTPUT DEL profilePicture
   server.post('/images',
     {
       onRequest: server.auth([server.authenticate]),
@@ -148,7 +175,8 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       ]),
       schema: {
         response: {
-          200: verifyAccountResponseSchema
+          200: verifyAccountResponseSchema,
+          400: errorResponseSchema
         }
       }
     },
@@ -161,7 +189,8 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       preHandler: server.auth([server.checkUserVerification]),
       schema: {
         response: {
-          404: verifyAccountResponseSchema
+          200: getProfilePictureResponseSchema,
+          404: errorResponseSchema
         }
       }
     },

@@ -4,12 +4,13 @@ import type { FastifyReply, FastifyRequest } from 'fastify'
 import type {
   CreateUserInput,
   CreateUserResponse,
-  ForgotPasswordInput,
+  EmailUserInput,
   LogInUserResponse,
   RefreshTokenHeaderInput,
   RefreshTokenResponse,
   ResetPasswordBodyInput,
   ResetPasswordParamsInput,
+  UpdateUserInput,
   VerifyAccountParamsInput,
   VerifyAccountResponse
 } from './user.schemas'
@@ -71,6 +72,23 @@ async function deleteUserHandler (
     const { userId } = request.user as { userId: string }
     await deleteUser(userId)
     return await reply.code(204).send()
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
+async function updateUserHandler (
+  request: FastifyRequest<{
+    Body: UpdateUserInput
+  }>,
+  reply: FastifyReply
+): Promise<VerifyAccountResponse> {
+  try {
+    const { userId } = request.user as { userId: string }
+    const data = request.body
+    await updateUser(userId, data)
+    return await reply.send({ message: 'User updated' })
   } catch (error) {
     console.error(error)
     return await reply.code(500).send(error)
@@ -175,7 +193,7 @@ async function refreshAccessTokenHandler (
 
 async function forgotPasswordHandler (
   request: FastifyRequest<{
-    Body: ForgotPasswordInput
+    Body: EmailUserInput
   }>,
   reply: FastifyReply): Promise<VerifyAccountResponse> {
   try {
@@ -222,7 +240,7 @@ async function resetPasswordHandler (
     if (!user.verified) {
       return await reply.code(401).send({ message: 'User not verify, please verify you account' })
     }
-    if (user.passwordResetCode !== passwordResetCode) {
+    if (user.passwordResetCode !== Number(passwordResetCode)) {
       return await reply.code(403).send({ message: 'Reset Code invalid' })
     }
     await updateUser(id, { passwordResetCode: null, password })
@@ -240,10 +258,14 @@ async function addProfilePictureHandler (
   try {
     const { file: image } = request
     if (typeof image === 'undefined') {
-      return await reply.code(404).send({ message: 'Incorrect image' })
+      return await reply.code(400).send({ message: 'Incorrect image' })
     }
     const { filename: profilePicture } = image
     const { userId } = request.user as { userId: string }
+    const { profilePicture: profilePictureUser } = await findUserUnique('id', userId) as User
+    if (profilePictureUser !== null) {
+      return await reply.code(403).send({ message: 'User already has an profile picture' })
+    }
     await updateUser(userId, { profilePicture })
     return await reply.send({ message: 'Profile Picture saved' })
   } catch (error) {
@@ -275,6 +297,7 @@ async function getProfilePictureHandler (
 export {
   createUserHandler,
   deleteUserHandler,
+  updateUserHandler,
   logInUserHandler,
   getMeHandler,
   verifyAccountHandler,

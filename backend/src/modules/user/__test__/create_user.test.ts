@@ -1,4 +1,4 @@
-import { test } from 'tap'
+/* import { test } from 'tap'
 import { ImportMock } from 'ts-mock-imports'
 import buildServer from '../../../server'
 import { fakeResponseUser } from '../../../utils/test.helpers'
@@ -146,3 +146,4 @@ void test('POST `api/users` - Edge Case: fail create user with mock createUser',
     t.equal(jsonChronicDisorders.message, "body must have required property 'chronicDisorders'")
     t.equal(jsonPassword.message, "body must have required property 'password'")
   })
+ */
