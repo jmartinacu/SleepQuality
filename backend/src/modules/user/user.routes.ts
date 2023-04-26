@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify'
+import type { FastifyInstance } from 'fastify'
 import {
   createUserHandler,
   logInUserHandler,
@@ -6,7 +6,10 @@ import {
   verifyAccountHandler,
   refreshAccessTokenHandler,
   forgotPasswordHandler,
-  resetPasswordHandler
+  resetPasswordHandler,
+  addProfilePictureHandler,
+  getProfilePictureHandler,
+  deleteUserHandler
 } from './user.controllers'
 import {
   createUserResponseSchema,
@@ -22,10 +25,10 @@ import {
   resetPasswordParamsSchema,
   resetPasswordBodySchema
 } from './user.schemas'
+import { upload } from '../../server'
 
-// CUANDO NO SE LE PASA UN OBJECT ID VALIDO A PRISMA PETA CON UN 500
-// Y ENSEÑA AL USUARIO DATOS IMPORTANTES CAMBIAR ESO EN EL FUTURO
-// PARA MANDAR UN ERROR SINTÁCTICO Y DARLE AL USUARIO UN 404
+/* AÑADIR RUTA PARA HACER UPDATE DONDE HAYA UN CAMPO PARA AÑADIR ENFERMEDADES
+Y OTRO CAMPO PARA QUITAR ENFERMEDADES QUE YA TENIA EL USUARIO */
 async function userRoutes (server: FastifyInstance): Promise<void> {
   server.post('/',
     {
@@ -73,12 +76,23 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       preHandler: server.auth([server.checkUserVerification]),
       schema: {
         response: {
-          200: createUserResponseSchema,
-          401: verificationErrorResponseSchema
+          200: createUserResponseSchema
         }
       }
     },
     getMeHandler
+  )
+
+  server.delete('/',
+    {
+      onRequest: server.auth([server.authenticate]),
+      schema: {
+        response: {
+          204: {}
+        }
+      }
+    },
+    deleteUserHandler
   )
 
   server.get('/verify/:id/:verificationCode',
@@ -87,7 +101,8 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
         params: verifyAccountParamsSchema,
         response: {
           200: verifyAccountResponseSchema,
-          400: verificationErrorResponseSchema
+          400: verificationErrorResponseSchema,
+          404: verificationErrorResponseSchema
         }
       }
     },
@@ -121,6 +136,36 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       }
     },
     resetPasswordHandler
+  )
+
+  // VALIDAR EL INPUT Y EL OUTPUT DEL profilePicture
+  server.post('/images',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([
+        server.checkUserVerification,
+        upload.single('profilePicture')
+      ]),
+      schema: {
+        response: {
+          200: verifyAccountResponseSchema
+        }
+      }
+    },
+    addProfilePictureHandler
+  )
+
+  server.get('/images',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkUserVerification]),
+      schema: {
+        response: {
+          404: verifyAccountResponseSchema
+        }
+      }
+    },
+    getProfilePictureHandler
   )
 }
 

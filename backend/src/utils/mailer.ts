@@ -1,5 +1,5 @@
 import config from 'config'
-import nodemailer, { SendMailOptions } from 'nodemailer'
+import nodemailer, { type SendMailOptions } from 'nodemailer'
 
 const smpt = config.get<{
   host: string
@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
   }
 })
 
-export default async function sendEmail (payload: SendMailOptions): Promise<void> {
+async function sendEmail (payload: SendMailOptions): Promise<void> {
   transporter.sendMail(payload, (error, info) => {
     if (error !== null) {
       console.error(error, 'Error sending email')
@@ -30,3 +30,5 @@ export default async function sendEmail (payload: SendMailOptions): Promise<void
     console.info(`Preview URL: ${nodemailer.getTestMessageUrl(info)}`)
   })
 }
+
+export default sendEmail

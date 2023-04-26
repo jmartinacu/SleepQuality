@@ -1,17 +1,10 @@
-import { PrismaClient, User, Session } from '@prisma/client'
-import config from 'config'
+import { PrismaClient, type User, type Session } from '@prisma/client'
 
-const databaseUrl = config.get<string>('databaseUrl')
-
-const prisma = new PrismaClient({
-  datasources: {
-    db: { url: databaseUrl }
-  }
-})
+const prisma = new PrismaClient()
 
 export default prisma
 
-export {
+export type {
   User,
   Session
 }

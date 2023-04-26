@@ -1,5 +1,7 @@
-import { FastifyReply, FastifyRequest } from 'fastify'
-import {
+import fs, { type ReadStream } from 'node:fs'
+import path from 'node:path'
+import type { FastifyReply, FastifyRequest } from 'fastify'
+import type {
   CreateUserInput,
   CreateUserResponse,
   ForgotPasswordInput,
@@ -14,15 +16,22 @@ import {
 import {
   createSession,
   createUser,
-  findSessionAndUserUnique,
+  deleteUser,
   findSessionUnique,
   findUserUnique,
   updateSession,
   updateUser
 } from './user.services'
 import sendEmail from '../../utils/mailer'
-import { Session, User } from '../../utils/database'
-import { checkTimeDiffGivenDateUntilNow, htmlResetPasswordUser, htmlVerifyUser, random } from '../../utils/helpers'
+import type { Session, User } from '../../utils/database'
+import {
+  checkTimeDiffOfGivenDateUntilNow,
+  getFileExtension,
+  getMIMEType,
+  htmlResetPasswordUser,
+  htmlVerifyUser,
+  random
+} from '../../utils/helpers'
 
 async function createUserHandler (
   request: FastifyRequest<{
@@ -32,13 +41,12 @@ async function createUserHandler (
 ): Promise<CreateUserResponse> {
   try {
     const { password, ...rest } = request.body
-    // const { server } = request
 
     const passwordHash = await request.bcryptHash(password)
 
     const user = await createUser({ ...rest, password: passwordHash })
 
-    const verificationLink = `http://127.0.0.1:8080/api/users/verify/${user.id}/${user.verificationCode}`
+    const verificationLink = `${request.protocol}://${request.hostname}/api/users/verify/${user.id}/${user.verificationCode}`
 
     const html = htmlVerifyUser(verificationLink)
 
@@ -49,6 +57,20 @@ async function createUserHandler (
     })
 
     return await reply.code(201).send(user)
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
+async function deleteUserHandler (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<void> {
+  try {
+    const { userId } = request.user as { userId: string }
+    await deleteUser(userId)
+    return await reply.code(204).send()
   } catch (error) {
     console.error(error)
     return await reply.code(500).send(error)
@@ -67,8 +89,8 @@ async function logInUserHandler (
       const { id } = await updateSession(session.id, { valid: true })
       sessionId = id
     } else {
-      const newSession = await createSession(userId)
-      sessionId = newSession.id
+      const { id } = await createSession(userId)
+      sessionId = id
     }
     const accessToken = await reply.accessSign({ userId })
     const refreshToken = await reply.refreshSign({ sessionId })
@@ -88,10 +110,7 @@ async function getMeHandler (
 ): Promise<CreateUserResponse> {
   try {
     const { userId } = request.user as { userId: string }
-    const { user, valid } = await findSessionAndUserUnique('userId', userId) as Session & { user: User }
-    if (!valid) {
-      return await reply.code(401).send({ message: 'Session expired, please login' })
-    }
+    const user = await findUserUnique('id', userId) as User
     return await reply.send(user)
   } catch (error) {
     console.error(error)
@@ -109,7 +128,7 @@ async function verifyAccountHandler (
     const { id, verificationCode } = request.params
     const user = await findUserUnique('id', id)
     if (user === null) {
-      return await reply.code(400).send({ message: 'Not Found' })
+      return await reply.code(404).send({ message: 'Not Found' })
     }
     if (user.verified) {
       return await reply.send({ message: 'User already verified' })
@@ -118,7 +137,7 @@ async function verifyAccountHandler (
       await updateUser(id, { verified: true })
       return await reply.send({ message: 'User verified' })
     }
-    return await reply.code(400).send({ message: 'Could not verified User' })
+    return await reply.code(400).send({ message: 'Could not verified user' })
   } catch (error) {
     console.error(error)
     return await reply.code(500).send(error)
@@ -135,15 +154,12 @@ async function refreshAccessTokenHandler (
     const jwtRefreshFunctionality = request.server.jwt.refresh
     const { refresh } = request.headers
     await jwtRefreshFunctionality.verify(refresh)
-    const decodedRefreshToken = jwtRefreshFunctionality.decode(refresh)
-    if (decodedRefreshToken === null) {
-      return await reply.code(401).send({ message: 'Could not refresh Access Token' })
-    }
-    const { id, valid, updatedAt, userId } = await findSessionUnique('id', decodedRefreshToken.sessionId) as Session
+    const { sessionId } = jwtRefreshFunctionality.decode(refresh) as { sessionId: string }
+    const { id, valid, updatedAt, userId } = await findSessionUnique('id', sessionId) as Session
     if (!valid) {
       return await reply.code(401).send({ message: 'Could not refresh Access Token' })
     }
-    if (checkTimeDiffGivenDateUntilNow(updatedAt, 1)) {
+    if (checkTimeDiffOfGivenDateUntilNow(updatedAt, 1)) {
       await updateSession(id, { valid: false })
       return await reply.code(400).send({ message: 'Refresh Token time limit exceeded, please login' })
     }
@@ -217,12 +233,54 @@ async function resetPasswordHandler (
   }
 }
 
+async function addProfilePictureHandler (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<VerifyAccountResponse> {
+  try {
+    const { file: image } = request
+    if (typeof image === 'undefined') {
+      return await reply.code(404).send({ message: 'Incorrect image' })
+    }
+    const { filename: profilePicture } = image
+    const { userId } = request.user as { userId: string }
+    await updateUser(userId, { profilePicture })
+    return await reply.send({ message: 'Profile Picture saved' })
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+async function getProfilePictureHandler (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<ReadStream> {
+  try {
+    const { userId } = request.user as { userId: string }
+    const { profilePicture } = await findUserUnique('id', userId) as User
+    if (profilePicture === null) {
+      return await reply.code(404).send({ message: 'No Profile Picture' })
+    }
+    const extension = getFileExtension(profilePicture)
+    const MIMEType = getMIMEType(extension)
+    const filePath = path.resolve(`images/${profilePicture}`)
+    const fileStream = fs.createReadStream(filePath)
+    return await reply.type(MIMEType).send(fileStream)
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
 export {
   createUserHandler,
+  deleteUserHandler,
   logInUserHandler,
   getMeHandler,
   verifyAccountHandler,
   refreshAccessTokenHandler,
   forgotPasswordHandler,
-  resetPasswordHandler
+  resetPasswordHandler,
+  addProfilePictureHandler,
+  getProfilePictureHandler
 }
