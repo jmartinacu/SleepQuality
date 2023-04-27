@@ -58,15 +58,18 @@ async function updateUser (userId: string, dataToUpdate: UpdateUserServiceInput)
     const BMI = calculateBMI({ height: newHeight, weight: newWeight })
     data.BMI = BMI
   }
-  if (typeof dataToUpdate.chronicDisordersToAdd !== 'undefined') {
-    data.chronicDisorders = chronicDisorders.concat(dataToUpdate.chronicDisordersToAdd)
-  }
+  let newChronicDisorders = chronicDisorders
   if (typeof dataToUpdate.chronicDisordersToRemove !== 'undefined') {
-    data.chronicDisorders = chronicDisorders
-      .filter(disorder =>
-        dataToUpdate.chronicDisordersToRemove?.includes(disorder) === false
-      )
-    console.log(data.chronicDisorders)
+    newChronicDisorders = newChronicDisorders.filter(disorder =>
+      dataToUpdate.chronicDisordersToRemove?.includes(disorder) === false
+    )
+    data.chronicDisorders = newChronicDisorders
+  }
+  if (typeof dataToUpdate.chronicDisordersToAdd !== 'undefined') {
+    const disordersToAdd = dataToUpdate.chronicDisordersToAdd
+      .filter(disorder => !newChronicDisorders.includes(disorder))
+    newChronicDisorders = newChronicDisorders.concat(disordersToAdd)
+    data.chronicDisorders = newChronicDisorders
   }
   const user = await prisma.user.update({
     where: {

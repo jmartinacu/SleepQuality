@@ -46,6 +46,7 @@ const userExtent = {
     Type.Literal('USER')
   ], { default: 'USER' }),
   verificationCode: Type.String({ format: 'uuid' }),
+  verified: Type.Boolean({ default: false }),
   id: Type.RegEx(regexObjectId),
   accessToken: Type.String(),
   refreshToken: Type.String(),
@@ -83,7 +84,8 @@ const {
   refreshToken,
   profilePictureJPG,
   profilePicturePNG,
-  profilePictureWEBP
+  profilePictureWEBP,
+  verified
 } = userExtent
 
 const { BMI, ...userCoreExceptBMI } = userCore
@@ -157,7 +159,7 @@ const updateUserServiceSchema = Type.Object({
   chronicDisordersToAdd: Type.Optional(chronicDisorders),
   chronicDisordersToRemove: Type.Optional(chronicDisorders),
   BMI: Type.Optional(BMI),
-  verified: Type.Optional(Type.Boolean()),
+  verified: Type.Optional(verified),
   passwordResetCode: Type.Optional(Type.Union([
     passwordResetCode,
     Type.Null()
@@ -167,7 +169,6 @@ const updateUserServiceSchema = Type.Object({
 })
 
 const updateUserSchema = Type.Omit(updateUserServiceSchema, [
-  'gender',
   'BMI',
   'verified',
   'passwordResetCode',
@@ -182,7 +183,7 @@ const updateUserDatabase = Type.Object({
   weight: Type.Optional(weight),
   chronicDisorders: Type.Optional(chronicDisorders),
   BMI: Type.Optional(BMI),
-  verified: Type.Optional(Type.Boolean()),
+  verified: Type.Optional(verified),
   passwordResetCode: Type.Optional(Type.Union([
     passwordResetCode,
     Type.Null()

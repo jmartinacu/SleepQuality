@@ -2,7 +2,7 @@ import Fastify, { type FastifyInstance } from 'fastify'
 import type { JWT } from '@fastify/jwt'
 import fastifyCors from '@fastify/cors'
 import multer from 'fastify-multer'
-import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
+import type { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import userRoutes from './modules/user/user.routes'
 import questionnaireRoutes from './modules/questionnaire/questionnaire.routes'
 import authPlugin from './plugins/auth/auth.plugin'
@@ -63,20 +63,6 @@ const buildServer = (): FastifyInstance => {
   void server.register(upload.contentParser)
 
   void server.register(authPlugin)
-
-  // server.setErrorHandler((error, _request, reply) => {
-  //   if (error instanceof ZodError) {
-  //     console.error(error)
-  //     void reply.status(400).send({
-  //       statusCode: 400,
-  //       error: 'Bad Request',
-  //       issues: error.issues.reduce<{ [key: string | number]: string }>((acc, item) => {
-  //         acc[item.path[0]] = item.message
-  //         return acc
-  //       }, {})
-  //     })
-  //   }
-  // })
 
   server.after(() => {
     server.get('/', async (_request, _reply) => {
