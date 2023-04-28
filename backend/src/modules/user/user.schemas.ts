@@ -1,4 +1,4 @@
-import { Static, Type } from '@sinclair/typebox'
+import { Static, Type } from '@fastify/type-provider-typebox'
 
 const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])([A-Za-z\d$@$!%*?&]|[^ ]){8,15}$/
 const regexObjectId = /^[a-fA-F0-9]{24}$/
@@ -133,10 +133,6 @@ const refreshTokenHeaderSchema = Type.Object({
   refresh: refreshToken
 })
 
-const findUserSchema = Type.Object({
-  id
-})
-
 const verifyAccountParamsSchema = Type.Object({
   id,
   verificationCode
@@ -215,64 +211,139 @@ const getProfilePictureResponseSchema = Type.Union([
   profilePictureWEBP
 ])
 
+const CreateUserSchema = {
+  body: createUserSchema,
+  response: {
+    201: createUserResponseSchema,
+    500: Type.Any()
+  }
+}
+
+const RefreshTokenSchema = {
+  headers: refreshTokenHeaderSchema,
+  response: {
+    200: refreshTokenResponseSchema,
+    401: errorResponseSchema,
+    400: errorResponseSchema,
+    500: Type.Any()
+  }
+}
+
+const LogInSchema = {
+  body: logInUserSchema,
+  response: {
+    200: logInUserResponseSchema,
+    401: errorResponseSchema,
+    500: Type.Any()
+  }
+}
+
+const GetUserAuthenticatedSchema = {
+  response: {
+    200: createUserResponseSchema,
+    500: Type.Any()
+  }
+}
+
+const DeleteUserAuthenticatedSchema = {
+  response: {
+    204: {},
+    500: Type.Any()
+  }
+}
+
+const UpdateUserAuthenticatedSchema = {
+  body: updateUserSchema,
+  response: {
+    200: verifyAccountResponseSchema,
+    500: Type.Any()
+  }
+}
+
+const VerifyUserSchema = {
+  params: verifyAccountParamsSchema,
+  response: {
+    200: verifyAccountResponseSchema,
+    400: errorResponseSchema,
+    404: errorResponseSchema,
+    500: Type.Any()
+  }
+}
+
+const ForgotPasswordSchema = {
+  body: emailUserSchema,
+  response: {
+    200: verifyAccountResponseSchema,
+    401: errorResponseSchema,
+    500: Type.Any()
+  }
+}
+
+const ResetPasswordSchema = {
+  params: resetPasswordParamsSchema,
+  body: resetPasswordBodySchema,
+  response: {
+    200: verifyAccountResponseSchema,
+    404: errorResponseSchema,
+    401: errorResponseSchema,
+    403: errorResponseSchema,
+    500: Type.Any()
+  }
+}
+
+const AddProfilePictureSchema = {
+  response: {
+    200: verifyAccountResponseSchema,
+    400: errorResponseSchema,
+    500: Type.Any()
+  }
+}
+
+const GetProfilePictureSchema = {
+  response: {
+    200: getProfilePictureResponseSchema,
+    404: errorResponseSchema,
+    500: Type.Any()
+  }
+}
+
 type CreateUserInput = Static<typeof createUserSchema>
 type CreateUserResponse = Static<typeof createUserResponseSchema>
 type CreateUserHandlerResponse = Static<typeof createUserHandlerResponseSchema>
 type LogInUserInput = Static<typeof logInUserSchema>
 type LogInUserResponse = Static<typeof logInUserResponseSchema>
-type FindUserInput = Static<typeof findUserSchema>
-type VerifyAccountParamsInput = Static<typeof verifyAccountParamsSchema>
+type EmailUserInput = Static<typeof emailUserSchema>
 type UpdateUserServiceInput = Static<typeof updateUserServiceSchema>
-type UpdateUserInput = Static<typeof updateUserSchema>
 type UpdateUserDatabase = Static<typeof updateUserDatabase>
 type VerifyAccountResponse = Static<typeof verifyAccountResponseSchema>
 type UpdateSessionInput = Static<typeof updateSessionSchema>
-type ErrorResponse = Static<typeof errorResponseSchema>
-type RefreshTokenHeaderInput = Static<typeof refreshTokenHeaderSchema>
 type RefreshTokenResponse = Static<typeof refreshTokenResponseSchema>
-type EmailUserInput = Static<typeof emailUserSchema>
-type ResetPasswordParamsInput = Static<typeof resetPasswordParamsSchema>
-type ResetPasswordBodyInput = Static<typeof resetPasswordBodySchema>
 type Gender = Static<typeof gender>
 type Role = Static<typeof role>
 
 export {
   type Gender,
   type Role,
-  createUserSchema,
-  createUserResponseSchema,
-  createUserHandlerResponseSchema,
-  logInUserSchema,
-  logInUserResponseSchema,
-  findUserSchema,
-  verifyAccountParamsSchema,
-  verifyAccountResponseSchema,
-  updateUserServiceSchema,
-  errorResponseSchema,
-  refreshTokenHeaderSchema,
-  refreshTokenResponseSchema,
-  emailUserSchema,
-  resetPasswordParamsSchema,
-  resetPasswordBodySchema,
-  getProfilePictureResponseSchema,
-  updateUserSchema,
-  updateUserDatabase,
+  CreateUserSchema,
+  RefreshTokenSchema,
+  LogInSchema,
+  GetUserAuthenticatedSchema,
+  DeleteUserAuthenticatedSchema,
+  UpdateUserAuthenticatedSchema,
+  VerifyUserSchema,
+  ForgotPasswordSchema,
+  ResetPasswordSchema,
+  AddProfilePictureSchema,
+  GetProfilePictureSchema,
   type UpdateUserDatabase,
-  type UpdateUserInput,
-  type ResetPasswordBodyInput,
-  type ResetPasswordParamsInput,
   type CreateUserResponse,
   type CreateUserInput,
   type CreateUserHandlerResponse,
   type LogInUserInput,
   type LogInUserResponse,
-  type FindUserInput,
-  type VerifyAccountParamsInput,
+  type EmailUserInput,
   type VerifyAccountResponse,
   type UpdateUserServiceInput,
   type UpdateSessionInput,
-  type ErrorResponse,
-  type RefreshTokenHeaderInput,
-  type RefreshTokenResponse,
-  type EmailUserInput
+  type RefreshTokenResponse
 }

@@ -24,8 +24,7 @@ model User {
   verified          Boolean @default(false)
   session           Session?
   profilePicture    String?
-  answerIds         String[] @db.ObjectId
-  answers           Answer[] @relation(fields: [answerIds], references: [id])
+  answers           Answer[] 
 }
 
 model Session {
@@ -38,10 +37,10 @@ model Session {
 
 model Questionnaire {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
+  name        String @unique
   questions   Json
   createdAt   DateTime @default(now())
-  updadatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt
   answers     Answer[]
 }
 
@@ -49,9 +48,9 @@ model Answer {
   id              String @id @default(auto()) @map("_id") @db.ObjectId
   answers         Json
   createdAt       DateTime @default(now())
-  updadatedAt     DateTime @updatedAt
-  userIds         String[] @db.ObjectId
-  users           User[] @relation(fields: [userIds], references: [id])
+  updatedAt     DateTime @updatedAt
+  userId         String @db.ObjectId
+  user           User @relation(fields: [userId], references: [id])
   questionnaireId String @db.ObjectId
   questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id])
 }
@@ -62,14 +61,6 @@ enum Gender {
   NEUTER
 }
 
-enum QuestionTypes {
-  PRIMARY_TEXT
-  PRIMARY_NUMBER
-  PRIMARY_BOOL
-  SECONDARY_TEXT
-  SECONDARY_NUMBER
-  SECONDARY_BOOL
-}
 
 enum Role {
   ADMIN

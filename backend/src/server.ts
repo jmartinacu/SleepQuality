@@ -1,4 +1,12 @@
-import Fastify, { type FastifyInstance } from 'fastify'
+import Fastify, {
+  type FastifyInstance,
+  type FastifyReply,
+  type FastifyRequest,
+  type RawRequestDefaultExpression,
+  type RawServerDefault,
+  type RawReplyDefaultExpression,
+  type ContextConfigDefault
+} from 'fastify'
 import type { JWT } from '@fastify/jwt'
 import fastifyCors from '@fastify/cors'
 import multer from 'fastify-multer'
@@ -9,6 +17,8 @@ import authPlugin from './plugins/auth/auth.plugin'
 import { fileFilter, destination, filename } from './plugins/auth/auth.controller'
 import type { File } from './plugins/types.plugins'
 import { MAX_FILE_SIZE } from './modules/user/user.schemas'
+import type { RouteGenericInterface } from 'fastify/types/route'
+import type { FastifySchema } from 'fastify/types/schema'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -42,6 +52,23 @@ declare module '@fastify/jwt' {
   }
 }
 
+export type FastifyRequestTypebox<TSchema extends FastifySchema> = FastifyRequest< RouteGenericInterface,
+RawServerDefault,
+RawRequestDefaultExpression<RawServerDefault>,
+TSchema,
+TypeBoxTypeProvider
+>
+
+export type FastifyReplyTypebox<TSchema extends FastifySchema> = FastifyReply<
+RawServerDefault,
+RawRequestDefaultExpression,
+RawReplyDefaultExpression,
+RouteGenericInterface,
+ContextConfigDefault,
+TSchema,
+TypeBoxTypeProvider
+>
+
 const storage = multer.diskStorage({
   destination,
   filename
@@ -56,7 +83,7 @@ export const upload = multer({
 })
 
 const buildServer = (): FastifyInstance => {
-  const server = Fastify().withTypeProvider<TypeBoxTypeProvider>()
+  const server = Fastify()
 
   void server.register(fastifyCors)
 

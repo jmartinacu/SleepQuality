@@ -50,16 +50,15 @@ function fakeUser ({
   const verified = faker.datatype.boolean()
   const role = roles.at(roleIndex) as Role
   const profilePicture = faker.datatype.string()
-  const answerIds: string[] = faker.datatype.array(7)
-    .filter(disorder => typeof disorder === 'string') as string[]
+  // const answerIds: string[] = faker.datatype.array(7)
+  //   .filter(disorder => typeof disorder === 'string') as string[]
   return {
     ...userResponse,
     verificationCode,
     passwordResetCode,
     verified,
     role,
-    profilePicture,
-    answerIds
+    profilePicture
   }
 }
 

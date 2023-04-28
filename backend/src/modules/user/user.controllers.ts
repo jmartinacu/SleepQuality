@@ -1,18 +1,21 @@
 import fs, { type ReadStream } from 'node:fs'
 import path from 'node:path'
-import type { FastifyReply, FastifyRequest } from 'fastify'
 import type {
-  CreateUserInput,
+  AddProfilePictureSchema,
   CreateUserResponse,
-  EmailUserInput,
+  CreateUserSchema,
+  DeleteUserAuthenticatedSchema,
+  ForgotPasswordSchema,
+  GetProfilePictureSchema,
+  GetUserAuthenticatedSchema,
+  LogInSchema,
   LogInUserResponse,
-  RefreshTokenHeaderInput,
   RefreshTokenResponse,
-  ResetPasswordBodyInput,
-  ResetPasswordParamsInput,
-  UpdateUserInput,
-  VerifyAccountParamsInput,
-  VerifyAccountResponse
+  RefreshTokenSchema,
+  ResetPasswordSchema,
+  UpdateUserAuthenticatedSchema,
+  VerifyAccountResponse,
+  VerifyUserSchema
 } from './user.schemas'
 import {
   createSession,
@@ -33,12 +36,11 @@ import {
   htmlVerifyUser,
   random
 } from '../../utils/helpers'
+import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 
 async function createUserHandler (
-  request: FastifyRequest<{
-    Body: CreateUserInput
-  }>,
-  reply: FastifyReply
+  request: FastifyRequestTypebox<typeof CreateUserSchema>,
+  reply: FastifyReplyTypebox<typeof CreateUserSchema>
 ): Promise<CreateUserResponse> {
   try {
     const { password, ...rest } = request.body
@@ -65,8 +67,8 @@ async function createUserHandler (
 }
 
 async function deleteUserHandler (
-  request: FastifyRequest,
-  reply: FastifyReply
+  request: FastifyRequestTypebox<typeof DeleteUserAuthenticatedSchema>,
+  reply: FastifyReplyTypebox<typeof DeleteUserAuthenticatedSchema>
 ): Promise<void> {
   try {
     const { userId } = request.user as { userId: string }
@@ -79,10 +81,8 @@ async function deleteUserHandler (
 }
 
 async function updateUserHandler (
-  request: FastifyRequest<{
-    Body: UpdateUserInput
-  }>,
-  reply: FastifyReply
+  request: FastifyRequestTypebox<typeof UpdateUserAuthenticatedSchema>,
+  reply: FastifyReplyTypebox<typeof UpdateUserAuthenticatedSchema>
 ): Promise<VerifyAccountResponse> {
   try {
     const { userId } = request.user as { userId: string }
@@ -96,8 +96,8 @@ async function updateUserHandler (
 }
 
 async function logInUserHandler (
-  request: FastifyRequest,
-  reply: FastifyReply
+  request: FastifyRequestTypebox<typeof LogInSchema>,
+  reply: FastifyReplyTypebox<typeof LogInSchema>
 ): Promise<LogInUserResponse> {
   try {
     const { userId } = request.user as { userId: string }
@@ -123,8 +123,8 @@ async function logInUserHandler (
 }
 
 async function getMeHandler (
-  request: FastifyRequest,
-  reply: FastifyReply
+  request: FastifyRequestTypebox<typeof GetUserAuthenticatedSchema>,
+  reply: FastifyReplyTypebox<typeof GetUserAuthenticatedSchema>
 ): Promise<CreateUserResponse> {
   try {
     const { userId } = request.user as { userId: string }
@@ -137,10 +137,8 @@ async function getMeHandler (
 }
 
 async function verifyAccountHandler (
-  request: FastifyRequest<{
-    Params: VerifyAccountParamsInput
-  }>,
-  reply: FastifyReply
+  request: FastifyRequestTypebox<typeof VerifyUserSchema>,
+  reply: FastifyReplyTypebox<typeof VerifyUserSchema>
 ): Promise<void> {
   try {
     const { id, verificationCode } = request.params
@@ -163,10 +161,8 @@ async function verifyAccountHandler (
 }
 
 async function refreshAccessTokenHandler (
-  request: FastifyRequest<{
-    Headers: RefreshTokenHeaderInput
-  }>,
-  reply: FastifyReply
+  request: FastifyRequestTypebox<typeof RefreshTokenSchema>,
+  reply: FastifyReplyTypebox<typeof RefreshTokenSchema>
 ): Promise<RefreshTokenResponse> {
   try {
     const jwtRefreshFunctionality = request.server.jwt.refresh
@@ -192,10 +188,9 @@ async function refreshAccessTokenHandler (
 }
 
 async function forgotPasswordHandler (
-  request: FastifyRequest<{
-    Body: EmailUserInput
-  }>,
-  reply: FastifyReply): Promise<VerifyAccountResponse> {
+  request: FastifyRequestTypebox<typeof ForgotPasswordSchema>,
+  reply: FastifyReplyTypebox<typeof ForgotPasswordSchema>
+): Promise<VerifyAccountResponse> {
   try {
     const { email } = request.body
     const message = `If user with email equal ${email} is registered, he will received an email to reset his password`
@@ -224,11 +219,8 @@ async function forgotPasswordHandler (
 }
 
 async function resetPasswordHandler (
-  request: FastifyRequest<{
-    Params: ResetPasswordParamsInput
-    Body: ResetPasswordBodyInput
-  }>,
-  reply: FastifyReply
+  request: FastifyRequestTypebox<typeof ResetPasswordSchema>,
+  reply: FastifyReplyTypebox<typeof ResetPasswordSchema>
 ): Promise<VerifyAccountResponse> {
   try {
     const { id, passwordResetCode } = request.params
@@ -252,8 +244,8 @@ async function resetPasswordHandler (
 }
 
 async function addProfilePictureHandler (
-  request: FastifyRequest,
-  reply: FastifyReply
+  request: FastifyRequestTypebox<typeof AddProfilePictureSchema>,
+  reply: FastifyReplyTypebox<typeof AddProfilePictureSchema>
 ): Promise<VerifyAccountResponse> {
   try {
     const { file: image } = request
@@ -274,8 +266,8 @@ async function addProfilePictureHandler (
   }
 }
 async function getProfilePictureHandler (
-  request: FastifyRequest,
-  reply: FastifyReply
+  request: FastifyRequestTypebox<typeof GetProfilePictureSchema>,
+  reply: FastifyReplyTypebox<typeof GetProfilePictureSchema>
 ): Promise<ReadStream> {
   try {
     const { userId } = request.user as { userId: string }

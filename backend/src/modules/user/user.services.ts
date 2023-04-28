@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import prisma, { type User, type Session } from '../../utils/database'
 import { calculateBMI } from '../../utils/helpers'
-import type {
+import {
   CreateUserInput,
   CreateUserHandlerResponse,
   UpdateSessionInput,
@@ -44,10 +44,22 @@ async function createSession (userId: string): Promise<Session> {
   return session
 }
 
-async function updateUser (userId: string, dataToUpdate: UpdateUserServiceInput): Promise<User> {
+async function updateUser (
+  userId: string,
+  dataToUpdate: UpdateUserServiceInput
+): Promise<User> {
   const { height, weight, chronicDisorders } = await findUserUnique('id', userId) as User
   const { BMI, chronicDisordersToAdd, chronicDisordersToRemove, ...rest } = dataToUpdate
-  const data: UpdateUserDatabase = rest
+  const data: UpdateUserDatabase = {
+    age: rest.age,
+    gender: rest.gender,
+    height: rest.height,
+    weight: rest.weight,
+    password: rest.password,
+    passwordResetCode: rest.passwordResetCode,
+    verified: rest.verified,
+    profilePicture: rest.profilePicture
+  }
   if (typeof dataToUpdate.height !== 'undefined' || typeof dataToUpdate.weight !== 'undefined') {
     const newHeight = typeof dataToUpdate.height === 'undefined'
       ? height
@@ -81,15 +93,18 @@ async function updateUser (userId: string, dataToUpdate: UpdateUserServiceInput)
 }
 
 async function deleteUser (id: string): Promise<void> {
-  const { answerIds, profilePicture } = await prisma.user.delete({
+  const { profilePicture, answers } = await prisma.user.delete({
     where: {
       id
+    },
+    include: {
+      answers: true
     }
   })
   await prisma.answer.deleteMany({
     where: {
       id: {
-        in: answerIds
+        in: answers.map(answer => answer.id)
       }
     }
   })

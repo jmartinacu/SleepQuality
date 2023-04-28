@@ -1,11 +1,30 @@
 import type { FastifyInstance } from 'fastify'
-import { getQuestionnaireHandler } from './questionnaire.controllers'
+import { createAnswerHandler, createQuestionnaireHandler } from './questionnaire.controllers'
+import {
+  CreateAnswerSchema,
+  CreateQuestionnaireSchema
+} from './questionnaire.schemas'
 
 async function questionnaireRoutes (server: FastifyInstance): Promise<void> {
-  server.get('/',
+  server.post('/',
     {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([
+        server.checkUserVerification,
+        server.checkAdmin
+      ]),
+      schema: CreateQuestionnaireSchema
     },
-    getQuestionnaireHandler
+    createQuestionnaireHandler
+  )
+
+  server.post('/response',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkUserVerification]),
+      schema: CreateAnswerSchema
+    },
+    createAnswerHandler
   )
 }
 

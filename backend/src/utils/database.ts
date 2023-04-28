@@ -1,4 +1,10 @@
-import { PrismaClient, type User, type Session } from '@prisma/client'
+import {
+  PrismaClient,
+  type User,
+  type Session,
+  type Answer,
+  type Questionnaire
+} from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -6,5 +12,7 @@ export default prisma
 
 export type {
   User,
-  Session
+  Session,
+  Answer,
+  Questionnaire
 }
