@@ -14,7 +14,8 @@ import {
   isAdmin,
   verifySession,
   verifyAuthorizationHeader,
-  userVerifiedWithoutAuthorization
+  userVerifiedWithoutAuthorization,
+  verifyEmailAndPasswordAdminHandler
 } from './auth.controller'
 
 const pluginAuthorization: FastifyPluginAsync = async (
@@ -57,6 +58,8 @@ const pluginAuthorization: FastifyPluginAsync = async (
   fastify.decorate('authenticate', verifyAuthorizationHeader)
 
   fastify.decorate('checkEmailAndPassword', verifyEmailAndPasswordHandler)
+
+  fastify.decorate('checkEmailAndPasswordAdmin', verifyEmailAndPasswordAdminHandler)
 
   fastify.decorate(
     'checkUserVerificationWithoutAuthorization',

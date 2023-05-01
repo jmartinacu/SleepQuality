@@ -11,6 +11,15 @@ function calculateBMI ({
   return Number(BMI.toFixed(3))
 }
 
+const checkAnswerTypes = {
+  PRIMARY_TEXT: (response: any) => typeof response === 'string',
+  PRIMARY_NUMBER: (response: any) => typeof response === 'number',
+  PRIMARY_BOOL: (response: any) => typeof response === 'boolean',
+  SECONDARY_TEXT: (response: any) => typeof response === 'string' || response === null,
+  SECONDARY_NUMBER: (response: any) => typeof response === 'number' || response === null,
+  SECONDARY_BOOL: (response: any) => typeof response === 'boolean' || response === null
+}
+
 function checkTimeDiffOfGivenDateUntilNow (date: Date, timeInHours: number): boolean {
   const millisecondsToHours = 1000 * 60 * 60
   const timeDiff = (new Date().getTime() - date.getTime()) / millisecondsToHours
@@ -73,5 +82,6 @@ export {
   checkFileExtension,
   getMIMEType,
   htmlVerifyUser,
-  htmlResetPasswordUser
+  htmlResetPasswordUser,
+  checkAnswerTypes
 }

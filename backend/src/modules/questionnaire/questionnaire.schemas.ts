@@ -1,17 +1,7 @@
-// import { Static } from '@sinclair/typebox'
 import { Type, Static } from '@fastify/type-provider-typebox'
 
 type QuestionTypes = 'PRIMARY_TEXT' | 'PRIMARY_NUMBER' | 'PRIMARY_BOOL' | 'SECONDARY_TEXT' | 'SECONDARY_NUMBER' | 'SECONDARY_BOOL'
-type QuestionsType = Record<string, QuestionTypes>
-
-const checkAnswerUsers = {
-  PRIMARY_TEXT: (response: any) => typeof response === 'string',
-  PRIMARY_NUMBER: (response: any) => typeof response === 'number',
-  PRIMARY_BOOL: (response: any) => typeof response === 'boolean',
-  SECONDARY_TEXT: (response: any) => typeof response === 'string' || response === null,
-  SECONDARY_NUMBER: (response: any) => typeof response === 'number' || response === null,
-  SECONDARY_BOOL: (response: any) => typeof response === 'boolean' || response === null
-}
+type QuestionsType = Record<string, QuestionTypes | string[]>
 
 const regexObjectId = /^[a-fA-F0-9]{24}$/
 // name        String
@@ -83,6 +73,5 @@ export {
   CreateAnswerSchema,
   type CreateQuestionnaireInput,
   type QuestionsType,
-  type QuestionTypes,
-  checkAnswerUsers
+  type QuestionTypes
 }

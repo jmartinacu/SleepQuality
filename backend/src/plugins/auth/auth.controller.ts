@@ -49,6 +49,29 @@ async function verifyEmailAndPasswordHandler (
   }
 }
 
+async function verifyEmailAndPasswordAdminHandler (
+  request: FastifyRequest<{
+    Body: LogInUserInput
+  }>,
+  reply: FastifyReply
+): Promise<void> {
+  try {
+    const { email, password } = request.body
+
+    const user = await findUserUnique('email', email)
+    if (user === null) {
+      return await reply.code(403).send({ message: 'Email or password wrong' })
+    }
+    if (password === user.password) {
+      return await reply.code(403).send({ message: 'Email or password wrong' })
+    }
+    request.user = { userId: user.id }
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
 async function userVerifiedWithoutAuthorization (
   request: FastifyRequest<{
     Body: EmailUserInput
@@ -165,6 +188,7 @@ function filename (
 export {
   verifyAuthorizationHeader,
   verifyEmailAndPasswordHandler,
+  verifyEmailAndPasswordAdminHandler,
   userVerifiedWithoutAuthorization,
   userVerified,
   isAdmin,

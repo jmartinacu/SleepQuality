@@ -23,6 +23,7 @@ import type { FastifySchema } from 'fastify/types/schema'
 declare module 'fastify' {
   interface FastifyInstance {
     checkEmailAndPassword: any
+    checkEmailAndPasswordAdmin: any
     checkUserVerification: any
     checkUserVerificationWithoutAuthorization: any
     checkAdmin: any

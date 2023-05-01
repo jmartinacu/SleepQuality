@@ -18,7 +18,7 @@ async function questionnaireRoutes (server: FastifyInstance): Promise<void> {
     createQuestionnaireHandler
   )
 
-  server.post('/response',
+  server.post('/answer',
     {
       onRequest: server.auth([server.authenticate]),
       preHandler: server.auth([server.checkUserVerification]),

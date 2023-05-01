@@ -1,6 +1,5 @@
 import {
   QuestionsType,
-  checkAnswerUsers,
   CreateQuestionnaireSchema,
   CreateAnswerSchema
 } from './questionnaire.schemas'
@@ -11,6 +10,7 @@ import {
   findQuestionnaireUnique
 } from './questionnaire.services'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
+import { checkAnswerTypes } from '../../utils/helpers'
 
 async function createQuestionnaireHandler (
   request: FastifyRequestTypebox<typeof CreateQuestionnaireSchema>,
@@ -48,11 +48,16 @@ async function createAnswerHandler (
       return await reply.code(400).send({ message: 'Incorrect answer' })
     }
     // CHECK TYPES OF EACH ANSWER
+    // FALTA COMPROBAR QUE LAS RESPUESTAS QUE ESTEN EN UN ENUM TENGAN LOS VALORES CORRECTOS
+    let i = 1
     for (const [key, value] of Object.entries(questionnaire.questions as QuestionsType)) {
-      const answerUser: any = answers[key]
-      if (!checkAnswerUsers[value](answerUser)) {
-        return await reply.code(400).send({ message: 'Incorrect answer' })
+      if (!Array.isArray(value)) {
+        const answerUser: any = answers[key]
+        if (!checkAnswerTypes[value](answerUser)) {
+          return await reply.code(400).send({ message: 'Incorrect answer' })
+        }
       }
+      i++
     }
     const answer = await createAnswer(questionnaire.id, userId, answers)
     return answer
