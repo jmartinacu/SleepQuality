@@ -1,14 +1,13 @@
 import { Type, Static } from '@fastify/type-provider-typebox'
 
-type QuestionTypes = 'PRIMARY_TEXT' | 'PRIMARY_NUMBER' | 'PRIMARY_BOOL' | 'SECONDARY_TEXT' | 'SECONDARY_NUMBER' | 'SECONDARY_BOOL'
-type QuestionsType = Record<string, QuestionTypes | string[]>
+type QuestionType = 'PRIMARY_TEXT' | 'PRIMARY_NUMBER' | 'PRIMARY_BOOL' | 'SECONDARY_TEXT' | 'SECONDARY_NUMBER' | 'SECONDARY_BOOL'
+type QuestionTypes = Record<string, QuestionType>
+
+type AdditionalInformationType = string | string[] | number[] | Record<number, string>
+type AdditionalInformationTypes = Record<string, AdditionalInformationType>
 
 const regexObjectId = /^[a-fA-F0-9]{24}$/
-// name        String
-// questions   Json
-// createdAt   DateTime @default(now())
-// updadatedAt DateTime @updatedAt
-// answers     Answer[]
+
 const questionnaireCore = {
   name: Type.String(),
   questions: Type.Any()
@@ -72,6 +71,8 @@ export {
   CreateQuestionnaireSchema,
   CreateAnswerSchema,
   type CreateQuestionnaireInput,
-  type QuestionsType,
-  type QuestionTypes
+  type QuestionType,
+  type QuestionTypes,
+  type AdditionalInformationType,
+  type AdditionalInformationTypes
 }

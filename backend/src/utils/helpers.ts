@@ -1,3 +1,6 @@
+import {
+  AdditionalInformationTypes
+} from '../modules/questionnaire/questionnaire.schemas'
 import { ALLOWED_EXTENSIONS, JPEG_EXTENSIONS } from '../modules/user/user.schemas'
 
 function calculateBMI ({
@@ -18,6 +21,24 @@ const checkAnswerTypes = {
   SECONDARY_TEXT: (response: any) => typeof response === 'string' || response === null,
   SECONDARY_NUMBER: (response: any) => typeof response === 'number' || response === null,
   SECONDARY_BOOL: (response: any) => typeof response === 'boolean' || response === null
+}
+
+function checkAnswersEnums ({
+  answerUser,
+  index,
+  additionalInformation
+}:
+{
+  answerUser: string
+  index: number
+  additionalInformation: AdditionalInformationTypes[] }
+): boolean {
+  const questionUserInformation = additionalInformation
+    .find(information => {
+      return (information.questions as number[])
+        .includes(index) && Object.prototype.hasOwnProperty.call(information, 'enum')
+    }) as AdditionalInformationTypes
+  return (questionUserInformation.enum as string[]).includes(answerUser)
 }
 
 function checkTimeDiffOfGivenDateUntilNow (date: Date, timeInHours: number): boolean {
@@ -83,5 +104,6 @@ export {
   getMIMEType,
   htmlVerifyUser,
   htmlResetPasswordUser,
-  checkAnswerTypes
+  checkAnswerTypes,
+  checkAnswersEnums
 }

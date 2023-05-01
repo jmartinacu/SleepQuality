@@ -39,7 +39,7 @@ model Questionnaire {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
   name        String @unique
   questions   Json
-  additionalInformation Json?
+  additionalInformation Json[]
   createdAt   DateTime @default(now())
   updatedAt DateTime @updatedAt
   answers     Answer[]

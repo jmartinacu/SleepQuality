@@ -28,16 +28,16 @@ const questionnaires = [
       'If so, list medication(s), dose, and time taken': 'SECONDARY_TEXT',
       Comments: 'SECONDARY_TEXT'
     },
-    additionalInformation: {
-      1: {
+    additionalInformation: [
+      {
         questions: [12],
         enum: ['Very poor', 'Poor', 'Fair', 'Good', 'Very good']
       },
-      2: {
+      {
         questions: [13],
         enum: ['Not at all rested', 'Slightly rested', 'Somewhat rested', 'Well-rested', 'Very well-rested']
       }
-    }
+    ]
   },
   {
     name: 'STOP-BANG',
@@ -94,34 +94,33 @@ const questionnaires = [
       'Episodes of disorientation or confusion during sleep': 'SECONDARY_TEXT',
       'Other restlessness while you sleep, please describe:': 'PRIMARY_TEXT'
     },
-    additionalInformation: {
-      1: {
+    additionalInformation: [
+      {
         questions: [5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16],
         description: 'During the past month, how often have you had trouble sleeping because you...',
         enum: ['Not during the past month', 'Less than once a week', 'Once or twice a week', 'Once or twice a week', 'Three or more times a week']
       },
-      2: {
+      {
         questions: [17],
         descriptions: '',
         enum: ['No problem at all', 'Only a very slight problem', 'Somewhat of a problem', 'A very big problem']
       },
-      3: {
+      {
         questions: [18],
         descriptions: '',
         enum: ['Very good', 'Fairly good', 'Fairly bad', 'Very bad']
       },
-      4: {
+      {
         questions: [19],
         descriptions: '',
         enum: ['Not bed partner or room mate', 'Partner/room mate in other room', 'Partner in same room but not same bed', 'partner in same bed']
       },
-      '    ': ['Not during the past month', 'Less than once a week', 'Once or twice a week', 'Three or more times a week'],
-      5: {
+      {
         questions: [20, 21, 22, 23],
         descriptions: 'If you have a room mate or bed partner, ask him/her how often in the past month you have had:',
         enum: ['Not during the past month', 'Less than once a week', 'Once or twice a week', 'Three or more times a week']
       }
-    }
+    ]
   },
   {
     name: 'Perceived Stress Questionnaire',
@@ -147,8 +146,8 @@ const questionnaires = [
       'Yoy have enough time for yourself': 'PRIMARY_NUMBER',
       'You feel under pressure from deadlines': 'PRIMARY_NUMBER'
     },
-    additionalInformation: {
-      1: {
+    additionalInformation: [
+      {
         questions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
         relations: {
           1: 'Almost never',
@@ -157,7 +156,7 @@ const questionnaires = [
           4: 'Usually'
         }
       }
-    }
+    ]
   },
   {
     name: 'Athens Insomnia Scale',
@@ -171,8 +170,8 @@ const questionnaires = [
       'Functioning (physical and mental) during the day': 'PRIMARY_NUMBER',
       'Sleepiness during the day': 'PRIMARY_NUMBER'
     },
-    additionalInformation: {
-      1: {
+    additionalInformation: [
+      {
         questions: [1],
         relations: {
           0: 'No problem',
@@ -181,7 +180,7 @@ const questionnaires = [
           3: 'Very delayed or did not sleep at all'
         }
       },
-      2: {
+      {
         questions: [2],
         relations: {
           0: 'No problem',
@@ -190,7 +189,7 @@ const questionnaires = [
           3: 'Serious problem or did not sleep at all'
         }
       },
-      3: {
+      {
         questions: [3],
         relations: {
           0: 'No earlier',
@@ -199,7 +198,7 @@ const questionnaires = [
           3: 'Much earlier or did not sleep at all'
         }
       },
-      4: {
+      {
         questions: [4],
         relations: {
           0: 'Sufficient',
@@ -208,7 +207,7 @@ const questionnaires = [
           3: 'Very insufficient or did not sleep at all'
         }
       },
-      5: {
+      {
         questions: [5],
         relations: {
           0: 'Satisfactory',
@@ -217,7 +216,7 @@ const questionnaires = [
           3: 'Very unsatisfactory or did not sleep at all'
         }
       },
-      6: {
+      {
         questions: [6, 7],
         relations: {
           0: 'Normal',
@@ -226,7 +225,7 @@ const questionnaires = [
           3: 'Very decreased'
         }
       },
-      7: {
+      {
         questions: [8],
         relations: {
           0: 'None',
@@ -235,7 +234,7 @@ const questionnaires = [
           3: 'Intense'
         }
       }
-    }
+    ]
   },
   {
     name: 'International Restless Legs Scale',
@@ -251,24 +250,24 @@ const questionnaires = [
       'Overall, how severe was the impact of your RLS symptoms on your ability to carry out your daily affairs, for example carrying out a satisfactory family, home, social, school or work life?': 'PRIMARY_TEXT',
       'How severe was your mood disturbance due to your RLS symptoms - for example angry, depressed, sad, anxious or irritable?': 'PRIMARY_TEXT'
     },
-    additionalInformation: {
-      1: {
+    additionalInformation: [
+      {
         questions: [1, 2, 4, 5, 6, 9, 10],
         enum: ['Very severe', 'Severe', 'Moderate', 'Mild', 'None']
       },
-      2: {
+      {
         questions: [3],
         enum: ['No relief', 'Mild relief', 'Moderate relief', 'Either complete or almost complete relief', 'No RLS symptoms to be relieved']
       },
-      3: {
+      {
         questions: [7],
         enum: ['Very often (This means 6 to 7 days a week)', 'Often (this means 4 to 5 days a week)', 'Sometimes (This means 2 to 3 days a week)', 'Occasionally (This means 1 day a week)', 'Never']
       },
-      4: {
+      {
         questions: [8],
         enum: ['Very severe (This means 8 hours or more per 24 hour day)', 'Severe (this means 3 to 8 hours per 24 hour day)', 'Moderate (This means 1 to 3 hours per day 24 hour day)', 'Mild (This means less than 1 hour per 24 hour day)', 'None']
       }
-    }
+    ]
   },
   {
     name: 'Insomnia Severity Index',
@@ -281,8 +280,8 @@ const questionnaires = [
       'How WORRIED/DISTRESSED are you about your current sleep problem?': 'PRIMARY_NUMBER',
       'TO what extent do you consider your sleep problem to INTERFERE with your daily functioning (e.g. daytime fatigue, mood, ability to function at work/daily chores, concentration, memory, etc.) CURRENTLY?': 'PRIMARY_NUMBER'
     },
-    additionalInformation: {
-      1: {
+    additionalInformation: [
+      {
         questions: [1, 2, 3],
         relation: {
           0: 'None',
@@ -292,7 +291,7 @@ const questionnaires = [
           4: 'Very Severe'
         }
       },
-      2: {
+      {
         questions: [4],
         relation: {
           0: 'Very Satisfied',
@@ -302,7 +301,7 @@ const questionnaires = [
           4: 'Very Dissatisfied'
         }
       },
-      3: {
+      {
         questions: [5],
         relation: {
           0: 'No at all Noticeable',
@@ -312,7 +311,7 @@ const questionnaires = [
           4: 'Very Much Noticeable'
         }
       },
-      4: {
+      {
         questions: [6],
         relation: {
           0: 'No at all Worried',
@@ -322,7 +321,7 @@ const questionnaires = [
           4: 'Very Much Worried'
         }
       },
-      5: {
+      {
         questions: [7],
         relation: {
           0: 'No at all Interfering',
@@ -332,7 +331,7 @@ const questionnaires = [
           4: 'Very Much Interfering'
         }
       }
-    }
+    ]
   }
 ]
 

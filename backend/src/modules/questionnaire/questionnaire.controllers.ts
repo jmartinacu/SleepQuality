@@ -1,7 +1,8 @@
 import {
-  QuestionsType,
+  QuestionTypes,
   CreateQuestionnaireSchema,
-  CreateAnswerSchema
+  CreateAnswerSchema,
+  AdditionalInformationTypes
 } from './questionnaire.schemas'
 import { Answer, Questionnaire } from '../../utils/database'
 import {
@@ -10,7 +11,7 @@ import {
   findQuestionnaireUnique
 } from './questionnaire.services'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
-import { checkAnswerTypes } from '../../utils/helpers'
+import { checkAnswerTypes, checkAnswersEnums } from '../../utils/helpers'
 
 async function createQuestionnaireHandler (
   request: FastifyRequestTypebox<typeof CreateQuestionnaireSchema>,
@@ -47,17 +48,31 @@ async function createAnswerHandler (
     if (JSON.stringify(Object.keys(questionnaire.questions as Object)) === JSON.stringify(Object.keys(answers))) {
       return await reply.code(400).send({ message: 'Incorrect answer' })
     }
-    // CHECK TYPES OF EACH ANSWER
-    // FALTA COMPROBAR QUE LAS RESPUESTAS QUE ESTEN EN UN ENUM TENGAN LOS VALORES CORRECTOS
-    let i = 1
-    for (const [key, value] of Object.entries(questionnaire.questions as QuestionsType)) {
-      if (!Array.isArray(value)) {
-        const answerUser: any = answers[key]
-        if (!checkAnswerTypes[value](answerUser)) {
+    // CHECK TYPES OF EACH ANSWER AND CHECK ENUM ANSWER
+    const questionsToCheckEnums = (questionnaire.additionalInformation as AdditionalInformationTypes[])
+      .reduce((result, current) => {
+        if (Object.prototype.hasOwnProperty.call(current, 'enum')) {
+          (current.questions as number[]).forEach(question => result.add(question))
+        }
+        return result
+      }, new Set<number>())
+    let index = 1
+    for (const [key, value] of Object.entries(questionnaire.questions as QuestionTypes)) {
+      const answerUser: any = answers[key]
+      if (!checkAnswerTypes[value](answerUser)) {
+        return await reply.code(400).send({ message: 'Incorrect answer' })
+      }
+      if (questionsToCheckEnums.has(index)) {
+        if (!checkAnswersEnums({
+          additionalInformation: (questionnaire
+            .additionalInformation as AdditionalInformationTypes[]),
+          answerUser,
+          index
+        })) {
           return await reply.code(400).send({ message: 'Incorrect answer' })
         }
       }
-      i++
+      index++
     }
     const answer = await createAnswer(questionnaire.id, userId, answers)
     return answer
