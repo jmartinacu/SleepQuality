@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 const questionnaires = [
@@ -342,26 +342,28 @@ async function main () {
     create: {
       email: 'admin@prisma.io',
       name: 'Admin',
-      age: null,
+      birth: new Date(),
       role: 'ADMIN',
-      gender: null,
-      height: null,
-      weight: null,
+      gender: 'NEUTER',
+      height: 3,
+      weight: 100,
       password: 'f^4p#XS71BtqLQrvtT&',
-      BMI: null,
-      verified: true
+      BMI: 100,
+      verified: true,
+      chronicDisorders: ''
     }
   })
 
+  console.log({ admin })
+
   for (const questionnaire of questionnaires) {
-    await prisma.questionnaire.upsert({
+    const questionnaireDB = await prisma.questionnaire.upsert({
       where: { name: questionnaire.name },
       update: {},
       create: questionnaire
     })
+    console.log(questionnaireDB)
   }
-
-  console.log({ admin })
 }
 
 main()

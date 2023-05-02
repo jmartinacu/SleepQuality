@@ -1,8 +1,8 @@
 import {
-  QuestionTypes,
+  Question,
   CreateQuestionnaireSchema,
   CreateAnswerSchema,
-  AdditionalInformationTypes
+  AdditionalInformation
 } from './questionnaire.schemas'
 import { Answer, Questionnaire } from '../../utils/database'
 import {
@@ -49,16 +49,16 @@ async function createAnswerHandler (
       return await reply.code(400).send({ message: 'Incorrect answer' })
     }
     // CHECK TYPES OF EACH ANSWER AND CHECK ENUM ANSWER
-    const questionsToCheckEnums = (questionnaire.additionalInformation as AdditionalInformationTypes[])
+    const questionsToCheckEnums = (questionnaire.additionalInformation as AdditionalInformation)
       .reduce((result, current) => {
         if (Object.prototype.hasOwnProperty.call(current, 'enum')) {
-          (current.questions as number[]).forEach(question => result.add(question))
+          current.questions.forEach(question => result.add(question))
         }
         return result
       }, new Set<number>())
     let index = 1
     for (const [question, questionType] of
-      Object.entries(questionnaire.questions as QuestionTypes)
+      Object.entries(questionnaire.questions as Question)
     ) {
       const answerUser: any = answers[question]
       if (!checkAnswerTypes[questionType](answerUser)) {
@@ -67,7 +67,7 @@ async function createAnswerHandler (
       if (questionsToCheckEnums.has(index)) {
         if (!checkAnswersEnums({
           additionalInformation: (questionnaire
-            .additionalInformation as AdditionalInformationTypes[]),
+            .additionalInformation as AdditionalInformation),
           answerUser,
           index
         })) {

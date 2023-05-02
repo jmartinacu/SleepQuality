@@ -19,6 +19,7 @@ import type { File } from './plugins/types.plugins'
 import { MAX_FILE_SIZE } from './modules/user/user.schemas'
 import type { RouteGenericInterface } from 'fastify/types/route'
 import type { FastifySchema } from 'fastify/types/schema'
+import adminRoutes from './modules/admin/admin.routes'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -103,6 +104,7 @@ const buildServer = (): FastifyInstance => {
 
     void server.register(userRoutes, { prefix: 'api/users' })
     void server.register(questionnaireRoutes, { prefix: 'api/questionnaires' })
+    void server.register(adminRoutes, { prefix: '/admin' })
   })
 
   return server

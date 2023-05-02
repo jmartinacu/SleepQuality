@@ -1,7 +1,13 @@
 import { faker } from '@faker-js/faker'
 import { random } from './helpers'
 import type { Session, User } from './database'
-import type { CreateUserInput, CreateUserResponse, Gender, Role } from '../modules/user/user.schemas'
+import type {
+  CreateUserInput,
+  CreateUserResponse,
+  Gender,
+  Role,
+  UpdateUserStrictSchema
+} from '../modules/user/user.schemas'
 
 function fakeInputUser (): CreateUserInput {
   const genders = ['MASCULINE', 'FEMININE', 'NEUTER']
@@ -62,6 +68,12 @@ function fakeUser ({
   }
 }
 
+function fakeUpdateUser (): UpdateUserStrictSchema {
+  const user = fakeInputUser()
+  const { birth, email, name, password, ...rest } = user
+  return rest
+}
+
 function fakerString ({ length = 10 }: { length?: number }): string {
   return faker.datatype.string(length)
 }
@@ -93,6 +105,7 @@ export {
   fakeInputUser,
   fakeResponseUser,
   fakeUser,
+  fakeUpdateUser,
   fakerString,
   fakerNumber,
   fakerSession

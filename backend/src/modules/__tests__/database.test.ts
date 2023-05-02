@@ -1,12 +1,13 @@
 import t from 'tap'
-import buildServer from '../../../server'
-import { fakeInputUser } from '../../../utils/test.helpers'
-import prisma, { User, Session } from '../../../utils/database'
-import type { CreateUserResponse, LogInUserResponse, RefreshTokenResponse, VerifyAccountResponse } from '../user.schemas'
-import { findSessionAndUserUnique, findUserUnique } from '../user.services'
+import buildServer from '../../server'
+import { fakeInputUser, fakeUpdateUser } from '../../utils/test.helpers'
+import prisma, { User, Session } from '../../utils/database'
+import type { CreateUserResponse, LogInUserResponse, RefreshTokenResponse, VerifyAccountResponse } from '../user/user.schemas'
+import { findSessionAndUserUnique, findUserUnique } from '../user/user.services'
+import { calculateBMI } from '../../utils/helpers'
 
 async function DatabaseTests (): Promise<void> {
-  t.plan(5)
+  t.plan(8)
 
   t.before(async () => {
     await prisma.$connect()
@@ -27,9 +28,7 @@ async function DatabaseTests (): Promise<void> {
   const createUserResponse = await fastify.inject({
     method: 'POST',
     url: '/api/users',
-    payload: {
-      ...userCreate
-    }
+    payload: userCreate
   })
 
   const createUserBackend: CreateUserResponse = createUserResponse.json()
@@ -44,7 +43,7 @@ async function DatabaseTests (): Promise<void> {
       childTest.equal(createUserBackend.email, userCreate.email)
       childTest.equal(createUserBackend.height, userCreate.height)
       childTest.equal(createUserBackend.weight, userCreate.weight)
-      childTest.same(createUserBackend.chronicDisorders, userCreate.chronicDisorders)
+      childTest.equal(createUserBackend.chronicDisorders, userCreate.chronicDisorders)
       childTest.equal(createUserBackend.gender, userCreate.gender)
       childTest.same(typeof createUserBackend.id, 'string')
     })
@@ -134,10 +133,95 @@ async function DatabaseTests (): Promise<void> {
       childTest.equal(getMeBackend.email, createUserBackend.email)
       childTest.equal(getMeBackend.height, createUserBackend.height)
       childTest.equal(getMeBackend.weight, createUserBackend.weight)
-      childTest.same(getMeBackend.chronicDisorders, createUserBackend.chronicDisorders)
+      childTest.equal(getMeBackend.chronicDisorders, createUserBackend.chronicDisorders)
       childTest.equal(getMeBackend.gender, createUserBackend.gender)
       childTest.equal(getMeBackend.id, createUserBackend.id)
     })
+
+  const fakeUserToUpdate = fakeUpdateUser()
+  const updatedBMI = calculateBMI({
+    height: fakeUserToUpdate.height,
+    weight: fakeUserToUpdate.weight
+  })
+
+  const updateUserResponse = await fastify.inject({
+    method: 'PATCH',
+    url: '/api/users',
+    payload: fakeUserToUpdate,
+    headers: {
+      authorization: `Bearer ${tokensBackend.accessToken}`
+    }
+  })
+
+  const updatedUserBackend: VerifyAccountResponse = updateUserResponse.json()
+
+  const {
+    email,
+    gender,
+    height,
+    weight,
+    BMI,
+    chronicDisorders
+  } = await findUserUnique('id', createUserBackend.id) as User
+
+  await t.test('PATCH `api/users` - Happy Path: update user with authorization header successfully with test database',
+    async childTest => {
+      childTest.equal(updateUserResponse.statusCode, 200)
+      childTest.equal(updateUserResponse.headers['content-type'], 'application/json; charset=utf-8')
+
+      childTest.equal(updatedUserBackend.message, 'User updated')
+      childTest.equal(height, fakeUserToUpdate.height)
+      childTest.equal(weight, fakeUserToUpdate.weight)
+      childTest.equal(chronicDisorders, fakeUserToUpdate.chronicDisorders)
+      childTest.equal(gender, fakeUserToUpdate.gender)
+      childTest.equal(BMI, updatedBMI)
+    })
+
+  const forgotpasswordResponse = await fastify.inject({
+    method: 'POST',
+    url: 'api/users/forgotpassword',
+    payload: {
+      email
+    }
+  })
+
+  const forgotPasswordBackend: VerifyAccountResponse = forgotpasswordResponse.json()
+
+  await t.test('POST `api/users/forgotpassword` - Happy Path: Ask for a code to reset password',
+    async childTest => {
+      childTest.equal(forgotpasswordResponse.statusCode, 200)
+      childTest.equal(forgotpasswordResponse.headers['content-type'], 'application/json; charset=utf-8')
+
+      childTest.equal(forgotPasswordBackend.message, `If user with email equal ${email} is registered, he will received an email to reset his password`)
+    })
+
+  const { passwordResetCode } = await findUserUnique('id', createUserBackend.id) as User
+  const passwordResetCodeString = String(passwordResetCode)
+  const newPassword = 'asldkfj12U&'
+
+  const resetPasswordResponse = await fastify.inject({
+    method: 'POST',
+    url: `api/users/resetpassword/${createUserBackend.id}/${passwordResetCodeString}`,
+    payload: {
+      password: newPassword
+    }
+  })
+
+  const resetPasswordBackend: VerifyAccountResponse = resetPasswordResponse.json()
+
+  const {
+    password,
+    passwordResetCode: newPasswordResetCode
+  } = await findUserUnique('id', createUserBackend.id) as User
+
+  await t.test('POST `api/users/resetpassword/:id/:passwordResetCode` - Happy Path: Reset password with password reset code', childTest => {
+    childTest.equal(resetPasswordResponse.statusCode, 200)
+    childTest.equal(resetPasswordResponse.headers['content-type'], 'application/json; charset=utf-8')
+
+    childTest.equal(password, newPassword)
+    childTest.same(newPasswordResetCode, null)
+    childTest.equal(resetPasswordBackend.message, 'Password reset')
+  })
 }
 
 void DatabaseTests()
