@@ -39,7 +39,8 @@ async function DatabaseTests (): Promise<void> {
       childTest.equal(createUserResponse.statusCode, 201)
       childTest.equal(createUserResponse.headers['content-type'], 'application/json; charset=utf-8')
 
-      childTest.equal(createUserBackend.age, userCreate.age)
+      childTest.equal(new Date(createUserBackend.birth).toDateString(), new Date(userCreate.birth).toDateString())
+      childTest.equal(createUserBackend.name, userCreate.name)
       childTest.equal(createUserBackend.email, userCreate.email)
       childTest.equal(createUserBackend.height, userCreate.height)
       childTest.equal(createUserBackend.weight, userCreate.weight)
@@ -129,7 +130,7 @@ async function DatabaseTests (): Promise<void> {
       childTest.equal(getMeResponse.statusCode, 200)
       childTest.equal(getMeResponse.headers['content-type'], 'application/json; charset=utf-8')
 
-      childTest.equal(getMeBackend.age, createUserBackend.age)
+      childTest.equal(getMeBackend.birth, createUserBackend.birth)
       childTest.equal(getMeBackend.email, createUserBackend.email)
       childTest.equal(getMeBackend.height, createUserBackend.height)
       childTest.equal(getMeBackend.weight, createUserBackend.weight)

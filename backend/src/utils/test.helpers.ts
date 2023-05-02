@@ -8,16 +8,17 @@ function fakeInputUser (): CreateUserInput {
   const genderIndex = random(0, 2)
   const email = faker.internet.email()
   const password = 'asdfR2&tr'
-  const age = faker.datatype.number({ max: 100 })
+  const birth = '1998-01-15'
   const gender = genders.at(genderIndex) as Gender
   const height = faker.datatype.number({ min: 1, max: 2.5, precision: 0.01 })
   const weight = faker.datatype.number({ min: 20, max: 200, precision: 0.01 })
-  const chronicDisorders: string[] = faker.datatype.array(7)
-    .filter(disorder => typeof disorder === 'string') as string[]
+  const chronicDisorders = faker.datatype.string()
+  const name = faker.name.fullName()
   return {
     email,
+    name,
     password,
-    age,
+    birth,
     gender,
     height,
     weight,
@@ -44,16 +45,15 @@ function fakeUser ({
 }): User {
   const roles = ['ADMIN', 'USER']
   const roleIndex = random(0, 1)
-  const userResponse = fakeResponseUser({ lengthString, maxNumber })
+  const { birth: birthString, ...rest } = fakeResponseUser({ lengthString, maxNumber })
   const verificationCode = faker.datatype.string(20)
   const passwordResetCode = random(10000, 99999)
   const verified = faker.datatype.boolean()
   const role = roles.at(roleIndex) as Role
   const profilePicture = faker.datatype.string()
-  // const answerIds: string[] = faker.datatype.array(7)
-  //   .filter(disorder => typeof disorder === 'string') as string[]
   return {
-    ...userResponse,
+    ...rest,
+    birth: new Date(birthString),
     verificationCode,
     passwordResetCode,
     verified,

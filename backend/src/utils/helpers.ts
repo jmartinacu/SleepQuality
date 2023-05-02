@@ -41,6 +41,22 @@ function checkAnswersEnums ({
   return (questionUserInformation.enum as string[]).includes(answerUser)
 }
 
+function checkBirth (birth: string): boolean {
+  let result = true
+  const birthArray = birth.split('-')
+  if (birthArray.some(number => Number.isNaN(Number(number)))) result = false
+  if (Number(birthArray[0]) < 1900 || Number(birthArray[0]) > new Date().getFullYear()) {
+    result = false
+  }
+  if (Number(birthArray[1]) < 0 || Number(birthArray[1]) > 12) {
+    result = false
+  }
+  if (Number(birthArray[2]) < 0 || Number(birthArray[2]) > 31) {
+    result = false
+  }
+  return result
+}
+
 function checkTimeDiffOfGivenDateUntilNow (date: Date, timeInHours: number): boolean {
   const millisecondsToHours = 1000 * 60 * 60
   const timeDiff = (new Date().getTime() - date.getTime()) / millisecondsToHours
@@ -105,5 +121,6 @@ export {
   htmlVerifyUser,
   htmlResetPasswordUser,
   checkAnswerTypes,
-  checkAnswersEnums
+  checkAnswersEnums,
+  checkBirth
 }

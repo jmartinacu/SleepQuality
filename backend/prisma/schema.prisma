@@ -11,12 +11,13 @@ datasource db {
 model User {
   id                String @id @default(auto()) @map("_id") @db.ObjectId
   email             String @unique
+  name              String
   password          String
   gender            Gender
-  age               Int
+  birth             DateTime
   height            Float
   weight            Float
-  chronicDisorders  String[]
+  chronicDisorders  String
   BMI               Float
   role              Role @default(USER)
   verificationCode  String @default(uuid())

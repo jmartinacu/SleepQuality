@@ -29,6 +29,7 @@ import {
 import sendEmail from '../../utils/mailer'
 import type { Session, User } from '../../utils/database'
 import {
+  checkBirth,
   checkTimeDiffOfGivenDateUntilNow,
   getFileExtension,
   getMIMEType,
@@ -46,6 +47,10 @@ async function createUserHandler (
     const { password, ...rest } = request.body
 
     const passwordHash = await request.bcryptHash(password)
+
+    if (!checkBirth(rest.birth)) {
+      return await reply.code(400).send({ message: 'Incorrect user birth' })
+    }
 
     const user = await createUser({ ...rest, password: passwordHash })
 

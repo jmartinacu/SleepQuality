@@ -2,6 +2,7 @@ import { Static, Type } from '@fastify/type-provider-typebox'
 
 const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])([A-Za-z\d$@$!%*?&]|[^ ]){8,15}$/
 const regexObjectId = /^[a-fA-F0-9]{24}$/
+const regexDate = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/
 export const MAX_FILE_SIZE = 1048576
 export const JPEG_EXTENSIONS = [
   'jpg',
@@ -17,7 +18,7 @@ export const ALLOWED_EXTENSIONS = [
 ]
 
 const userCore = {
-  age: Type.Integer({ exclusiveMinimum: 0, maximum: 150 }),
+  birth: Type.Date(),
   gender: Type.Union([
     Type.Literal('MASCULINE'),
     Type.Literal('FEMININE'),
@@ -25,7 +26,7 @@ const userCore = {
   ]),
   height: Type.Number({ exclusiveMinimum: 0, maximum: 3 }),
   weight: Type.Number({ exclusiveMinimum: 0, maximum: 600 }),
-  chronicDisorders: Type.Array(Type.String()),
+  chronicDisorders: Type.String(),
   BMI: Type.Number({ exclusiveMinimum: 0 })
 }
 
@@ -36,6 +37,8 @@ const sessionCore = {
 
 const userExtent = {
   email: Type.String({ format: 'email' }),
+  name: Type.String(),
+  birthInput: Type.RegEx(regexDate),
   password: Type.RegEx(regexPassword),
   passwordInput: Type.String({
     minLength: 8,
@@ -72,6 +75,8 @@ const userExtent = {
 
 const {
   email,
+  name,
+  birthInput,
   password,
   id,
   verificationCode,
@@ -88,24 +93,28 @@ const {
   verified
 } = userExtent
 
-const { BMI, ...userCoreExceptBMI } = userCore
+const { BMI, birth, ...userCoreExceptBMIAndBirth } = userCore
 
 const {
-  age,
   chronicDisorders,
   gender,
   height,
   weight
-} = userCoreExceptBMI
+} = userCoreExceptBMIAndBirth
 
 const createUserSchema = Type.Object({
-  ...userCoreExceptBMI,
+  ...userCoreExceptBMIAndBirth,
+  birth: birthInput,
   email,
+  name,
   password
 })
 
 const createUserResponseSchema = Type.Object({
-  ...userCore,
+  ...userCoreExceptBMIAndBirth,
+  BMI,
+  birth: birthInput,
+  name,
   email,
   id
 })
@@ -113,6 +122,7 @@ const createUserResponseSchema = Type.Object({
 const createUserHandlerResponseSchema = Type.Object({
   ...userCore,
   email,
+  name,
   id,
   verificationCode
 })
@@ -148,12 +158,11 @@ const resetPasswordBodySchema = Type.Object({
 })
 
 const updateUserServiceSchema = Type.Object({
-  age: Type.Optional(age),
+  birth: Type.Optional(birthInput),
   gender: Type.Optional(gender),
   height: Type.Optional(height),
   weight: Type.Optional(weight),
-  chronicDisordersToAdd: Type.Optional(chronicDisorders),
-  chronicDisordersToRemove: Type.Optional(chronicDisorders),
+  chronicDisorders: Type.Optional(chronicDisorders),
   BMI: Type.Optional(BMI),
   verified: Type.Optional(verified),
   passwordResetCode: Type.Optional(Type.Union([
@@ -173,7 +182,7 @@ const updateUserSchema = Type.Omit(updateUserServiceSchema, [
 ])
 
 const updateUserDatabase = Type.Object({
-  age: Type.Optional(age),
+  birth: Type.Optional(birth),
   gender: Type.Optional(gender),
   height: Type.Optional(height),
   weight: Type.Optional(weight),
@@ -215,6 +224,7 @@ const CreateUserSchema = {
   body: createUserSchema,
   response: {
     201: createUserResponseSchema,
+    400: errorResponseSchema,
     500: Type.Any()
   }
 }

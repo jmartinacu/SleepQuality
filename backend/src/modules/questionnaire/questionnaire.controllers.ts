@@ -57,9 +57,11 @@ async function createAnswerHandler (
         return result
       }, new Set<number>())
     let index = 1
-    for (const [key, value] of Object.entries(questionnaire.questions as QuestionTypes)) {
-      const answerUser: any = answers[key]
-      if (!checkAnswerTypes[value](answerUser)) {
+    for (const [question, questionType] of
+      Object.entries(questionnaire.questions as QuestionTypes)
+    ) {
+      const answerUser: any = answers[question]
+      if (!checkAnswerTypes[questionType](answerUser)) {
         return await reply.code(400).send({ message: 'Incorrect answer' })
       }
       if (questionsToCheckEnums.has(index)) {

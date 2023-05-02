@@ -14,17 +14,21 @@ async function createUser (
   userInput: CreateUserInput
 ):
   Promise<CreateUserHandlerResponse> {
+  const { birth: birthString, ...rest } = userInput
+  const birth = new Date(birthString)
   const userToCreate = {
-    ...userInput,
+    ...rest,
+    birth,
     BMI: calculateBMI(userInput)
   }
   const userCreated = await prisma.user.create({
     data: userToCreate,
     select: {
-      age: true,
+      birth: true,
       BMI: true,
       chronicDisorders: true,
       email: true,
+      name: true,
       gender: true,
       height: true,
       id: true,
@@ -48,17 +52,20 @@ async function updateUser (
   userId: string,
   dataToUpdate: UpdateUserServiceInput
 ): Promise<User> {
-  const { height, weight, chronicDisorders } = await findUserUnique('id', userId) as User
-  const { BMI, chronicDisordersToAdd, chronicDisordersToRemove, ...rest } = dataToUpdate
+  const { height, weight } = await findUserUnique('id', userId) as User
+  const { BMI, chronicDisorders, ...rest } = dataToUpdate
   const data: UpdateUserDatabase = {
-    age: rest.age,
     gender: rest.gender,
     height: rest.height,
     weight: rest.weight,
     password: rest.password,
     passwordResetCode: rest.passwordResetCode,
     verified: rest.verified,
-    profilePicture: rest.profilePicture
+    profilePicture: rest.profilePicture,
+    chronicDisorders
+  }
+  if (typeof dataToUpdate.birth !== 'undefined') {
+    data.birth = new Date(dataToUpdate.birth)
   }
   if (typeof dataToUpdate.height !== 'undefined' || typeof dataToUpdate.weight !== 'undefined') {
     const newHeight = typeof dataToUpdate.height === 'undefined'
@@ -69,19 +76,6 @@ async function updateUser (
       : dataToUpdate.weight
     const BMI = calculateBMI({ height: newHeight, weight: newWeight })
     data.BMI = BMI
-  }
-  let newChronicDisorders = chronicDisorders
-  if (typeof dataToUpdate.chronicDisordersToRemove !== 'undefined') {
-    newChronicDisorders = newChronicDisorders.filter(disorder =>
-      dataToUpdate.chronicDisordersToRemove?.includes(disorder) === false
-    )
-    data.chronicDisorders = newChronicDisorders
-  }
-  if (typeof dataToUpdate.chronicDisordersToAdd !== 'undefined') {
-    const disordersToAdd = dataToUpdate.chronicDisordersToAdd
-      .filter(disorder => !newChronicDisorders.includes(disorder))
-    newChronicDisorders = newChronicDisorders.concat(disordersToAdd)
-    data.chronicDisorders = newChronicDisorders
   }
   const user = await prisma.user.update({
     where: {
