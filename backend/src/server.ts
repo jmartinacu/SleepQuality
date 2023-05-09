@@ -87,9 +87,8 @@ export const upload = multer({
 const buildServer = (): FastifyInstance => {
   const server = Fastify()
 
-  server.addHook('onResponse', (_request, reply, done) => {
+  server.addHook('onSend', async (_request, reply) => {
     void reply.header('Access-Control-Allow-Origin', '*')
-    done()
   })
 
   // void server.register(fastifyCors)
