@@ -1,8 +1,8 @@
 import { Image, StyleSheet } from 'react-native'
-import LoginForm from '../components/LoginForm'
+import RegisterForm from '../components/RegisterForm'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-const Login = ({ navigation }) => {
+const SignUp = ({ navigation }) => {
   return (
     <KeyboardAwareScrollView style={styles.container}>
       {/* <Image
@@ -11,7 +11,7 @@ const Login = ({ navigation }) => {
         style={styles.image}
       /> */}
 
-      <LoginForm navigation={navigation} />
+      <RegisterForm navigation={navigation} />
     </KeyboardAwareScrollView>
   )
 }
@@ -28,4 +28,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default Login
+export default SignUp

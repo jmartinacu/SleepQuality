@@ -8,6 +8,8 @@ import Proffile from '../screens/Proffile'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import CalendarPage from '../screens/CalendarPage'
 import Login from '../screens/Login'
+import SignUp from '../screens/SignUp'
+import EmailVerification from '../screens/EmailVerification'
 
 const Stack = createStackNavigator()
 
@@ -20,6 +22,22 @@ const MyStack = () => {
         }
       }}
     >
+      <Stack.Screen
+        name='Login'
+        component={Login}
+        options={{
+          headerShown: false
+        }}
+      />
+
+      <Stack.Screen
+        name='SignUp'
+        component={SignUp}
+        options={{
+          headerShown: false
+        }}
+      />
+
       <Stack.Screen
         name='Home'
         component={Home}
@@ -75,8 +93,18 @@ const MyStack = () => {
       />
 
       <Stack.Screen
-        name='Login'
-        component={Login}
+        name='RegisterVerification'
+        component={EmailVerification}
+        initialParams={{ mode: 'Register' }}
+        options={{
+          headerShown: false
+        }}
+      />
+
+      <Stack.Screen
+        name='PasswordChangeVerification'
+        component={EmailVerification}
+        initialParams={{ mode: 'Password' }}
         options={{
           headerShown: false
         }}
