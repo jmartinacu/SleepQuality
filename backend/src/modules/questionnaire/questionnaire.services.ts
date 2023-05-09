@@ -1,5 +1,5 @@
-import prisma, { Answer, Questionnaire } from '../../utils/database'
-import { CreateQuestionnaireInput } from './questionnaire.schemas'
+import prisma, { type Answer, type Questionnaire } from '../../utils/database'
+import type { AnswerUser, CreateQuestionnaireInput } from './questionnaire.schemas'
 
 async function createQuestionnaire (data: CreateQuestionnaireInput): Promise<Questionnaire> {
   const questionnaire = await prisma.questionnaire.create({
@@ -11,7 +11,7 @@ async function createQuestionnaire (data: CreateQuestionnaireInput): Promise<Que
 async function createAnswer (
   questionnaireId: string,
   userId: string,
-  answers: any
+  answers: AnswerUser
 ): Promise<Answer> {
   const answer = await prisma.answer.create({
     data: {

@@ -9,23 +9,24 @@ datasource db {
 }
 
 model User {
-  id                String @id @default(auto()) @map("_id") @db.ObjectId
-  email             String @unique
-  name              String
-  password          String
-  gender            Gender
-  birth             DateTime
-  height            Float
-  weight            Float
-  chronicDisorders  String
-  BMI               Float
-  role              Role @default(USER)
-  verificationCode  String @default(uuid())
-  passwordResetCode Int?
-  verified          Boolean @default(false)
-  session           Session?
-  profilePicture    String?
-  answers           Answer[] 
+  id                 String @id @default(auto()) @map("_id") @db.ObjectId
+  email              String @unique
+  name               String
+  password           String
+  gender             Gender
+  birth              DateTime
+  height             Float
+  weight             Float
+  chronicDisorders   String
+  BMI                Float
+  role               Role @default(USER)
+  verificationCode   String @default(uuid())
+  passwordResetCode  Int?
+  verified           Boolean @default(false)
+  session            Session?
+  profilePicture     String?
+  questionnairesToDo String[]
+  answers            Answer[] 
 }
 
 model Session {
@@ -37,22 +38,22 @@ model Session {
 }
 
 model Questionnaire {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  name        String @unique
-  questions   Json
+  id                    String @id @default(auto()) @map("_id") @db.ObjectId
+  name                  String @unique
+  questions             Json
   additionalInformation Json[]
-  createdAt   DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  answers     Answer[]
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  answers               Answer[]
 }
 
 model Answer {
   id              String @id @default(auto()) @map("_id") @db.ObjectId
   answers         Json
   createdAt       DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  userId         String @db.ObjectId
-  user           User @relation(fields: [userId], references: [id])
+  updatedAt       DateTime @updatedAt
+  userId          String @db.ObjectId
+  user            User @relation(fields: [userId], references: [id])
   questionnaireId String @db.ObjectId
   questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id])
 }
@@ -66,5 +67,6 @@ enum Gender {
 
 enum Role {
   ADMIN
+  DOCTOR
   USER
 }

@@ -340,7 +340,7 @@ async function main () {
     where: { email: 'admin@admin.com' },
     update: {},
     create: {
-      email: 'admin@prisma.io',
+      email: 'admin@admin.com',
       name: 'Admin',
       birth: new Date(),
       role: 'ADMIN',

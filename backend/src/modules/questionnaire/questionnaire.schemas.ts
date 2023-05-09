@@ -1,6 +1,5 @@
 import { Type, Static } from '@fastify/type-provider-typebox'
-
-const regexObjectId = /^[a-fA-F0-9]{24}$/
+import { regexObjectId } from '../user/user.schemas'
 
 const questionnaireAttributes = {
   id: Type.RegEx(regexObjectId),
@@ -12,14 +11,25 @@ const questionnaireAttributes = {
     Type.Literal('SECONDARY_TEXT'),
     Type.Literal('SECONDARY_NUMBER'),
     Type.Literal('SECONDARY_BOOL')
-  ])
+  ]),
+  answers: Type.Record(
+    Type.String(),
+    Type.Union([
+      Type.String(),
+      Type.Number(),
+      Type.Boolean(),
+      Type.Null()
+    ])
+  )
 }
+
+const { id, message, questionType, answers } = questionnaireAttributes
 
 const questionnaireCore = {
   name: Type.String(),
   questions: Type.Record(
     Type.String(),
-    questionnaireAttributes.questionType
+    questionType
   ),
   additionalInformation: Type.Array(
     Type.Object({
@@ -32,7 +42,6 @@ const questionnaireCore = {
 }
 
 const { name, questions, additionalInformation } = questionnaireCore
-const { id, message } = questionnaireAttributes
 
 const createQuestionnaireSchema = Type.Object({
   name,
@@ -42,7 +51,7 @@ const createQuestionnaireSchema = Type.Object({
 
 const createAnswerSchema = Type.Object({
   name,
-  answers: questions
+  answers
 })
 
 const createQuestionnaireResponseSchema = Type.Object({
@@ -56,7 +65,7 @@ const createAnswerResponseSchema = Type.Object({
   id,
   questionnaireId: id,
   name,
-  answers: questions
+  answers
 })
 
 const errorResponseSchema = Type.Object({
@@ -81,13 +90,15 @@ const CreateAnswerSchema = {
 }
 
 type CreateQuestionnaireInput = Static<typeof createQuestionnaireSchema>
-type Question = Static<typeof questions>
+type Questions = Static<typeof questions>
+type AnswerUser = Static<typeof answers>
 type AdditionalInformation = Static<typeof additionalInformation>
 
 export {
   CreateQuestionnaireSchema,
   CreateAnswerSchema,
   type CreateQuestionnaireInput,
-  type Question,
+  type Questions,
+  type AnswerUser,
   type AdditionalInformation
 }

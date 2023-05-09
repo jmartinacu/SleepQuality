@@ -3,14 +3,14 @@ import path from 'node:path'
 import prisma, { type User, type Session } from '../../utils/database'
 import { calculateBMI } from '../../utils/helpers'
 import {
-  CreateUserInput,
   CreateUserHandlerResponse,
   UpdateSessionInput,
-  UpdateUserServiceInput
+  UpdateUserServiceInput,
+  CreateUserServiceInput
 } from './user.schemas'
 
 async function createUser (
-  userInput: CreateUserInput
+  userInput: CreateUserServiceInput
 ):
   Promise<CreateUserHandlerResponse> {
   const { birth: birthString, ...rest } = userInput

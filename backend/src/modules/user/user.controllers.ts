@@ -4,6 +4,7 @@ import type {
   AddProfilePictureSchema,
   CreateUserResponse,
   CreateUserSchema,
+  CreateDoctorSchema,
   DeleteUserAuthenticatedSchema,
   ForgotPasswordSchema,
   GetProfilePictureSchema,
@@ -15,7 +16,9 @@ import type {
   ResetPasswordSchema,
   UpdateUserAuthenticatedSchema,
   VerifyAccountResponse,
-  VerifyUserSchema
+  VerifyUserSchema,
+  CreateDoctorResponse,
+  Role
 } from './user.schemas'
 import {
   createSession,
@@ -46,13 +49,66 @@ async function createUserHandler (
   try {
     const { password, ...rest } = request.body
 
+    const restOfData = {
+      birth: rest.birth,
+      chronicDisorders: rest.chronicDisorders,
+      email: rest.email,
+      gender: rest.gender,
+      height: rest.height,
+      name: rest.name,
+      weight: rest.weight
+    }
+
     const passwordHash = await request.bcryptHash(password)
 
     if (!checkBirth(rest.birth)) {
       return await reply.code(400).send({ message: 'Incorrect user birth' })
     }
 
-    const user = await createUser({ ...rest, password: passwordHash })
+    const user = await createUser({ ...restOfData, password: passwordHash })
+
+    const verificationLink = `${request.protocol}://${request.hostname}/api/users/verify/${user.id}/${user.verificationCode}`
+
+    const html = htmlVerifyUser(verificationLink)
+
+    await sendEmail({
+      from: 'test@example.com',
+      to: user.email,
+      html
+    })
+
+    return await reply.code(201).send(user)
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
+async function createDoctorHandler (
+  request: FastifyRequestTypebox<typeof CreateDoctorSchema>,
+  reply: FastifyReplyTypebox<typeof CreateDoctorSchema>
+): Promise<CreateDoctorResponse> {
+  try {
+    const { password, ...rest } = request.body
+
+    const restOfData = {
+      birth: rest.birth,
+      chronicDisorders: '',
+      email: rest.email,
+      gender: rest.gender,
+      height: rest.height,
+      name: rest.name,
+      weight: rest.weight,
+      role: 'DOCTOR' as Role
+    }
+
+    const passwordHash = await request.bcryptHash(password)
+
+    if (!checkBirth(rest.birth)) {
+      return await reply.code(400).send({ message: 'Incorrect user birth' })
+    }
+
+    const user = await createUser({ ...restOfData, password: passwordHash })
 
     const verificationLink = `${request.protocol}://${request.hostname}/api/users/verify/${user.id}/${user.verificationCode}`
 
@@ -260,6 +316,7 @@ async function addProfilePictureHandler (
     const { filename: profilePicture } = image
     const { userId } = request.user as { userId: string }
     const { profilePicture: profilePictureUser } = await findUserUnique('id', userId) as User
+    // TENGO QUE MIRAR SI AUNQUE SALTE ESTO MULTER AÑADE LA IMAGEN AL DIRECTORIO IMAGES
     if (profilePictureUser !== null) {
       return await reply.code(403).send({ message: 'User already has an profile picture' })
     }
@@ -293,6 +350,7 @@ async function getProfilePictureHandler (
 
 export {
   createUserHandler,
+  createDoctorHandler,
   deleteUserHandler,
   updateUserHandler,
   logInUserHandler,

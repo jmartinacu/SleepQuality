@@ -10,7 +10,8 @@ import {
   addProfilePictureHandler,
   getProfilePictureHandler,
   deleteUserHandler,
-  updateUserHandler
+  updateUserHandler,
+  createDoctorHandler
 } from './user.controllers'
 import {
   CreateUserSchema,
@@ -23,7 +24,8 @@ import {
   ForgotPasswordSchema,
   ResetPasswordSchema,
   AddProfilePictureSchema,
-  GetProfilePictureSchema
+  GetProfilePictureSchema,
+  CreateDoctorSchema
 } from './user.schemas'
 import { upload } from '../../server'
 
@@ -33,6 +35,13 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       schema: CreateUserSchema
     },
     createUserHandler
+  )
+
+  server.post('/doctor',
+    {
+      schema: CreateDoctorSchema
+    },
+    createDoctorHandler
   )
 
   server.post('/refresh',

@@ -49,7 +49,7 @@ function fakeUser ({
   lengthString = 10,
   maxNumber = 50
 }): User {
-  const roles = ['ADMIN', 'USER']
+  const roles = ['USER', 'DOCTOR']
   const roleIndex = random(0, 1)
   const { birth: birthString, ...rest } = fakeResponseUser({ lengthString, maxNumber })
   const verificationCode = faker.datatype.string(20)
@@ -57,6 +57,7 @@ function fakeUser ({
   const verified = faker.datatype.boolean()
   const role = roles.at(roleIndex) as Role
   const profilePicture = faker.datatype.string()
+  const questionnairesToDo: string[] = []
   return {
     ...rest,
     birth: new Date(birthString),
@@ -64,14 +65,21 @@ function fakeUser ({
     passwordResetCode,
     verified,
     role,
-    profilePicture
+    profilePicture,
+    questionnairesToDo
   }
 }
 
 function fakeUpdateUser (): UpdateUserStrictSchema {
   const user = fakeInputUser()
+  const roles = ['USER', 'DOCTOR']
+  const roleIndex = random(0, 1)
+  const role = roles.at(roleIndex) as Role
   const { birth, email, name, password, ...rest } = user
-  return rest
+  return {
+    ...rest,
+    role
+  }
 }
 
 function fakerString ({ length = 10 }: { length?: number }): string {

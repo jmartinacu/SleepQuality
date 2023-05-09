@@ -8,7 +8,7 @@ import Fastify, {
   type ContextConfigDefault
 } from 'fastify'
 import type { JWT } from '@fastify/jwt'
-import fastifyCors from '@fastify/cors'
+// import fastifyCors from '@fastify/cors'
 import multer from 'fastify-multer'
 import type { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import userRoutes from './modules/user/user.routes'
@@ -87,7 +87,12 @@ export const upload = multer({
 const buildServer = (): FastifyInstance => {
   const server = Fastify()
 
-  void server.register(fastifyCors)
+  server.addHook('onResponse', (_request, reply, done) => {
+    void reply.header('Access-Control-Allow-Origin', '*')
+    done()
+  })
+
+  // void server.register(fastifyCors)
 
   void server.register(upload.contentParser)
 

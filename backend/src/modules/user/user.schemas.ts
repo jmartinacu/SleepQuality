@@ -1,7 +1,7 @@
 import { Static, Type } from '@fastify/type-provider-typebox'
 
 const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])([A-Za-z\d$@$!%*?&]|[^ ]){8,15}$/
-const regexObjectId = /^[a-fA-F0-9]{24}$/
+export const regexObjectId = /^[a-fA-F0-9]{24}$/
 const regexDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/
 
 export const MAX_FILE_SIZE = 1048576
@@ -47,8 +47,10 @@ const userAttributes = {
   }),
   role: Type.Union([
     Type.Literal('ADMIN'),
-    Type.Literal('USER')
+    Type.Literal('USER'),
+    Type.Literal('DOCTOR')
   ], { default: 'USER' }),
+  questionnairesToDo: Type.Array(Type.RegEx(regexObjectId)),
   verificationCode: Type.String({ format: 'uuid' }),
   verified: Type.Boolean({ default: false }),
   id: Type.RegEx(regexObjectId),
@@ -91,7 +93,8 @@ const {
   profilePictureJPG,
   profilePicturePNG,
   profilePictureWEBP,
-  verified
+  verified,
+  questionnairesToDo
 } = userAttributes
 
 const { BMI, birth, ...userCoreExceptBMIAndBirth } = userCore
@@ -111,6 +114,36 @@ const createUserSchema = Type.Object({
   password
 })
 
+const createUserServiceSchema = Type.Object({
+  email,
+  name,
+  password,
+  gender,
+  birth: birthInput,
+  height,
+  weight,
+  chronicDisorders,
+  BMI: Type.Optional(BMI),
+  role: Type.Optional(role),
+  verificationCode: Type.Optional(verificationCode),
+  passwordResetCode: Type.Optional(
+    Type.Union([
+      passwordResetCode,
+      Type.Null()
+    ])
+  ),
+  verified: Type.Optional(verified),
+  profilePicture: Type.Optional(
+    Type.Union([
+      profilePictureString,
+      Type.Null()
+    ])
+  ),
+  questionnairesToDo: Type.Optional(questionnairesToDo)
+})
+
+const createDoctorSchema = Type.Omit(createUserSchema, ['chronicDisorders'])
+
 const createUserResponseSchema = Type.Object({
   ...userCoreExceptBMIAndBirth,
   BMI,
@@ -119,6 +152,8 @@ const createUserResponseSchema = Type.Object({
   email,
   id
 })
+
+const createDoctorResponseSchema = Type.Omit(createUserResponseSchema, ['chronicDisorders'])
 
 const createUserHandlerResponseSchema = Type.Object({
   ...userCore,
@@ -214,6 +249,15 @@ const CreateUserSchema = {
   }
 }
 
+const CreateDoctorSchema = {
+  body: createDoctorSchema,
+  response: {
+    201: createDoctorResponseSchema,
+    400: errorResponseSchema,
+    500: Type.Any()
+  }
+}
+
 const RefreshTokenSchema = {
   headers: refreshTokenHeaderSchema,
   response: {
@@ -304,6 +348,8 @@ const GetProfilePictureSchema = {
 
 type CreateUserInput = Static<typeof createUserSchema>
 type CreateUserResponse = Static<typeof createUserResponseSchema>
+type CreateUserServiceInput = Static<typeof createUserServiceSchema>
+type CreateDoctorResponse = Static<typeof createDoctorResponseSchema>
 type CreateUserHandlerResponse = Static<typeof createUserHandlerResponseSchema>
 type LogInUserInput = Static<typeof logInUserSchema>
 type LogInUserResponse = Static<typeof logInUserResponseSchema>
@@ -320,6 +366,7 @@ export {
   type Gender,
   type Role,
   CreateUserSchema,
+  CreateDoctorSchema,
   RefreshTokenSchema,
   LogInSchema,
   GetUserAuthenticatedSchema,
@@ -331,7 +378,9 @@ export {
   AddProfilePictureSchema,
   GetProfilePictureSchema,
   type CreateUserResponse,
+  type CreateDoctorResponse,
   type CreateUserInput,
+  type CreateUserServiceInput,
   type CreateUserHandlerResponse,
   type LogInUserInput,
   type LogInUserResponse,

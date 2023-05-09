@@ -38,7 +38,8 @@ function checkAnswersEnums ({
       return information.questions
         .includes(index) && Object.prototype.hasOwnProperty.call(information, 'enum')
     })
-  return (questionUserInformation?.enum as string[]).includes(answerUser)
+  if (typeof questionUserInformation === 'undefined') return false
+  return (questionUserInformation.enum as string[]).includes(answerUser)
 }
 
 function checkBirth (birth: string): boolean {
