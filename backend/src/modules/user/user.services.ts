@@ -3,15 +3,14 @@ import path from 'node:path'
 import prisma, { type User, type Session } from '../../utils/database'
 import { calculateBMI } from '../../utils/helpers'
 import {
-  CreateUserInput,
   CreateUserHandlerResponse,
   UpdateSessionInput,
   UpdateUserServiceInput,
-  UpdateUserDatabase
+  CreateUserServiceInput
 } from './user.schemas'
 
 async function createUser (
-  userInput: CreateUserInput
+  userInput: CreateUserServiceInput
 ):
   Promise<CreateUserHandlerResponse> {
   const { birth: birthString, ...rest } = userInput
@@ -53,8 +52,8 @@ async function updateUser (
   dataToUpdate: UpdateUserServiceInput
 ): Promise<User> {
   const { height, weight } = await findUserUnique('id', userId) as User
-  const { BMI, chronicDisorders, ...rest } = dataToUpdate
-  const data: UpdateUserDatabase = {
+  const { BMI, ...rest } = dataToUpdate
+  const data: UpdateUserServiceInput = {
     gender: rest.gender,
     height: rest.height,
     weight: rest.weight,
@@ -62,10 +61,8 @@ async function updateUser (
     passwordResetCode: rest.passwordResetCode,
     verified: rest.verified,
     profilePicture: rest.profilePicture,
-    chronicDisorders
-  }
-  if (typeof dataToUpdate.birth !== 'undefined') {
-    data.birth = new Date(dataToUpdate.birth)
+    chronicDisorders: rest.chronicDisorders,
+    role: rest.role
   }
   if (typeof dataToUpdate.height !== 'undefined' || typeof dataToUpdate.weight !== 'undefined') {
     const newHeight = typeof dataToUpdate.height === 'undefined'

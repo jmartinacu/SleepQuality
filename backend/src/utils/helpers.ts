@@ -1,5 +1,5 @@
 import {
-  AdditionalInformationTypes
+  AdditionalInformation
 } from '../modules/questionnaire/questionnaire.schemas'
 import { ALLOWED_EXTENSIONS, JPEG_EXTENSIONS } from '../modules/user/user.schemas'
 
@@ -31,13 +31,14 @@ function checkAnswersEnums ({
 {
   answerUser: string
   index: number
-  additionalInformation: AdditionalInformationTypes[] }
+  additionalInformation: AdditionalInformation }
 ): boolean {
   const questionUserInformation = additionalInformation
     .find(information => {
-      return (information.questions as number[])
+      return information.questions
         .includes(index) && Object.prototype.hasOwnProperty.call(information, 'enum')
-    }) as AdditionalInformationTypes
+    })
+  if (typeof questionUserInformation === 'undefined') return false
   return (questionUserInformation.enum as string[]).includes(answerUser)
 }
 

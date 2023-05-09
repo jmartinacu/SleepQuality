@@ -1,47 +1,71 @@
 import { Type, Static } from '@fastify/type-provider-typebox'
+import { regexObjectId } from '../user/user.schemas'
 
-type QuestionType = 'PRIMARY_TEXT' | 'PRIMARY_NUMBER' | 'PRIMARY_BOOL' | 'SECONDARY_TEXT' | 'SECONDARY_NUMBER' | 'SECONDARY_BOOL'
-type QuestionTypes = Record<string, QuestionType>
+const questionnaireAttributes = {
+  id: Type.RegEx(regexObjectId),
+  message: Type.String(),
+  questionType: Type.Union([
+    Type.Literal('PRIMARY_TEXT'),
+    Type.Literal('PRIMARY_NUMBER'),
+    Type.Literal('PRIMARY_BOOL'),
+    Type.Literal('SECONDARY_TEXT'),
+    Type.Literal('SECONDARY_NUMBER'),
+    Type.Literal('SECONDARY_BOOL')
+  ]),
+  answers: Type.Record(
+    Type.String(),
+    Type.Union([
+      Type.String(),
+      Type.Number(),
+      Type.Boolean(),
+      Type.Null()
+    ])
+  )
+}
 
-type AdditionalInformationType = string | string[] | number[] | Record<number, string>
-type AdditionalInformationTypes = Record<string, AdditionalInformationType>
-
-const regexObjectId = /^[a-fA-F0-9]{24}$/
+const { id, message, questionType, answers } = questionnaireAttributes
 
 const questionnaireCore = {
   name: Type.String(),
-  questions: Type.Any()
+  questions: Type.Record(
+    Type.String(),
+    questionType
+  ),
+  additionalInformation: Type.Array(
+    Type.Object({
+      questions: Type.Array(Type.Integer()),
+      enum: Type.Optional(Type.Array(Type.String())),
+      description: Type.Optional(Type.String()),
+      relations: Type.Optional(Type.Record(Type.Integer(), Type.String()))
+    })
+  )
 }
 
-const questionnaireExtend = {
-  id: Type.RegEx(regexObjectId),
-  message: Type.String()
-}
-
-const { name, questions } = questionnaireCore
-const { id, message } = questionnaireExtend
+const { name, questions, additionalInformation } = questionnaireCore
 
 const createQuestionnaireSchema = Type.Object({
   name,
-  questions
+  questions,
+  additionalInformation: Type.Optional(additionalInformation)
 })
 
 const createAnswerSchema = Type.Object({
   name,
-  answers: questions
+  answers
 })
 
 const createQuestionnaireResponseSchema = Type.Object({
   id,
   name,
-  questions
+  questions,
+  additionalInformation
 })
 
 const createAnswerResponseSchema = Type.Object({
   id,
   questionnaireId: id,
   name,
-  answers: questions
+  answers
 })
 
 const errorResponseSchema = Type.Object({
@@ -66,13 +90,15 @@ const CreateAnswerSchema = {
 }
 
 type CreateQuestionnaireInput = Static<typeof createQuestionnaireSchema>
+type Questions = Static<typeof questions>
+type AnswerUser = Static<typeof answers>
+type AdditionalInformation = Static<typeof additionalInformation>
 
 export {
   CreateQuestionnaireSchema,
   CreateAnswerSchema,
   type CreateQuestionnaireInput,
-  type QuestionType,
-  type QuestionTypes,
-  type AdditionalInformationType,
-  type AdditionalInformationTypes
+  type Questions,
+  type AnswerUser,
+  type AdditionalInformation
 }
