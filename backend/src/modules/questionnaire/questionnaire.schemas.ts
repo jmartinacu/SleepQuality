@@ -36,7 +36,8 @@ const questionnaireCore = {
       questions: Type.Array(Type.Integer()),
       enum: Type.Optional(Type.Array(Type.String())),
       description: Type.Optional(Type.String()),
-      relations: Type.Optional(Type.Record(Type.Integer(), Type.String()))
+      relations: Type.Optional(Type.Record(Type.Integer(), Type.String())),
+      default: Type.Optional(Type.Boolean())
     })
   )
 }

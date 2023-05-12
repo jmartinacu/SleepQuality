@@ -1,8 +1,8 @@
 import { Static, Type } from '@fastify/type-provider-typebox'
 
-const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])([A-Za-z\d$@$!%*?&]|[^ ]){8,15}$/
+const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹])([A-Za-z\d~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹]|[^ ]){8,15}$/
 export const regexObjectId = /^[a-fA-F0-9]{24}$/
-const regexDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/
+const regexDate = /[0-9]{4}\/[0-9]{2}\/[0-9]{2}/ // DD/MM/YYYY
 
 export const MAX_FILE_SIZE = 1048576
 export const JPEG_EXTENSIONS = [
@@ -73,6 +73,7 @@ const userAttributes = {
     contentEncoding: 'base64',
     contentMediaType: 'image/webp'
   }),
+  isDoctor: Type.Boolean(),
   message: Type.String()
 }
 
@@ -142,8 +143,6 @@ const createUserServiceSchema = Type.Object({
   questionnairesToDo: Type.Optional(questionnairesToDo)
 })
 
-const createDoctorSchema = Type.Omit(createUserSchema, ['chronicDisorders'])
-
 const createUserResponseSchema = Type.Object({
   ...userCoreExceptBMIAndBirth,
   BMI,
@@ -152,8 +151,6 @@ const createUserResponseSchema = Type.Object({
   email,
   id
 })
-
-const createDoctorResponseSchema = Type.Omit(createUserResponseSchema, ['chronicDisorders'])
 
 const createUserHandlerResponseSchema = Type.Object({
   ...userCore,
@@ -185,12 +182,12 @@ const verifyAccountParamsSchema = Type.Object({
 })
 
 const resetPasswordParamsSchema = Type.Object({
-  id,
   passwordResetCode
 })
 
 const resetPasswordBodySchema = Type.Object({
-  password
+  password,
+  email
 })
 
 const updateUserServiceSchema = Type.Object({
@@ -245,16 +242,7 @@ const CreateUserSchema = {
   response: {
     201: createUserResponseSchema,
     400: errorResponseSchema,
-    500: Type.Any()
-  }
-}
-
-const CreateDoctorSchema = {
-  body: createDoctorSchema,
-  response: {
-    201: createDoctorResponseSchema,
-    400: errorResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -264,7 +252,7 @@ const RefreshTokenSchema = {
     200: refreshTokenResponseSchema,
     401: errorResponseSchema,
     400: errorResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -273,21 +261,21 @@ const LogInSchema = {
   response: {
     200: logInUserResponseSchema,
     401: errorResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
 const GetUserAuthenticatedSchema = {
   response: {
     200: createUserResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
 const DeleteUserAuthenticatedSchema = {
   response: {
     204: {},
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -295,7 +283,7 @@ const UpdateUserAuthenticatedSchema = {
   body: updateUserSchema,
   response: {
     200: verifyAccountResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -305,7 +293,7 @@ const VerifyUserSchema = {
     200: verifyAccountResponseSchema,
     400: errorResponseSchema,
     404: errorResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -314,7 +302,7 @@ const ForgotPasswordSchema = {
   response: {
     200: verifyAccountResponseSchema,
     401: errorResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -326,7 +314,7 @@ const ResetPasswordSchema = {
     404: errorResponseSchema,
     401: errorResponseSchema,
     403: errorResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -334,7 +322,7 @@ const AddProfilePictureSchema = {
   response: {
     200: verifyAccountResponseSchema,
     400: errorResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -342,14 +330,13 @@ const GetProfilePictureSchema = {
   response: {
     200: getProfilePictureResponseSchema,
     404: errorResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
 type CreateUserInput = Static<typeof createUserSchema>
 type CreateUserResponse = Static<typeof createUserResponseSchema>
 type CreateUserServiceInput = Static<typeof createUserServiceSchema>
-type CreateDoctorResponse = Static<typeof createDoctorResponseSchema>
 type CreateUserHandlerResponse = Static<typeof createUserHandlerResponseSchema>
 type LogInUserInput = Static<typeof logInUserSchema>
 type LogInUserResponse = Static<typeof logInUserResponseSchema>
@@ -366,7 +353,6 @@ export {
   type Gender,
   type Role,
   CreateUserSchema,
-  CreateDoctorSchema,
   RefreshTokenSchema,
   LogInSchema,
   GetUserAuthenticatedSchema,
@@ -378,7 +364,6 @@ export {
   AddProfilePictureSchema,
   GetProfilePictureSchema,
   type CreateUserResponse,
-  type CreateDoctorResponse,
   type CreateUserInput,
   type CreateUserServiceInput,
   type CreateUserHandlerResponse,

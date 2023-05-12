@@ -51,7 +51,6 @@ async function updateUser (
   userId: string,
   dataToUpdate: UpdateUserServiceInput
 ): Promise<User> {
-  const { height, weight } = await findUserUnique('id', userId) as User
   const { BMI, ...rest } = dataToUpdate
   const data: UpdateUserServiceInput = {
     gender: rest.gender,
@@ -65,6 +64,7 @@ async function updateUser (
     role: rest.role
   }
   if (typeof dataToUpdate.height !== 'undefined' || typeof dataToUpdate.weight !== 'undefined') {
+    const { height, weight } = await findUserUnique('id', userId) as User
     const newHeight = typeof dataToUpdate.height === 'undefined'
       ? height
       : dataToUpdate.height
@@ -81,6 +81,48 @@ async function updateUser (
     data
   })
   return user
+}
+
+async function updateUsers (
+  userIds: string[],
+  dataToUpdate: UpdateUserServiceInput[]
+): Promise<number> {
+  const newDataToUpdate = dataToUpdate
+    .map(async (data: UpdateUserServiceInput, index) => {
+      let BMI: number | undefined
+      if (typeof data.height !== 'undefined' || typeof data.weight !== 'undefined') {
+        const userId = userIds.at(index) as string
+        const { height, weight } = await findUserUnique('id', userId) as User
+        const newHeight = typeof data.height === 'undefined'
+          ? height
+          : data.height
+        const newWeight = typeof data.weight === 'undefined'
+          ? weight
+          : data.weight
+        BMI = calculateBMI({ height: newHeight, weight: newWeight })
+      }
+      return {
+        gender: data.gender,
+        height: data.height,
+        weight: data.weight,
+        password: data.password,
+        passwordResetCode: data.passwordResetCode,
+        verified: data.verified,
+        profilePicture: data.profilePicture,
+        chronicDisorders: data.chronicDisorders,
+        role: data.role,
+        BMI
+      }
+    })
+  const users = await prisma.user.updateMany({
+    where: {
+      id: {
+        in: userIds
+      }
+    },
+    data: newDataToUpdate
+  })
+  return users.count
 }
 
 async function deleteUser (id: string): Promise<void> {
@@ -213,6 +255,7 @@ export {
   createUser,
   createSession,
   updateUser,
+  updateUsers,
   deleteUser,
   findUserUnique,
   findUserUniqueOrThrow,

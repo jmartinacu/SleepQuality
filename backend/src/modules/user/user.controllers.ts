@@ -4,7 +4,6 @@ import type {
   AddProfilePictureSchema,
   CreateUserResponse,
   CreateUserSchema,
-  CreateDoctorSchema,
   DeleteUserAuthenticatedSchema,
   ForgotPasswordSchema,
   GetProfilePictureSchema,
@@ -16,9 +15,7 @@ import type {
   ResetPasswordSchema,
   UpdateUserAuthenticatedSchema,
   VerifyAccountResponse,
-  VerifyUserSchema,
-  CreateDoctorResponse,
-  Role
+  VerifyUserSchema
 } from './user.schemas'
 import {
   createSession,
@@ -57,49 +54,6 @@ async function createUserHandler (
       height: rest.height,
       name: rest.name,
       weight: rest.weight
-    }
-
-    const passwordHash = await request.bcryptHash(password)
-
-    if (!checkBirth(rest.birth)) {
-      return await reply.code(400).send({ message: 'Incorrect user birth' })
-    }
-
-    const user = await createUser({ ...restOfData, password: passwordHash })
-
-    const verificationLink = `${request.protocol}://${request.hostname}/api/users/verify/${user.id}/${user.verificationCode}`
-
-    const html = htmlVerifyUser(verificationLink)
-
-    await sendEmail({
-      from: 'test@example.com',
-      to: user.email,
-      html
-    })
-
-    return await reply.code(201).send(user)
-  } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
-  }
-}
-
-async function createDoctorHandler (
-  request: FastifyRequestTypebox<typeof CreateDoctorSchema>,
-  reply: FastifyReplyTypebox<typeof CreateDoctorSchema>
-): Promise<CreateDoctorResponse> {
-  try {
-    const { password, ...rest } = request.body
-
-    const restOfData = {
-      birth: rest.birth,
-      chronicDisorders: '',
-      email: rest.email,
-      gender: rest.gender,
-      height: rest.height,
-      name: rest.name,
-      weight: rest.weight,
-      role: 'DOCTOR' as Role
     }
 
     const passwordHash = await request.bcryptHash(password)
@@ -284,9 +238,9 @@ async function resetPasswordHandler (
   reply: FastifyReplyTypebox<typeof ResetPasswordSchema>
 ): Promise<VerifyAccountResponse> {
   try {
-    const { id, passwordResetCode } = request.params
-    const { password } = request.body
-    const user = await findUserUnique('id', id)
+    const { passwordResetCode } = request.params
+    const { password, email } = request.body
+    const user = await findUserUnique('email', email)
     if (user === null) {
       return await reply.code(404).send({ message: 'User not found' })
     }
@@ -296,7 +250,7 @@ async function resetPasswordHandler (
     if (user.passwordResetCode !== Number(passwordResetCode)) {
       return await reply.code(403).send({ message: 'Reset Code invalid' })
     }
-    await updateUser(id, { passwordResetCode: null, password })
+    await updateUser(user.id, { passwordResetCode: null, password })
     return await reply.send({ message: 'Password reset' })
   } catch (error) {
     console.error(error)
@@ -350,7 +304,6 @@ async function getProfilePictureHandler (
 
 export {
   createUserHandler,
-  createDoctorHandler,
   deleteUserHandler,
   updateUserHandler,
   logInUserHandler,

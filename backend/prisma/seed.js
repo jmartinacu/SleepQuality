@@ -9,7 +9,7 @@ const questionnaires = [
       'What did you you try to go to sleep?': 'PRIMARY_TEXT',
       'How long did it take you to fall asleep?': 'PRIMARY_TEXT',
       'How many times did you wake up, not counting your final awakening?': 'PRIMARY_NUMBER',
-      'In total, how long did these awakenings last?': 'PRIMARY_NUMBER',
+      'In total, how long did these awakenings last?': 'SECONDARY_NUMBER',
       'What time was your final awakening?': 'PRIMARY_TEXT',
       'After your final awakening, how long did you spend in bed trying to sleep?': 'PRIMARY_NUMBER',
       'Did you wake up earlier than you planed?': 'PRIMARY_BOOL',
@@ -46,12 +46,17 @@ const questionnaires = [
       'Tired? Do you often feel Tired, Fatigued, or Sleepy during the daytime (such as falling asleep during driving or talking to someone)?': 'PRIMARY_BOOL',
       'Observed? Has anyone Observed you Stop Breathing or Choking/Gasping during your sleep?': 'PRIMARY_BOOL',
       'Pressure? Do you have or are being treated for High Blood Pressure?': 'PRIMARY_BOOL',
-      // PREGUNTAR POR LA PREGUNTA DE ABAJO POR QUE LA PODEMOS CALCULAR AUTOMÁTICAMENTE
       'Body Mass Index more than 35 kg/m^2?': 'PRIMARY_BOOL',
       'Age older than 50?': 'PRIMARY_BOOL',
       'Neck size large? (Measured around Adams Apple) is your shirt collar 16 inches / 40 cm larger?': 'PRIMARY_BOOL',
       'Gender = Male?': 'PRIMARY_BOOL'
-    }
+    },
+    additionalInformation: [
+      {
+        questions: [6, 7, 9],
+        default: true
+      }
+    ]
   },
   {
     name: 'Epworth Sleepiness Scale',
@@ -64,7 +69,18 @@ const questionnaires = [
       'Sitting and talking to someone': 'PRIMARY_NUMBER',
       'Sitting quietly by yourself after lunch': 'PRIMARY_NUMBER',
       'Sitting and eating a meal': 'PRIMARY_NUMBER'
-    }
+    },
+    additionalInformation: [
+      {
+        questions: [1, 2, 3, 4, 5, 6, 7, 8],
+        relations: {
+          0: 'Would never fall asleep',
+          1: 'Slight chance of falling asleep',
+          2: 'Moderate chance of falling asleep',
+          3: 'High chance of falling asleep'
+        }
+      }
+    ]
   },
   {
     name: 'Pittsburgh Sleep Quality Index',
@@ -82,7 +98,7 @@ const questionnaires = [
       'Feel too hot': 'PRIMARY_TEXT',
       'Have bad dreams': 'PRIMARY_TEXT',
       'Have pain': 'PRIMARY_TEXT',
-      'Other reason(s), please describe:': 'PRIMARY_TEXT',
+      'Other reason(s), please describe:': 'SECONDARY_TEXT',
       'During the past month, how often have you taken medicine to help you sleep (prescribed or "over the counter")?': 'PRIMARY_NUMBER',
       'During the past month, how often have you had trouble staying awake while driving, eating meals, or engaging in social activity?': 'PRIMARY_NUMBER',
       'During the past month, how much of a problem has it been for you to keep up enough enthusiasm to get things done?': 'PRIMARY_TEXT',
@@ -92,7 +108,7 @@ const questionnaires = [
       'Long pauses between breaths while asleep': 'SECONDARY_TEXT',
       'Legs twitching or jerking while you sleep': 'SECONDARY_TEXT',
       'Episodes of disorientation or confusion during sleep': 'SECONDARY_TEXT',
-      'Other restlessness while you sleep, please describe:': 'PRIMARY_TEXT'
+      'Other restlessness while you sleep, please describe:': 'SECONDARY_TEXT'
     },
     additionalInformation: [
       {
@@ -278,7 +294,7 @@ const questionnaires = [
       'How SATISFIED/DISSATISFIED are you with your CURRENT sleep pattern?': 'PRIMARY_NUMBER',
       'How NOTICEABLE to others do you think you sleep problem is in terms of impairing the quality of your life?': 'PRIMARY_NUMBER',
       'How WORRIED/DISTRESSED are you about your current sleep problem?': 'PRIMARY_NUMBER',
-      'TO what extent do you consider your sleep problem to INTERFERE with your daily functioning (e.g. daytime fatigue, mood, ability to function at work/daily chores, concentration, memory, etc.) CURRENTLY?': 'PRIMARY_NUMBER'
+      'To what extent do you consider your sleep problem to INTERFERE with your daily functioning (e.g. daytime fatigue, mood, ability to function at work/daily chores, concentration, memory, etc.) CURRENTLY?': 'PRIMARY_NUMBER'
     },
     additionalInformation: [
       {

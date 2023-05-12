@@ -44,15 +44,15 @@ function checkAnswersEnums ({
 
 function checkBirth (birth: string): boolean {
   let result = true
-  const birthArray = birth.split('-')
+  const birthArray = birth.split('/')
   if (birthArray.some(number => Number.isNaN(Number(number)))) result = false
-  if (Number(birthArray[0]) < 1900 || Number(birthArray[0]) > new Date().getFullYear()) {
+  if (Number(birthArray[0]) < 0 || Number(birthArray[0]) > 31) {
     result = false
   }
   if (Number(birthArray[1]) < 0 || Number(birthArray[1]) > 12) {
     result = false
   }
-  if (Number(birthArray[2]) < 0 || Number(birthArray[2]) > 31) {
+  if (Number(birthArray[2]) < 1900 || Number(birthArray[2]) > new Date().getFullYear()) {
     result = false
   }
   return result
