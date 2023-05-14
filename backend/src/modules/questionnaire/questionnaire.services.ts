@@ -44,8 +44,14 @@ async function findQuestionnaireUnique (
   return questionnaire
 }
 
+async function findQuestionnaires (): Promise<Questionnaire[]> {
+  const questionnaires = await prisma.questionnaire.findMany()
+  return questionnaires
+}
+
 export {
   createQuestionnaire,
   createAnswer,
-  findQuestionnaireUnique
+  findQuestionnaireUnique,
+  findQuestionnaires
 }

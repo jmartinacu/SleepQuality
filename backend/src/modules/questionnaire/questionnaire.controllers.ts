@@ -1,14 +1,17 @@
+import { FastifyRequest, FastifyReply } from 'fastify'
 import {
   CreateQuestionnaireSchema,
   CreateAnswerSchema,
   type Questions,
-  type AdditionalInformation
+  type AdditionalInformation,
+  GetQuestionnaireSchema
 } from './questionnaire.schemas'
 import { Answer, Questionnaire } from '../../utils/database'
 import {
   createAnswer,
   createQuestionnaire,
-  findQuestionnaireUnique
+  findQuestionnaireUnique,
+  findQuestionnaires
 } from './questionnaire.services'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 import { checkAnswerTypes, checkAnswersEnums, convertToCorrectType } from '../../utils/helpers'
@@ -21,6 +24,36 @@ async function createQuestionnaireHandler (
     const data = request.body
     const questionnaire = await createQuestionnaire(data)
     return await reply.code(201).send(questionnaire)
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
+async function getQuestionnaireHandler (
+  request: FastifyRequestTypebox<typeof GetQuestionnaireSchema>,
+  reply: FastifyReplyTypebox<typeof GetQuestionnaireSchema>
+): Promise<Questionnaire> {
+  try {
+    const { id } = request.params
+    const questionnaire = await findQuestionnaireUnique('id', id)
+    if (questionnaire === null) {
+      return await reply.code(404).send({ message: 'Not found' })
+    }
+    return await reply.send(questionnaire)
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
+async function getQuestionnairesInformationHandler (
+  _request: FastifyRequest,
+  reply: FastifyReply
+): Promise<Questionnaire[]> {
+  try {
+    const questionnaires = await findQuestionnaires()
+    return await reply.send(questionnaires)
   } catch (error) {
     console.error(error)
     return await reply.code(500).send(error)
@@ -92,5 +125,7 @@ async function createAnswerHandler (
 
 export {
   createQuestionnaireHandler,
-  createAnswerHandler
+  createAnswerHandler,
+  getQuestionnaireHandler,
+  getQuestionnairesInformationHandler
 }

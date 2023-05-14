@@ -62,6 +62,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     getMeHandler
   )
 
+  // TODO TESTING HAPPY PATH
   server.delete('/',
     {
       onRequest: server.auth([server.authenticate]),
@@ -95,6 +96,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     forgotPasswordHandler
   )
 
+  // TODO FIX TESTING HAPPY PATH
   server.post('/resetpassword/:passwordResetCode',
     {
       schema: ResetPasswordSchema
@@ -102,6 +104,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     resetPasswordHandler
   )
 
+  // TODO TESTING HAPPY PATH
   server.post('/images',
     {
       onRequest: server.auth([server.authenticate]),
@@ -114,6 +117,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     addProfilePictureHandler
   )
 
+  // TODO TESTING HAPPY PATH
   server.get('/images',
     {
       onRequest: server.auth([server.authenticate]),

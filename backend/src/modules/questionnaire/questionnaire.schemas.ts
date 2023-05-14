@@ -69,6 +69,24 @@ const createAnswerResponseSchema = Type.Object({
   answers
 })
 
+const getQuestionnaireParamsSchema = Type.Object({
+  id
+})
+
+const getQuestionnaireResponseSchema = Type.Object({
+  id,
+  name,
+  questions,
+  additionalInformation
+})
+
+const getQuestionnairesInformationResponseSchema = Type.Array(
+  Type.Object({
+    id,
+    name
+  })
+)
+
 const errorResponseSchema = Type.Object({
   message
 })
@@ -77,6 +95,22 @@ const CreateQuestionnaireSchema = {
   body: createQuestionnaireSchema,
   response: {
     201: createQuestionnaireResponseSchema,
+    500: Type.Any()
+  }
+}
+
+const GetQuestionnaireSchema = {
+  params: getQuestionnaireParamsSchema,
+  response: {
+    200: getQuestionnaireResponseSchema,
+    404: errorResponseSchema,
+    500: Type.Any()
+  }
+}
+
+const GetQuestionnairesInformationSchema = {
+  response: {
+    200: getQuestionnairesInformationResponseSchema,
     500: Type.Any()
   }
 }
@@ -99,6 +133,8 @@ type AdditionalInformation = Static<typeof additionalInformation>
 export {
   CreateQuestionnaireSchema,
   CreateAnswerSchema,
+  GetQuestionnaireSchema,
+  GetQuestionnairesInformationSchema,
   type CreateQuestionnaireInput,
   type Questions,
   type QuestionType,
