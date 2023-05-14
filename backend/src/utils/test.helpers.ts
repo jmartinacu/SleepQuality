@@ -14,7 +14,7 @@ function fakeInputUser (): CreateUserInput {
   const genderIndex = random(0, 2)
   const email = faker.internet.email()
   const password = 'asdfR2&tr'
-  const birth = '1998-01-15'
+  const birth = '15/01/1998'
   const gender = genders.at(genderIndex) as Gender
   const height = faker.datatype.number({ min: 1, max: 2.5, precision: 0.01 })
   const weight = faker.datatype.number({ min: 20, max: 200, precision: 0.01 })
@@ -112,12 +112,12 @@ function fakerSession ({
 const correctAnswers = [
   {
     name: 'Consensus Sleep Diary',
-    questions: {
+    answers: {
       'What time did you get into bed?': 'Around 1 am',
       'What did you you try to go to sleep?': 'I went to sleep very late, at 1:30 am',
       'How long did it take you to fall asleep?': 'I feel asleep in 10 minutes',
       'How many times did you wake up, not counting your final awakening?': 0,
-      'In total, how long did these awakenings last?': null,
+      'In total, how long did these awakenings last?': 0,
       'What time was your final awakening?': 'Around 7 am',
       'After your final awakening, how long did you spend in bed trying to sleep?': 0,
       'Did you wake up earlier than you planed?': true,
@@ -125,7 +125,7 @@ const correctAnswers = [
       'What time did you get out of bed for the day?': 'At 7:30 am',
       'In total, how long did you sleep?': 330,
       'How would you rate the quality of your sleep?': 'Good', // ENUM
-      'How rested or refreshed did you feel when you woke-up for the day?': 'ENUM', // ENUM
+      'How rested or refreshed did you feel when you woke-up for the day?': 'Slightly rested', // ENUM
       'How many times did you nap or doze': 2,
       'In total, how long did you nap or doze?': 40,
       'How many drinks containing alcohol did you have?': 2,
@@ -139,7 +139,7 @@ const correctAnswers = [
   },
   {
     name: 'STOP-BANG',
-    questions: {
+    answers: {
       'Snoring? Do you Snore Loudly (loud enough to be heard through closed doors or your bed-partner-elbows you for snoring at night)?': false,
       'Tired? Do you often feel Tired, Fatigued, or Sleepy during the daytime (such as falling asleep during driving or talking to someone)?': false,
       'Observed? Has anyone Observed you Stop Breathing or Choking/Gasping during your sleep?': false,
@@ -152,7 +152,7 @@ const correctAnswers = [
   },
   {
     name: 'Epworth Sleepiness Scale',
-    questions: {
+    answers: {
       'Sitting and reading': 1,
       'Sitting and watching TV or a video': 2,
       'Sitting in a classroom at school during the morning': 1,
@@ -165,7 +165,7 @@ const correctAnswers = [
   },
   {
     name: 'Pittsburgh Sleep Quality Index',
-    questions: {
+    answers: {
       'During the past month, what time have you usually gone to bed at night?': 'At 1 am',
       'During the past month, how long (in minutes) has it usually taken you to fall asleep each night?': 20,
       'During the past month, what time have you usually gotten up in the morning?': 7.30,
@@ -185,7 +185,7 @@ const correctAnswers = [
       'During the past month, how much of a problem has it been for you to keep up enough enthusiasm to get things done?': 'Somewhat of a problem', // ENUM
       'During the past month, how would you rate your sleep quality overall?': 'Fairly good', // ENUM
       'Do you have a bed partner or room mate': 'Not bed partner or room mate', // ENUM
-      'Loud snoring': 'SECONDARY_TEXT', // ENUM
+      'Loud snoring': null, // ENUM
       'Long pauses between breaths while asleep': null, // ENUM
       'Legs twitching or jerking while you sleep': null, // ENUM
       'Episodes of disorientation or confusion during sleep': null, // ENUM
@@ -194,7 +194,7 @@ const correctAnswers = [
   },
   {
     name: 'Perceived Stress Questionnaire',
-    questions: {
+    answers: {
       'You feel rested': 3,
       'You feel that too many demands are being made on you': 3,
       'You have too many things to do': 3,
@@ -219,7 +219,7 @@ const correctAnswers = [
   },
   {
     name: 'Athens Insomnia Scale',
-    questions: {
+    answers: {
       'Sleep induction (time it takes you to fall asleep after turning-off the lights)': 0,
       'Awakenings during the night': 0,
       'Final awakening earlier than desired': 1,
@@ -232,7 +232,7 @@ const correctAnswers = [
   },
   {
     name: 'International Restless Legs Scale',
-    questions: {
+    answers: {
       'Overall, how would you rate the RLS discomfort in you legs or arms?': 'Severe', // ENUM
       'Overall, how would you rate the need to move around because of your RLS symptoms?': 'Moderate', // ENUM
       'Overall, how much relief of your RLS arm or leg discomfort did you get from moving around?': 'Either complete or almost complete relief', // ENUM
@@ -247,7 +247,7 @@ const correctAnswers = [
   },
   {
     name: 'Insomnia Severity Index',
-    questions: {
+    answers: {
       'Difficulty falling asleep': 1,
       'Difficulty staying asleep': 2,
       'Problems waking up too early': 2,

@@ -92,6 +92,7 @@ const CreateAnswerSchema = {
 
 type CreateQuestionnaireInput = Static<typeof createQuestionnaireSchema>
 type Questions = Static<typeof questions>
+type QuestionType = Static<typeof questionType>
 type AnswerUser = Static<typeof answers>
 type AdditionalInformation = Static<typeof additionalInformation>
 
@@ -100,6 +101,7 @@ export {
   CreateAnswerSchema,
   type CreateQuestionnaireInput,
   type Questions,
+  type QuestionType,
   type AnswerUser,
   type AdditionalInformation
 }

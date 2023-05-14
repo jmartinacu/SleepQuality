@@ -1,5 +1,5 @@
 import {
-  AdditionalInformation
+  AdditionalInformation, QuestionType
 } from '../modules/questionnaire/questionnaire.schemas'
 import { ALLOWED_EXTENSIONS, JPEG_EXTENSIONS } from '../modules/user/user.schemas'
 
@@ -16,23 +16,64 @@ function calculateBMI ({
 
 const checkAnswerTypes = {
   PRIMARY_TEXT: (response: any) => typeof response === 'string',
-  PRIMARY_NUMBER: (response: any) => typeof response === 'number',
-  PRIMARY_BOOL: (response: any) => typeof response === 'boolean',
+  PRIMARY_NUMBER: (response: any) => {
+    if (typeof response !== 'string') return false
+    return !isNaN(Number(response)) && !isNaN(parseFloat(response))
+  },
+  PRIMARY_BOOL: (response: any) => {
+    if (typeof response !== 'string') return false
+    return response === 'true' || response === 'false'
+  },
   SECONDARY_TEXT: (response: any) => typeof response === 'string' || response === null,
-  SECONDARY_NUMBER: (response: any) => typeof response === 'number' || response === null,
-  SECONDARY_BOOL: (response: any) => typeof response === 'boolean' || response === null
+  SECONDARY_NUMBER: (response: any) => {
+    if (typeof response !== 'string') return false
+    return (!isNaN(Number(response)) && !isNaN(parseFloat(response))) || response === null
+  },
+  SECONDARY_BOOL: (response: any) => {
+    if (typeof response !== 'string') return false
+    return response === 'true' || response === 'false' || response === null
+  }
+}
+
+const convertToCorrectType = {
+  PRIMARY_TEXT: (response: any) => (response as string).trim(),
+  PRIMARY_NUMBER: (response: any) => Number(response),
+  PRIMARY_BOOL: (response: any) => {
+    if (response === 'false') return false
+    else return true
+  },
+  SECONDARY_TEXT: (response: any) => {
+    if (response === null || response === '') return null
+    return (response as string).trim()
+  },
+  SECONDARY_NUMBER: (response: any) => {
+    if (response === null) return null
+    return Number(response)
+  },
+  SECONDARY_BOOL: (response: any) => {
+    if (response === null) return null
+    else if (response === 'false') return false
+    else return true
+  }
 }
 
 function checkAnswersEnums ({
   answerUser,
   index,
-  additionalInformation
+  additionalInformation,
+  questionType
 }:
 {
   answerUser: string
   index: number
-  additionalInformation: AdditionalInformation }
+  additionalInformation: AdditionalInformation
+  questionType: QuestionType }
 ): boolean {
+  if (
+    (questionType === 'SECONDARY_BOOL' ||
+    questionType === 'SECONDARY_NUMBER' ||
+    questionType === 'SECONDARY_TEXT') && answerUser === null
+  ) return true
   const questionUserInformation = additionalInformation
     .find(information => {
       return information.questions
@@ -122,6 +163,7 @@ export {
   htmlVerifyUser,
   htmlResetPasswordUser,
   checkAnswerTypes,
+  convertToCorrectType,
   checkAnswersEnums,
   checkBirth
 }

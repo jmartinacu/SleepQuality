@@ -9,7 +9,7 @@ const questionnaires = [
       'What did you you try to go to sleep?': 'PRIMARY_TEXT',
       'How long did it take you to fall asleep?': 'PRIMARY_TEXT',
       'How many times did you wake up, not counting your final awakening?': 'PRIMARY_NUMBER',
-      'In total, how long did these awakenings last?': 'SECONDARY_NUMBER',
+      'In total, how long did these awakenings last?': 'PRIMARY_NUMBER',
       'What time was your final awakening?': 'PRIMARY_TEXT',
       'After your final awakening, how long did you spend in bed trying to sleep?': 'PRIMARY_NUMBER',
       'Did you wake up earlier than you planed?': 'PRIMARY_BOOL',
@@ -99,8 +99,8 @@ const questionnaires = [
       'Have bad dreams': 'PRIMARY_TEXT',
       'Have pain': 'PRIMARY_TEXT',
       'Other reason(s), please describe:': 'SECONDARY_TEXT',
-      'During the past month, how often have you taken medicine to help you sleep (prescribed or "over the counter")?': 'PRIMARY_NUMBER',
-      'During the past month, how often have you had trouble staying awake while driving, eating meals, or engaging in social activity?': 'PRIMARY_NUMBER',
+      'During the past month, how often have you taken medicine to help you sleep (prescribed or "over the counter")?': 'PRIMARY_TEXT',
+      'During the past month, how often have you had trouble staying awake while driving, eating meals, or engaging in social activity?': 'PRIMARY_TEXT',
       'During the past month, how much of a problem has it been for you to keep up enough enthusiasm to get things done?': 'PRIMARY_TEXT',
       'During the past month, how would you rate your sleep quality overall?': 'PRIMARY_TEXT',
       'Do you have a bed partner or room mate': 'PRIMARY_TEXT',
@@ -352,10 +352,11 @@ const questionnaires = [
 ]
 
 async function main () {
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@admin.com' },
-    update: {},
-    create: {
+  await prisma.answer.deleteMany()
+  await prisma.user.deleteMany()
+  await prisma.questionnaire.deleteMany()
+  const admin = await prisma.user.create({
+    data: {
       email: 'admin@admin.com',
       name: 'Admin',
       birth: new Date(),
@@ -372,14 +373,10 @@ async function main () {
 
   console.log({ admin })
 
-  for (const questionnaire of questionnaires) {
-    const questionnaireDB = await prisma.questionnaire.upsert({
-      where: { name: questionnaire.name },
-      update: {},
-      create: questionnaire
-    })
-    console.log(questionnaireDB)
-  }
+  const questionnaireDB = await prisma.questionnaire.createMany({
+    data: questionnaires
+  })
+  console.log(questionnaireDB)
 }
 
 main()

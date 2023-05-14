@@ -62,6 +62,13 @@ async function createUserHandler (
       return await reply.code(400).send({ message: 'Incorrect user birth' })
     }
 
+    // TENGO QUE CAMBIAR EL MES POR EL DIA PARA QUE LO HAGA BIEN
+    const [day, month, year] = rest.birth.split('/')
+
+    const newStringDate = `${month}/${day}/${year}`
+
+    restOfData.birth = newStringDate
+
     const user = await createUser({ ...restOfData, password: passwordHash })
 
     const verificationLink = `${request.protocol}://${request.hostname}/api/users/verify/${user.id}/${user.verificationCode}`

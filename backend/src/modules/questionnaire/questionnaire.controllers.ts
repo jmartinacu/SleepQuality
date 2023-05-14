@@ -11,7 +11,7 @@ import {
   findQuestionnaireUnique
 } from './questionnaire.services'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
-import { checkAnswerTypes, checkAnswersEnums } from '../../utils/helpers'
+import { checkAnswerTypes, checkAnswersEnums, convertToCorrectType } from '../../utils/helpers'
 
 async function createQuestionnaireHandler (
   request: FastifyRequestTypebox<typeof CreateQuestionnaireSchema>,
@@ -41,8 +41,8 @@ async function createAnswerHandler (
       })
     }
     // CHECK THAT THE QUESTIONS IN QUESTIONNAIRE AND THE QUESTIONS IN ANSWER ARE THE SAME
-    if (JSON.stringify(Object.keys(questionnaire.questions as Object)) === JSON.stringify(Object.keys(answers))) {
-      return await reply.code(400).send({ message: 'Incorrect answer' })
+    if (JSON.stringify(Object.keys(questionnaire.questions as object)) !== JSON.stringify(Object.keys(answers))) {
+      return await reply.code(400).send({ message: 'Wrong answer' })
     }
     // CHECK TYPES OF EACH ANSWER AND CHECK ENUM ANSWER QUESTIONS RESPONSES
     const questionIndexesToCheckEnums = (questionnaire.additionalInformation as AdditionalInformation)
@@ -55,20 +55,23 @@ async function createAnswerHandler (
     let index = 1
     for (const [question, questionType] of Object.entries(questionnaire.questions as Questions)
     ) {
-      const answerUser = answers[question]
+      let answerUser = answers[question]
       if (!checkAnswerTypes[questionType](answerUser)) {
-        return await reply.code(400).send({ message: 'Incorrect answer' })
+        return await reply.code(400).send({ message: 'Wrong answer' })
       }
+      answerUser = convertToCorrectType[questionType](answerUser)
       if (questionIndexesToCheckEnums.has(index)) {
         if (!checkAnswersEnums({
           additionalInformation: (questionnaire
             .additionalInformation as AdditionalInformation),
           answerUser: (answerUser as string),
-          index
+          index,
+          questionType
         })) {
-          return await reply.code(400).send({ message: 'Incorrect answer' })
+          return await reply.code(400).send({ message: 'Wrong answer' })
         }
       }
+      answers[question] = answerUser
       index++
     }
     const {

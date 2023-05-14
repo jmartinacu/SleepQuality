@@ -1,13 +1,19 @@
 import t from 'tap'
 import buildServer from '../../server'
-import { fakeInputUser, fakeUpdateUser } from '../../utils/test.helpers'
-import prisma, { User, Session } from '../../utils/database'
-import type { CreateUserResponse, LogInUserResponse, RefreshTokenResponse, VerifyAccountResponse } from '../user/user.schemas'
+import { fakeInputUser, fakeUpdateUser, correctAnswers } from '../../utils/test.helpers'
+import prisma, { User, Session, Answer, Questionnaire } from '../../utils/database'
+import type {
+  CreateUserResponse,
+  LogInUserResponse,
+  RefreshTokenResponse,
+  VerifyAccountResponse
+} from '../user/user.schemas'
 import { findSessionAndUserUnique, findUserUnique } from '../user/user.services'
 import { calculateBMI } from '../../utils/helpers'
+import { findQuestionnaireUnique } from '../questionnaire/questionnaire.services'
 
 async function DatabaseTests (): Promise<void> {
-  t.plan(8)
+  t.plan(9)
 
   t.before(async () => {
     await prisma.$connect()
@@ -17,7 +23,9 @@ async function DatabaseTests (): Promise<void> {
   t.teardown(async () => {
     await fastify.close()
     await prisma.session.deleteMany()
+    await prisma.answer.deleteMany()
     await prisma.user.deleteMany()
+    await prisma.questionnaire.deleteMany()
     await prisma.$disconnect()
   })
 
@@ -38,7 +46,10 @@ async function DatabaseTests (): Promise<void> {
       childTest.equal(createUserResponse.statusCode, 201)
       childTest.equal(createUserResponse.headers['content-type'], 'application/json; charset=utf-8')
 
-      childTest.equal(new Date(createUserBackend.birth).toDateString(), new Date(userCreate.birth).toDateString())
+      const [day, month, year] = userCreate.birth.split('/')
+      const newStringDate = `${month}/${day}/${year}`
+
+      childTest.equal(new Date(createUserBackend.birth).toDateString(), new Date(newStringDate).toDateString())
       childTest.equal(createUserBackend.name, userCreate.name)
       childTest.equal(createUserBackend.email, userCreate.email)
       childTest.equal(createUserBackend.height, userCreate.height)
@@ -199,26 +210,68 @@ async function DatabaseTests (): Promise<void> {
   const passwordResetCodeString = String(passwordResetCode)
   const newPassword = 'asldkfj12U&'
 
+  const {
+    passwordResetCode: newPasswordResetCode
+  } = await findUserUnique('id', createUserBackend.id) as User
+
+  const answersResponse: any[] = []
+  const answersBackend: Answer[] = []
+  const questionnairesBackend: Questionnaire[] = []
+
+  for (const answer of correctAnswers) {
+    const answerResponse = await fastify.inject({
+      method: 'POST',
+      url: 'api/questionnaires/answer',
+      payload: answer,
+      headers: {
+        authorization: `Bearer ${tokensBackend.accessToken}`
+      }
+    })
+
+    const questionnaire = await findQuestionnaireUnique('name', answer.name) as Questionnaire
+
+    const answerBackend: Answer = answerResponse.json()
+
+    answersResponse.push(answerResponse)
+    answersBackend.push(answerBackend)
+    questionnairesBackend.push(questionnaire)
+  }
+
+  await t.test('POST `api/questionnaires/answer` - Happy Path: Create answer', childTest => {
+    for (let i = 0; i < answersResponse.length; i++) {
+      const answerResponse: any = answersResponse.at(i)
+      const answer = correctAnswers.at(i)
+      const questionnaire = questionnairesBackend.at(i)
+      const answerBackend = answersBackend.at(i)
+
+      childTest.equal(answerResponse.statusCode, 201)
+      childTest.equal(answerResponse.headers['content-type'], 'application/json; charset=utf-8')
+
+      childTest.same(answerBackend?.answers, answer?.answers)
+      childTest.equal(answerBackend?.questionnaireId, questionnaire?.id)
+    }
+  })
+
   const resetPasswordResponse = await fastify.inject({
     method: 'POST',
-    url: `api/users/resetpassword/${createUserBackend.id}/${passwordResetCodeString}`,
+    url: `api/users/resetpassword/${passwordResetCodeString}`,
     payload: {
-      password: newPassword
+      password: newPassword,
+      email
     }
   })
 
   const resetPasswordBackend: VerifyAccountResponse = resetPasswordResponse.json()
 
   const {
-    password,
-    passwordResetCode: newPasswordResetCode
+    password: modifiedPassword
   } = await findUserUnique('id', createUserBackend.id) as User
 
-  await t.test('POST `api/users/resetpassword/:id/:passwordResetCode` - Happy Path: Reset password with password reset code', childTest => {
+  await t.test('POST `api/users/resetpassword/:passwordResetCode` - Happy Path: Reset password with password reset code', childTest => {
     childTest.equal(resetPasswordResponse.statusCode, 200)
     childTest.equal(resetPasswordResponse.headers['content-type'], 'application/json; charset=utf-8')
 
-    childTest.equal(password, newPassword)
+    childTest.equal(modifiedPassword, newPassword)
     childTest.same(newPasswordResetCode, null)
     childTest.equal(resetPasswordBackend.message, 'Password reset')
   })
