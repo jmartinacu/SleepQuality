@@ -39,6 +39,7 @@ import {
 } from '../../utils/helpers'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 
+// CHECK EMAIL IS NOT IN DB
 async function createUserHandler (
   request: FastifyRequestTypebox<typeof CreateUserSchema>,
   reply: FastifyReplyTypebox<typeof CreateUserSchema>
@@ -54,6 +55,12 @@ async function createUserHandler (
       height: rest.height,
       name: rest.name,
       weight: rest.weight
+    }
+
+    const checkEmailIsUnique = await findUserUnique('email', rest.email)
+
+    if (checkEmailIsUnique !== null) {
+      return await reply.code(400).send({ message: `Email ${rest.email} is used by other user` })
     }
 
     const passwordHash = await request.bcryptHash(password)
@@ -239,7 +246,7 @@ async function forgotPasswordHandler (
     return await reply.code(500).send(error)
   }
 }
-
+// TODO: HASH NEW PASSWORD PROVIDED BY USER
 async function resetPasswordHandler (
   request: FastifyRequestTypebox<typeof ResetPasswordSchema>,
   reply: FastifyReplyTypebox<typeof ResetPasswordSchema>
@@ -257,7 +264,10 @@ async function resetPasswordHandler (
     if (user.passwordResetCode !== Number(passwordResetCode)) {
       return await reply.code(403).send({ message: 'Reset Code invalid' })
     }
-    await updateUser(user.id, { passwordResetCode: null, password })
+
+    const passwordHash = await request.bcryptHash(password)
+
+    await updateUser(user.id, { passwordResetCode: null, password: passwordHash })
     return await reply.send({ message: 'Password reset' })
   } catch (error) {
     console.error(error)

@@ -355,6 +355,7 @@ async function main () {
   await prisma.answer.deleteMany()
   await prisma.user.deleteMany()
   await prisma.questionnaire.deleteMany()
+  // TODO: HASH ADMIN PASSWORD
   const admin = await prisma.user.create({
     data: {
       email: 'admin@admin.com',

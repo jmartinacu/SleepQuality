@@ -25,6 +25,7 @@ async function questionnaireRoutes (server: FastifyInstance): Promise<void> {
     createQuestionnaireHandler
   )
 
+  // TODO: TEST HAPPY PATH
   server.get('/:id',
     {
       onRequest: server.auth([server.authenticate]),
@@ -34,6 +35,7 @@ async function questionnaireRoutes (server: FastifyInstance): Promise<void> {
     getQuestionnaireHandler
   )
 
+  // TODO: TEST HAPPY PATH
   server.get('/',
     {
       onRequest: server.auth([server.authenticate]),
@@ -43,6 +45,7 @@ async function questionnaireRoutes (server: FastifyInstance): Promise<void> {
     getQuestionnairesInformationHandler
   )
 
+  // TODO: ADD ALGORITHM FUNCTIONALITY WHEN THIS ROUTE IS CALL
   server.post('/answer',
     {
       onRequest: server.auth([server.authenticate]),

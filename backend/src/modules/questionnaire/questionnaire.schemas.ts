@@ -20,10 +20,17 @@ const questionnaireAttributes = {
       Type.Boolean(),
       Type.Null()
     ])
-  )
+  ),
+  stopBangAnswers: Type.Record(Type.String(), Type.Boolean())
 }
 
-const { id, message, questionType, answers } = questionnaireAttributes
+const {
+  id,
+  message,
+  questionType,
+  answers,
+  stopBangAnswers
+} = questionnaireAttributes
 
 const questionnaireCore = {
   name: Type.String(),
@@ -128,6 +135,7 @@ type CreateQuestionnaireInput = Static<typeof createQuestionnaireSchema>
 type Questions = Static<typeof questions>
 type QuestionType = Static<typeof questionType>
 type AnswerUser = Static<typeof answers>
+type AnswerStopBang = Static<typeof stopBangAnswers>
 type AdditionalInformation = Static<typeof additionalInformation>
 
 export {
@@ -139,5 +147,6 @@ export {
   type Questions,
   type QuestionType,
   type AnswerUser,
+  type AnswerStopBang,
   type AdditionalInformation
 }

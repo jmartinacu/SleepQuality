@@ -11,7 +11,8 @@ import {
   createAnswer,
   createQuestionnaire,
   findQuestionnaireUnique,
-  findQuestionnaires
+  findQuestionnaires,
+  questionnairesAlgorithms
 } from './questionnaire.services'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 import { checkAnswerTypes, checkAnswersEnums, convertToCorrectType } from '../../utils/helpers'
@@ -70,7 +71,7 @@ async function createAnswerHandler (
     const questionnaire = await findQuestionnaireUnique('name', name)
     if (questionnaire === null) {
       return await reply.code(400).send({
-        message: `Questionnaire with name equal to ${name} does not exist`
+        message: `Questionnaire ${name} does not exist`
       })
     }
     // CHECK THAT THE QUESTIONS IN QUESTIONNAIRE AND THE QUESTIONS IN ANSWER ARE THE SAME
@@ -80,7 +81,7 @@ async function createAnswerHandler (
     // CHECK TYPES OF EACH ANSWER AND CHECK ENUM ANSWER QUESTIONS RESPONSES
     const questionIndexesToCheckEnums = (questionnaire.additionalInformation as AdditionalInformation)
       .reduce((result, current) => {
-        if (Object.prototype.hasOwnProperty.call(current, 'enum')) {
+        if ('enum' in current) {
           current.questions.forEach(questionIndex => result.add(questionIndex))
         }
         return result
@@ -93,13 +94,20 @@ async function createAnswerHandler (
         return await reply.code(400).send({ message: 'Wrong answer' })
       }
       answerUser = convertToCorrectType[questionType](answerUser)
-      if (questionIndexesToCheckEnums.has(index)) {
+      if (questionIndexesToCheckEnums.has(index) &&
+        !(
+          (
+            questionType === 'SECONDARY_BOOL' ||
+            questionType === 'SECONDARY_NUMBER' ||
+            questionType === 'SECONDARY_TEXT'
+          ) && answerUser === null
+        )
+      ) {
         if (!checkAnswersEnums({
           additionalInformation: (questionnaire
             .additionalInformation as AdditionalInformation),
           answerUser: (answerUser as string),
-          index,
-          questionType
+          index
         })) {
           return await reply.code(400).send({ message: 'Wrong answer' })
         }
@@ -107,15 +115,16 @@ async function createAnswerHandler (
       answers[question] = answerUser
       index++
     }
+    await questionnairesAlgorithms[name as keyof typeof questionnairesAlgorithms](answers)
     const {
       id,
-      answers: answersBackend
+      answers: answersDB
     } = await createAnswer(questionnaire.id, userId, answers)
     return await reply.code(201).send({
       id,
       questionnaireId: questionnaire.id,
-      name: questionnaire.name,
-      answers: answersBackend
+      name,
+      answers: answersDB
     })
   } catch (error) {
     console.error(error)
