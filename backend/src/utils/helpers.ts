@@ -78,19 +78,43 @@ function checkAnswersEnums ({
 }
 
 function checkBirth (birth: string): boolean {
+  // DD/MM/YYYY-HH:MM
   let result = true
-  const birthArray = birth.split('/')
+  const [DayMonthYear] = birth.split('-')
+  const birthArray = DayMonthYear.split('/')
   if (birthArray.some(number => Number.isNaN(Number(number)))) result = false
-  if (Number(birthArray[0]) < 0 || Number(birthArray[0]) > 31) {
+  if (Number(birthArray[0]) <= 0 || Number(birthArray[0]) > 31) {
     result = false
   }
-  if (Number(birthArray[1]) < 0 || Number(birthArray[1]) > 12) {
+  if (Number(birthArray[1]) <= 0 || Number(birthArray[1]) > 12) {
     result = false
   }
   if (Number(birthArray[2]) < 1900 || Number(birthArray[2]) > new Date().getFullYear()) {
     result = false
   }
   return result
+}
+
+function parseDateToString (date: Date): string {
+  const dateStringBackend = date.toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+  const [dateString, timeString] = dateStringBackend.split(',')
+  return `${dateString}-${timeString.trim()}`
+}
+
+function parseStringToDate (date: string): Date {
+  const [DayMonthYear, HourMinute] = date.split('-')
+  const [day, month, year] = DayMonthYear.split('/')
+  const [hour, minute] = HourMinute.split(':')
+
+  const newStringDate = `${year}-${month}-${day}T${hour}:${minute}`
+
+  return new Date(newStringDate)
 }
 
 function checkTimeDiffOfGivenDateUntilNow (date: Date, timeInHours: number): boolean {
@@ -159,5 +183,7 @@ export {
   checkAnswerTypes,
   convertToCorrectType,
   checkAnswersEnums,
-  checkBirth
+  checkBirth,
+  parseDateToString,
+  parseStringToDate
 }

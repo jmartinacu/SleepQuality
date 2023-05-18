@@ -2,7 +2,8 @@ import { Static, Type } from '@fastify/type-provider-typebox'
 
 const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹])([A-Za-z\d~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹]|[^ ]){8,15}$/
 export const regexObjectId = /^[a-fA-F0-9]{24}$/
-const regexDate = /[0-9]{2}\/[0-9]{2}\/[0-9]{4}/ // DD/MM/YYYY
+export const regexDate = /^[0-9]{2}\/[0-9]{2}\/[0-9]{4}-[0-9]{2}:[0-9]{2}$/ // DD/MM/YYYY-HH:MM
+// new Date(year, monthIndex -> {0 - 11}, day, hours, minutes)
 
 export const MAX_FILE_SIZE = 1048576
 export const JPEG_EXTENSIONS = [

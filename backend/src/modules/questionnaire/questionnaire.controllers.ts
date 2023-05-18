@@ -115,7 +115,11 @@ async function createAnswerHandler (
       answers[question] = answerUser
       index++
     }
-    await questionnairesAlgorithms[name as keyof typeof questionnairesAlgorithms](answers)
+    await questionnairesAlgorithms[name as keyof typeof questionnairesAlgorithms](
+      answers,
+      questionnaire.id,
+      userId
+    )
     const {
       id,
       answers: answersDB

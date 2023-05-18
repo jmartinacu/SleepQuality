@@ -9,24 +9,25 @@ datasource db {
 }
 
 model User {
-  id                 String @id @default(auto()) @map("_id") @db.ObjectId
-  email              String @unique
-  name               String
-  password           String
-  gender             Gender
-  birth              DateTime
-  height             Float
-  weight             Float
-  chronicDisorders   String
-  BMI                Float
-  role               Role @default(USER)
-  verificationCode   String @default(uuid())
-  passwordResetCode  Int?
-  verified           Boolean @default(false)
-  session            Session?
-  profilePicture     String?
-  questionnairesToDo String[]
-  answers            Answer[] 
+  id                     String @id @default(auto()) @map("_id") @db.ObjectId
+  email                  String @unique
+  name                   String
+  password               String
+  gender                 Gender
+  birth                  DateTime
+  height                 Float
+  weight                 Float
+  chronicDisorders       String
+  BMI                    Float
+  role                   Role @default(USER)
+  verificationCode       String @default(uuid())
+  passwordResetCode      Int?
+  verified               Boolean @default(false)
+  session                Session?
+  profilePicture         String?
+  questionnairesToDo     String[]
+  answers                Answer[] 
+  questionnaireAlgorithm QuestionnaireAlgorithm[]
   // doctor             Doctor? @relation(fields: [doctorId], references: [id]) 
   // doctorId           String? @unique @db.ObjectId
 }
@@ -53,13 +54,32 @@ model Session {
 }
 
 model Questionnaire {
-  id                    String @id @default(auto()) @map("_id") @db.ObjectId
-  name                  String @unique
-  questions             Json
-  additionalInformation Json[]
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-  answers               Answer[]
+  id                     String @id @default(auto()) @map("_id") @db.ObjectId
+  name                   String @unique
+  questions              Json
+  additionalInformation  Json[]
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  answers                Answer[]
+  questionnaireAlgorithm QuestionnaireAlgorithm[]
+}
+
+model QuestionnaireAlgorithm {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  StopBangWarning                String?
+  StopBangRisk                   Int?
+  EpworthSleepinessScaleRisk     Int?
+  EpworthSleepinessScaleWarning  String?
+  PittsburghSleepQualityIndex    Int?
+  PerceivedStressQuestionnaire   Int?
+  AthensInsomniaScale            Int?  
+  InternationalRestlessLegsScale Int?
+  InsomniaSeverityIndexWarning   String?
+  InsomniaSeverityIndexRisk      Int?
+  questionnaireId                String  @db.ObjectId
+  quesionnaire                   Questionnaire @relation(fields: [questionnaireId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId                         String @db.ObjectId
+  user                           User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model Answer {
