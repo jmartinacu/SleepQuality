@@ -24,7 +24,7 @@ const questionnaires = [
       'What time was your last alcohol drink?': 'SECONDARY_TEXT',
       'How many caffeinated drinks (coffee, tea, soda, energy drinks) did you have?': 'PRIMARY_NUMBER',
       'What time was your last caffeinated drink?': 'SECONDARY_TEXT',
-      'Did you take any over-the-counter or prescription medication(s) to help you sleep': 'PRIMARY_BOOL',
+      'Did you take any over-the-counter or prescription medication(s) to help you sleep?': 'PRIMARY_BOOL',
       'If so, list medication(s), dose, and time taken': 'SECONDARY_TEXT',
       Comments: 'SECONDARY_TEXT'
     },
@@ -73,11 +73,11 @@ const questionnaires = [
     additionalInformation: [
       {
         questions: [1, 2, 3, 4, 5, 6, 7, 8],
-        relations: {
-          0: 'Would never fall asleep',
-          1: 'Slight chance of falling asleep',
-          2: 'Moderate chance of falling asleep',
-          3: 'High chance of falling asleep'
+        relation: {
+          'Would never fall asleep': 0,
+          'Slight chance of falling asleep': 1,
+          'Moderate chance of falling asleep': 2,
+          'High chance of falling asleep': 3
         }
       }
     ]
@@ -85,7 +85,7 @@ const questionnaires = [
   {
     name: 'Pittsburgh Sleep Quality Index',
     questions: {
-      'During the past month, what time have you usually gone to bed at night?': 'PRIMARY_TEXT',
+      'During the past month, what time have you usually gone to bed at night?': 'PRIMARY_NUMBER',
       'During the past month, how long (in minutes) has it usually taken you to fall asleep each night?': 'PRIMARY_NUMBER',
       'During the past month, what time have you usually gotten up in the morning?': 'PRIMARY_NUMBER',
       'During the past month, how many hours of actual sleep did you get at night? (This may be different than the number of hours you spent in bed.)': 'PRIMARY_NUMBER',
@@ -114,7 +114,13 @@ const questionnaires = [
       {
         questions: [5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16],
         description: 'During the past month, how often have you had trouble sleeping because you...',
-        enum: ['Not during the past month', 'Less than once a week', 'Once or twice a week', 'Once or twice a week', 'Three or more times a week']
+        enum: ['Not during the past month', 'Less than once a week', 'Once or twice a week', 'Three or more times a week'],
+        relation: {
+          'Not during the past month': 0,
+          'Less than once a week': 1,
+          'Once or twice a week': 2,
+          'Three or more times a week': 3
+        }
       },
       {
         questions: [17],
@@ -123,8 +129,13 @@ const questionnaires = [
       },
       {
         questions: [18],
-        descriptions: '',
-        enum: ['Very good', 'Fairly good', 'Fairly bad', 'Very bad']
+        enum: ['Very good', 'Fairly good', 'Fairly bad', 'Very bad'],
+        relation: {
+          'Very good': 0,
+          'Fairly good': 1,
+          'Fairly bad': 2,
+          'Very bad': 3
+        }
       },
       {
         questions: [19],
@@ -141,35 +152,36 @@ const questionnaires = [
   {
     name: 'Perceived Stress Questionnaire',
     questions: {
-      'You feel rested': 'PRIMARY_NUMBER',
-      'You feel that too many demands are being made on you': 'PRIMARY_NUMBER',
-      'You have too many things to do': 'PRIMARY_NUMBER',
-      "You feel you're doing things you really like": 'PRIMARY_NUMBER',
-      'You fear you may not manage to attain your goals': 'PRIMARY_NUMBER',
-      'You feel calm': 'PRIMARY_NUMBER',
-      'You feel frustrated': 'PRIMARY_NUMBER',
-      'You are full of energy': 'PRIMARY_NUMBER',
-      'You feel tense': 'PRIMARY_NUMBER',
-      'Your problems seem to be pilling up': 'PRIMARY_NUMBER',
-      "You feel you're in a hurry": 'PRIMARY_NUMBER',
-      'You feel safe and protected': 'PRIMARY_NUMBER',
-      'You have many worries': 'PRIMARY_NUMBER',
-      'You enjoy yourself': 'PRIMARY_NUMBER',
-      'You are afraid for the future': 'PRIMARY_NUMBER',
-      'You are lighthearted': 'PRIMARY_NUMBER',
-      'You feel mentally relaxing': 'PRIMARY_NUMBER',
-      'You have trouble relaxing': 'PRIMARY_NUMBER',
-      'Yoy have enough time for yourself': 'PRIMARY_NUMBER',
-      'You feel under pressure from deadlines': 'PRIMARY_NUMBER'
+      'You feel rested': 'PRIMARY_TEXT',
+      'You feel that too many demands are being made on you': 'PRIMARY_TEXT',
+      'You have too many things to do': 'PRIMARY_TEXT',
+      "You feel you're doing things you really like": 'PRIMARY_TEXT',
+      'You fear you may not manage to attain your goals': 'PRIMARY_TEXT',
+      'You feel calm': 'PRIMARY_TEXT',
+      'You feel frustrated': 'PRIMARY_TEXT',
+      'You are full of energy': 'PRIMARY_TEXT',
+      'You feel tense': 'PRIMARY_TEXT',
+      'Your problems seem to be pilling up': 'PRIMARY_TEXT',
+      "You feel you're in a hurry": 'PRIMARY_TEXT',
+      'You feel safe and protected': 'PRIMARY_TEXT',
+      'You have many worries': 'PRIMARY_TEXT',
+      'You enjoy yourself': 'PRIMARY_TEXT',
+      'You are afraid for the future': 'PRIMARY_TEXT',
+      'You are lighthearted': 'PRIMARY_TEXT',
+      'You feel mentally relaxing': 'PRIMARY_TEXT',
+      'You have trouble relaxing': 'PRIMARY_TEXT',
+      'Yoy have enough time for yourself': 'PRIMARY_TEXT',
+      'You feel under pressure from deadlines': 'PRIMARY_TEXT'
     },
     additionalInformation: [
       {
         questions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
-        relations: {
-          1: 'Almost never',
-          2: 'Some-times',
-          3: 'Often',
-          4: 'Usually'
+        enum: ['Almost never', 'Some-times', 'Often', 'Usually'],
+        relation: {
+          'Almost never': 0,
+          'Some-times': 1,
+          Often: 2,
+          Usually: 3
         }
       }
     ]
@@ -177,77 +189,84 @@ const questionnaires = [
   {
     name: 'Athens Insomnia Scale',
     questions: {
-      'Sleep induction (time it takes you to fall asleep after turning-off the lights)': 'PRIMARY_NUMBER',
-      'Awakenings during the night': 'PRIMARY_NUMBER',
-      'Final awakening earlier than desired': 'PRIMARY_NUMBER',
-      'Total sleep duration': 'PRIMARY_NUMBER',
-      'Overall quality of sleep (no matter how long you slept)': 'PRIMARY_NUMBER',
-      'Sense of well-being during the day': 'PRIMARY_NUMBER',
-      'Functioning (physical and mental) during the day': 'PRIMARY_NUMBER',
-      'Sleepiness during the day': 'PRIMARY_NUMBER'
+      'Sleep induction (time it takes you to fall asleep after turning-off the lights)': 'PRIMARY_TEXT',
+      'Awakenings during the night': 'PRIMARY_TEXT',
+      'Final awakening earlier than desired': 'PRIMARY_TEXT',
+      'Total sleep duration': 'PRIMARY_TEXT',
+      'Overall quality of sleep (no matter how long you slept)': 'PRIMARY_TEXT',
+      'Sense of well-being during the day': 'PRIMARY_TEXT',
+      'Functioning (physical and mental) during the day': 'PRIMARY_TEXT',
+      'Sleepiness during the day': 'PRIMARY_TEXT'
     },
     additionalInformation: [
       {
         questions: [1],
-        relations: {
-          0: 'No problem',
-          1: 'Slightly delayed',
-          2: 'Markedly delayed',
-          3: 'Very delayed or did not sleep at all'
+        enum: ['No problem', 'Slightly delayed', 'Markedly delayed', 'Very delayed or did not sleep at all'],
+        relation: {
+          'No problem': 0,
+          'Slightly delayed': 1,
+          'Markedly delayed': 2,
+          'Very delayed or did not sleep at all': 3
         }
       },
       {
         questions: [2],
-        relations: {
-          0: 'No problem',
-          1: 'Minor problem',
-          2: 'Considerable problem',
-          3: 'Serious problem or did not sleep at all'
+        enum: ['No problem', 'Minor problem', 'Considerable problem', 'Serious problem or did not sleep at all'],
+        relation: {
+          'No problem': 0,
+          'Minor problem': 1,
+          'Considerable problem': 2,
+          'Serious problem or did not sleep at all': 3
         }
       },
       {
         questions: [3],
-        relations: {
-          0: 'No earlier',
-          1: 'A little earlier',
-          2: 'Markedly earlier',
-          3: 'Much earlier or did not sleep at all'
+        enum: ['No earlier', 'A little earlier', 'Markedly earlier', 'Much earlier or did not sleep at all'],
+        relation: {
+          'No earlier': 0,
+          'A little earlier': 1,
+          'Markedly earlier': 2,
+          'Much earlier or did not sleep at all': 3
         }
       },
       {
         questions: [4],
-        relations: {
-          0: 'Sufficient',
-          1: 'Slightly insufficient',
-          2: 'Markedly insufficient',
-          3: 'Very insufficient or did not sleep at all'
+        enum: ['Sufficient', 'Slightly insufficient', 'Markedly insufficient', 'Very insufficient or did not sleep at all'],
+        relation: {
+          Sufficient: 0,
+          'Slightly insufficient': 1,
+          'Markedly insufficient': 2,
+          'Very insufficient or did not sleep at all': 3
         }
       },
       {
         questions: [5],
-        relations: {
-          0: 'Satisfactory',
-          1: 'Slightly unsatisfactory',
-          2: 'Markedly unsatisfactory',
-          3: 'Very unsatisfactory or did not sleep at all'
+        enum: ['Satisfactory', 'Slightly unsatisfactory', 'Markedly unsatisfactory', 'Very unsatisfactory or did not sleep at all'],
+        relation: {
+          Satisfactory: 0,
+          'Slightly unsatisfactory': 1,
+          'Markedly unsatisfactory': 2,
+          'Very unsatisfactory or did not sleep at all': 3
         }
       },
       {
         questions: [6, 7],
-        relations: {
-          0: 'Normal',
-          1: 'Slightly decreased',
-          2: 'Markedly decreased',
-          3: 'Very decreased'
+        enum: ['Normal', 'Slightly decreased', 'Markedly decreased', 'Very decreased'],
+        relation: {
+          Normal: 0,
+          'Slightly decreased': 1,
+          'Markedly decreased': 2,
+          'Very decreased': 3
         }
       },
       {
         questions: [8],
-        relations: {
-          0: 'None',
-          1: 'Mild',
-          2: 'Considerable',
-          3: 'Intense'
+        enum: ['None', 'Mild', 'Considerable', 'Intense'],
+        relation: {
+          None: 0,
+          Mild: 1,
+          Considerable: 2,
+          Intense: 3
         }
       }
     ]
@@ -269,82 +288,115 @@ const questionnaires = [
     additionalInformation: [
       {
         questions: [1, 2, 4, 5, 6, 9, 10],
-        enum: ['Very severe', 'Severe', 'Moderate', 'Mild', 'None']
+        enum: ['Very severe', 'Severe', 'Moderate', 'Mild', 'None'],
+        relation: {
+          'Very severe': 4,
+          Severe: 3,
+          Moderate: 2,
+          Mild: 1,
+          None: 0
+        }
       },
       {
         questions: [3],
-        enum: ['No relief', 'Mild relief', 'Moderate relief', 'Either complete or almost complete relief', 'No RLS symptoms to be relieved']
+        enum: ['No relief', 'Mild relief', 'Moderate relief', 'Either complete or almost complete relief', 'No RLS symptoms to be relieved'],
+        relation: {
+          'No relief': 4,
+          'Mild relief': 3,
+          'Moderate relief': 2,
+          'Either complete or almost complete relief': 1,
+          'No RLS symptoms to be relieved': 0
+        }
       },
       {
         questions: [7],
-        enum: ['Very often (This means 6 to 7 days a week)', 'Often (this means 4 to 5 days a week)', 'Sometimes (This means 2 to 3 days a week)', 'Occasionally (This means 1 day a week)', 'Never']
+        enum: ['Very often (This means 6 to 7 days a week)', 'Often (this means 4 to 5 days a week)', 'Sometimes (This means 2 to 3 days a week)', 'Occasionally (This means 1 day a week)', 'Never'],
+        relation: {
+          'Very often (This means 6 to 7 days a week)': 4,
+          'Often (this means 4 to 5 days a week)': 3,
+          'Sometimes (This means 2 to 3 days a week)': 2,
+          'Occasionally (This means 1 day a week)': 1,
+          Never: 0
+        }
       },
       {
         questions: [8],
-        enum: ['Very severe (This means 8 hours or more per 24 hour day)', 'Severe (this means 3 to 8 hours per 24 hour day)', 'Moderate (This means 1 to 3 hours per day 24 hour day)', 'Mild (This means less than 1 hour per 24 hour day)', 'None']
+        enum: ['Very severe (This means 8 hours or more per 24 hour day)', 'Severe (this means 3 to 8 hours per 24 hour day)', 'Moderate (This means 1 to 3 hours per day 24 hour day)', 'Mild (This means less than 1 hour per 24 hour day)', 'None'],
+        relation: {
+          'Very severe (This means 8 hours or more per 24 hour day)': 4,
+          'Severe (this means 3 to 8 hours per 24 hour day)': 3,
+          'Moderate (This means 1 to 3 hours per day 24 hour day)': 2,
+          'Mild (This means less than 1 hour per 24 hour day)': 1,
+          None: 0
+        }
       }
     ]
   },
   {
     name: 'Insomnia Severity Index',
     questions: {
-      'Difficulty falling asleep': 'PRIMARY_NUMBER',
-      'Difficulty staying asleep': 'PRIMARY_NUMBER',
-      'Problems waking up too early': 'PRIMARY_NUMBER',
-      'How SATISFIED/DISSATISFIED are you with your CURRENT sleep pattern?': 'PRIMARY_NUMBER',
-      'How NOTICEABLE to others do you think you sleep problem is in terms of impairing the quality of your life?': 'PRIMARY_NUMBER',
-      'How WORRIED/DISTRESSED are you about your current sleep problem?': 'PRIMARY_NUMBER',
-      'To what extent do you consider your sleep problem to INTERFERE with your daily functioning (e.g. daytime fatigue, mood, ability to function at work/daily chores, concentration, memory, etc.) CURRENTLY?': 'PRIMARY_NUMBER'
+      'Difficulty falling asleep': 'PRIMARY_TEXT',
+      'Difficulty staying asleep': 'PRIMARY_TEXT',
+      'Problems waking up too early': 'PRIMARY_TEXT',
+      'How SATISFIED/DISSATISFIED are you with your CURRENT sleep pattern?': 'PRIMARY_TEXT',
+      'How NOTICEABLE to others do you think you sleep problem is in terms of impairing the quality of your life?': 'PRIMARY_TEXT',
+      'How WORRIED/DISTRESSED are you about your current sleep problem?': 'PRIMARY_TEXT',
+      'To what extent do you consider your sleep problem to INTERFERE with your daily functioning (e.g. daytime fatigue, mood, ability to function at work/daily chores, concentration, memory, etc.) CURRENTLY?': 'PRIMARY_TEXT'
     },
     additionalInformation: [
       {
         questions: [1, 2, 3],
+        enum: ['None', 'Mild', 'Moderate', 'Severe', 'Very Severe'],
         relation: {
-          0: 'None',
-          1: 'Mild',
-          2: 'Moderate',
-          3: 'Severe',
-          4: 'Very Severe'
+          None: 0,
+          Mild: 1,
+          Moderate: 2,
+          Severe: 3,
+          'Very Severe': 4
         }
       },
       {
         questions: [4],
+        enum: ['Very Satisfied', 'Satisfied', 'Moderately Satisfied', 'Dissatisfied', 'Very Dissatisfied'],
         relation: {
-          0: 'Very Satisfied',
-          1: 'Satisfied',
-          2: 'Moderately Satisfied',
-          3: 'Dissatisfied',
-          4: 'Very Dissatisfied'
+          'Very Satisfied': 0,
+          Satisfied: 1,
+          'Moderately Satisfied': 2,
+          Dissatisfied: 3,
+          'Very Dissatisfied': 4
         }
       },
       {
         questions: [5],
+        enum: ['No at all Noticeable', 'A little', 'Somewhat', 'Much', 'Very Much Noticeable'],
         relation: {
-          0: 'No at all Noticeable',
-          1: 'A little',
-          2: 'Somewhat',
-          3: 'Much',
-          4: 'Very Much Noticeable'
+          'No at all Noticeable': 0,
+          'A little': 1,
+          Somewhat: 2,
+          Much: 3,
+          'Very Much Noticeable': 4
         }
       },
       {
         questions: [6],
+        enum: ['No at all Worried', 'A little', 'Somewhat', 'Much', 'Very Much Worried'],
         relation: {
-          0: 'No at all Worried',
-          1: 'A little',
-          2: 'Somewhat',
-          3: 'Much',
-          4: 'Very Much Worried'
+          'No at all Worried': 0,
+          'A little': 1,
+          Somewhat: 2,
+          Much: 3,
+          'Very Much Worried': 4
         }
       },
       {
         questions: [7],
+        enum: ['No at all Interfering', 'A little', 'Somewhat', 'Much', 'Very Much Interfering'],
         relation: {
-          0: 'No at all Interfering',
-          1: 'A little',
-          2: 'Somewhat',
-          3: 'Much',
-          4: 'Very Much Interfering'
+          'No at all Interfering': 0,
+          'A little': 1,
+          Somewhat: 2,
+          Much: 3,
+          'Very Much Interfering': 4
         }
       }
     ]
@@ -356,6 +408,8 @@ async function main () {
   await prisma.user.deleteMany()
   await prisma.questionnaire.deleteMany()
   // TODO: HASH ADMIN PASSWORD
+  // IDEA ELIMINAR LA CREACION DEL ADMIN DE AQUI Y LUEGO CREAR EL ADMIN USANDO LA
+  // UTILIDAD FASTIFY.INJECT
   const admin = await prisma.user.create({
     data: {
       email: 'admin@admin.com',

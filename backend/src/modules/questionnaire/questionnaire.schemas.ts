@@ -21,7 +21,36 @@ const questionnaireAttributes = {
       Type.Null()
     ])
   ),
-  stopBangAnswers: Type.Record(Type.String(), Type.Boolean())
+  stopBangAnswer: Type.Record(Type.String(), Type.Boolean()),
+  epworthSleepinessScaleAnswer: Type.Record(Type.String(), Type.Integer())
+}
+
+const algorithmAttributes = {
+  stopBangWarning: Type.Union([
+    Type.Literal('OSA - Low Risk'),
+    Type.Literal('OSA - Intermediate Risk'),
+    Type.Literal('OSA - High Risk')
+  ]),
+  stopBangRisk: Type.Integer({ minimum: 0, maximum: 8 }),
+  epworthSleepinessScaleWarning: Type.Union([
+    Type.Literal('Lower Normal Daytime Sleepiness'),
+    Type.Literal('Higher Normal Daytime Sleepiness'),
+    Type.Literal('Mild Excessive Normal Daytime Sleepiness'),
+    Type.Literal('Moderate Excessive Normal Daytime Sleepiness'),
+    Type.Literal('Severe Excessive Normal Daytime Sleepiness')
+  ]),
+  epworthSleepinessScaleRisk: Type.Integer({ minimum: 0, maximum: 24 }),
+  pittsburghSleepQualityIndex: Type.Integer({ minimum: 0, maximum: 21 }),
+  perceivedStressQuestionnaire: Type.Integer(),
+  athensInsomniaScale: Type.Integer({ minimum: 0, maximum: 24 }),
+  internationalRestlessLegsScale: Type.Integer({ minimum: 0, maximum: 40 }),
+  insomniaSeverityIndexWarning: Type.Union([
+    Type.Literal('No clinically significant insomnia'),
+    Type.Literal('Subthreshold insomnia'),
+    Type.Literal('Clinical insomnia (moderate severity)'),
+    Type.Literal('Clinical insomnia (severe)')
+  ]),
+  insomniaSeverityIndexRisk: Type.Integer({ minimum: 0, maximum: 28 })
 }
 
 const {
@@ -29,8 +58,11 @@ const {
   message,
   questionType,
   answers,
-  stopBangAnswers
+  stopBangAnswer,
+  epworthSleepinessScaleAnswer
 } = questionnaireAttributes
+
+const { stopBangWarning, epworthSleepinessScaleWarning, insomniaSeverityIndexWarning } = algorithmAttributes
 
 const questionnaireCore = {
   name: Type.String(),
@@ -43,7 +75,7 @@ const questionnaireCore = {
       questions: Type.Array(Type.Integer()),
       enum: Type.Optional(Type.Array(Type.String())),
       description: Type.Optional(Type.String()),
-      relations: Type.Optional(Type.Record(Type.Integer(), Type.String())),
+      relation: Type.Optional(Type.Record(Type.String(), Type.Number())),
       default: Type.Optional(Type.Boolean())
     })
   )
@@ -98,6 +130,8 @@ const errorResponseSchema = Type.Object({
   message
 })
 
+const createAlgorithmSchema = Type.Object(algorithmAttributes)
+
 const CreateQuestionnaireSchema = {
   body: createQuestionnaireSchema,
   response: {
@@ -135,8 +169,13 @@ type CreateQuestionnaireInput = Static<typeof createQuestionnaireSchema>
 type Questions = Static<typeof questions>
 type QuestionType = Static<typeof questionType>
 type AnswerUser = Static<typeof answers>
-type AnswerStopBang = Static<typeof stopBangAnswers>
+type AnswerStopBang = Static<typeof stopBangAnswer>
+type AnswerEpworthSleepinessScale = Static<typeof epworthSleepinessScaleAnswer>
 type AdditionalInformation = Static<typeof additionalInformation>
+type CreateAlgorithmInput = Partial<Static<typeof createAlgorithmSchema>>
+type StopBangWarning = Static<typeof stopBangWarning>
+type EpworthSleepinessScaleWarning = Static<typeof epworthSleepinessScaleWarning>
+type InsomniaSeverityIndexWarning = Static<typeof insomniaSeverityIndexWarning>
 
 export {
   CreateQuestionnaireSchema,
@@ -148,5 +187,10 @@ export {
   type QuestionType,
   type AnswerUser,
   type AnswerStopBang,
-  type AdditionalInformation
+  type AnswerEpworthSleepinessScale,
+  type AdditionalInformation,
+  type CreateAlgorithmInput,
+  type StopBangWarning,
+  type EpworthSleepinessScaleWarning,
+  type InsomniaSeverityIndexWarning
 }

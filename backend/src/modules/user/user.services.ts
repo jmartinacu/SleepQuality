@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import prisma, { type User, type Session } from '../../utils/database'
-import { calculateBMI } from '../../utils/helpers'
+import { calculateBMI, parseStringToDate } from '../../utils/helpers'
 import {
   CreateUserHandlerResponse,
   UpdateSessionInput,
@@ -14,7 +14,7 @@ async function createUser (
 ):
   Promise<CreateUserHandlerResponse> {
   const { birth: birthString, ...rest } = userInput
-  const birth = new Date(birthString)
+  const birth = parseStringToDate(birthString)
   const userToCreate = {
     ...rest,
     birth,
