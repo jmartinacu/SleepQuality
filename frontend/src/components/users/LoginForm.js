@@ -8,10 +8,12 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import { userLogin } from '../api/ApiUser'
-import { Eye, EyeActive } from '../assests'
+import { userLogin } from '../../api/ApiUser'
+import { Eye, EyeActive } from '../../assests/eyes'
 
 const LoginForm = ({ navigation }) => {
+  const [status, setStatus] = useState('')
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [seePassword, setSeePassword] = useState(true)
@@ -19,7 +21,7 @@ const LoginForm = ({ navigation }) => {
 
   const handleCheckEmail = text => {
     const re = /\S+@\S+\.\S+/
-    const regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im
+    const regex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im
 
     setEmail(text)
     if (re.test(text) || regex.test(text)) {
@@ -56,9 +58,14 @@ const LoginForm = ({ navigation }) => {
     }
 
     const isContainsSymbol =
-       /^(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).*$/
+       /^(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹]).*$/
     if (!isContainsSymbol.test(value)) {
       return 'Password must contain at least one Special Symbol.'
+    }
+
+    const isContainsComma = /,/
+    if (isContainsComma.test(value)) {
+      return 'Password must not contain Commas.'
     }
 
     return null
@@ -73,24 +80,31 @@ const LoginForm = ({ navigation }) => {
       })
         .then(result => {
           if (result.status === 200) {
-            AsyncStorage.setItem('AccessToken', result.data.token)
+            console.log(result)
+            setStatus('')
+            AsyncStorage.setItem('accessToken', result.data.accessToken)
+            AsyncStorage.setItem('refreshToken', result.data.refreshToken)
             navigation.replace('Home')
+          } else {
+            console.log(result)
+            setStatus(result.message)
           }
         })
         .catch(err => {
           console.error(err)
         })
     } else {
-      console.err(checkPassword)
+      console.error(checkPassword)
+      setStatus('Email or password wrong')
     }
   }
 
   const handleRegister = () => {
-    navigation.replace('SignUp')
+    navigation.push('SignUp')
   }
 
   const handlePasswordForgotten = () => {
-    navigation.replace('PasswordChangeVerification')
+    navigation.push('EmailVerification', { mode: 'Password' })
   }
 
   return (
@@ -146,6 +160,8 @@ const LoginForm = ({ navigation }) => {
             <Text style={styles.text}>Login</Text>
           </TouchableOpacity>
           )}
+      {status !== '' &&
+        <Text style={styles.textFailed}>{status}</Text>}
       <TouchableOpacity
         style={styles.forgotPass}
         onPress={handleRegister}

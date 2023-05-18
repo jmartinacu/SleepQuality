@@ -1,5 +1,5 @@
 import { Image, StyleSheet } from 'react-native'
-import RegisterForm from '../components/RegisterForm'
+import RegisterForm from '../components/users/RegisterForm'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 const SignUp = ({ navigation }) => {

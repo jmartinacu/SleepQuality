@@ -2,12 +2,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Picker } from '@react-native-picker/picker'
 import React, { useState } from 'react'
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, Platform, Button } from 'react-native'
-import { userLogin, userRegister } from '../api/ApiUser'
-import { Eye, EyeActive } from '../assests'
+import { userLogin, userRegister } from '../../api/ApiUser'
+import { Eye, EyeActive } from '../../assests/eyes'
 import { Input } from 'react-native-elements'
 import DateTimePicker from '@react-native-community/datetimepicker'
 
 const RegisterForm = ({ navigation }) => {
+  const [status, setStatus] = useState('')
+
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -46,7 +48,7 @@ const RegisterForm = ({ navigation }) => {
 
   const handleCheckEmail = text => {
     const re = /\S+@\S+\.\S+/
-    const regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im
+    const regex = /^[+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im
 
     setEmail(text)
     if (re.test(text) || regex.test(text)) {
@@ -62,7 +64,12 @@ const RegisterForm = ({ navigation }) => {
     const isContainsLowercase = /^(?=.*[a-z]).*$/
     const isContainsNumber = /^(?=.*[0-9]).*$/
     const isValidLength = /^.{8,15}$/
-    const isContainsSymbol = /^(?=.*[~`!@#$%^&*€()--+={}\[\]|\\:;"'<>,.?/_₹]).*$/
+    const isContainsSymbol = /^(?=.*[~`!@#$%^&*€()--+={}[\]|\\:;"'<>,.?/_₹]).*$/
+    const isContainsComma = /,/
+
+    if (isContainsComma.test(value)) {
+      return 'Password must not contain Commas.'
+    }
 
     if (!isNonWhiteSpace.test(value)) {
       return 'Password must not contain Whitespaces.'
@@ -98,20 +105,27 @@ const RegisterForm = ({ navigation }) => {
     const isContainsLowercase = /^(?=.*[a-z]).*$/
     const isContainsNumber = /^(?=.*[0-9]).*$/
     const isValidLength = /^.{8,15}$/
-    const isContainsSymbol = /^(?=.*[~`!@#$%^&*€()--+={}\[\]|\\:;"'<>,.?/_₹]).*$/
+    const isContainsSymbol = /^(?=.*[~`!@#$%^&*€()--+={}[\]|\\:;"'<>,.?/_₹]).*$/
+    const isContainsComma = /,/
 
     if (!isNonWhiteSpace.test(value) || !isContainsUppercase.test(value) || !isContainsLowercase.test(value) ||
-              !isContainsNumber.test(value) || !isValidLength.test(value) || !isValidLength.test(value) || !isContainsSymbol.test(value)) {
+              !isContainsNumber.test(value) || !isValidLength.test(value) || !isValidLength.test(value) ||
+              !isContainsSymbol.test(value) || isContainsComma.test(value)) {
       setCheckValidPassword(true)
     } else {
       setCheckValidPassword(false)
     }
-    handleCheckConfirmedPasswordValidity(confirmedPassword)
+
+    if (value !== confirmedPassword && confirmedPassword !== '') {
+      setCheckValidConfirmedPassword(true)
+    } else {
+      setCheckValidConfirmedPassword(false)
+    }
   }
 
   const handleCheckConfirmedPasswordValidity = value => {
     setConfirmedPassword(value)
-    if (password === value || confirmedPassword === '') {
+    if (password === value) {
       setCheckValidConfirmedPassword(false)
     } else {
       setCheckValidConfirmedPassword(true)
@@ -166,15 +180,20 @@ const RegisterForm = ({ navigation }) => {
         gender,
         height,
         weight,
-        birthDate,
+        birth: birthDate.toLocaleDateString('es-ES', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }),
         chronicDisorders: chronicDisorders === '' ? null : chronicDisorders,
         password
       })
         .then(result => {
-          console.log(result)
-          if (result.status === 200) {
-            AsyncStorage.setItem('AccessToken', result.data.token)
-            navigation.replace('RegisterVerification')
+          if (result.status === 201) {
+            setStatus('')
+            navigation.replace('EmailVerification', { mode: 'Register' })
+          } else {
+            setStatus(result.data.message)
           }
         })
         .catch(err => {
@@ -533,6 +552,8 @@ const RegisterForm = ({ navigation }) => {
             <Text style={styles.text}>Create Account</Text>
           </TouchableOpacity>
           )}
+      {status !== '' &&
+        <Text style={styles.textFailed}>{status}</Text>}
     </View>
   )
 }
