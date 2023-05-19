@@ -4,12 +4,15 @@ import {
   CreateAnswerSchema,
   type Questions,
   type AdditionalInformation,
-  GetQuestionnaireSchema
+  GetQuestionnaireSchema,
+  GetAlgorithmSchema,
+  GetAlgorithmsSchema
 } from './questionnaire.schemas'
-import { Answer, Questionnaire } from '../../utils/database'
+import { Answer, Questionnaire, QuestionnaireAlgorithm } from '../../utils/database'
 import {
   createAnswer,
   createQuestionnaire,
+  findQuestionnaireAlgorithmsOrderByCreatedAt,
   findQuestionnaireUnique,
   findQuestionnaires,
   questionnairesAlgorithms
@@ -76,7 +79,7 @@ async function createAnswerHandler (
     }
     // CHECK THAT THE QUESTIONS IN QUESTIONNAIRE AND THE QUESTIONS IN ANSWER ARE THE SAME
     if (JSON.stringify(Object.keys(questionnaire.questions as object)) !== JSON.stringify(Object.keys(answers))) {
-      return await reply.code(400).send({ message: 'Wrong answer' })
+      return await reply.code(400).send({ message: 'Answer does not have the right questions' })
     }
     // CHECK TYPES OF EACH ANSWER AND CHECK ENUM ANSWER QUESTIONS RESPONSES
     const questionIndexesToCheckEnums = (questionnaire.additionalInformation as AdditionalInformation)
@@ -91,7 +94,7 @@ async function createAnswerHandler (
     ) {
       let answerUser = answers[question]
       if (!checkAnswerTypes[questionType](answerUser)) {
-        return await reply.code(400).send({ message: 'Wrong answer' })
+        return await reply.code(400).send({ message: 'Answer responses does no have the right types' })
       }
       answerUser = convertToCorrectType[questionType](answerUser)
       if (questionIndexesToCheckEnums.has(index) &&
@@ -109,7 +112,7 @@ async function createAnswerHandler (
           answerUser: (answerUser as string),
           index
         })) {
-          return await reply.code(400).send({ message: 'Wrong answer' })
+          return await reply.code(400).send({ message: 'Answer does not have the right responses' })
         }
       }
       answers[question] = answerUser
@@ -136,9 +139,44 @@ async function createAnswerHandler (
   }
 }
 
+async function getLastAlgorithmHandler (
+  request: FastifyRequestTypebox<typeof GetAlgorithmSchema>,
+  reply: FastifyReplyTypebox<typeof GetAlgorithmSchema>
+): Promise<QuestionnaireAlgorithm> {
+  try {
+    const { userId } = request.user as { userId: string }
+    const { id } = request.params
+    const algorithmData = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, id)
+    if (algorithmData.length === 0) {
+      return await reply.code(404).send({ message: 'Not found' })
+    }
+    return await reply.send(algorithmData.at(0))
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
+async function getAlgorithmHandler (
+  request: FastifyRequestTypebox<typeof GetAlgorithmsSchema>,
+  reply: FastifyReplyTypebox<typeof GetAlgorithmsSchema>
+): Promise<QuestionnaireAlgorithm> {
+  try {
+    const { userId } = request.user as { userId: string }
+    const { id } = request.params
+    const algorithmData = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, id)
+    return await reply.send(algorithmData)
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
 export {
   createQuestionnaireHandler,
   createAnswerHandler,
   getQuestionnaireHandler,
-  getQuestionnairesInformationHandler
+  getQuestionnairesInformationHandler,
+  getLastAlgorithmHandler,
+  getAlgorithmHandler
 }

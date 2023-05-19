@@ -62,7 +62,18 @@ const {
   epworthSleepinessScaleAnswer
 } = questionnaireAttributes
 
-const { stopBangWarning, epworthSleepinessScaleWarning, insomniaSeverityIndexWarning } = algorithmAttributes
+const {
+  stopBangWarning,
+  epworthSleepinessScaleWarning,
+  insomniaSeverityIndexWarning,
+  athensInsomniaScale,
+  epworthSleepinessScaleRisk,
+  insomniaSeverityIndexRisk,
+  internationalRestlessLegsScale,
+  perceivedStressQuestionnaire,
+  pittsburghSleepQualityIndex,
+  stopBangRisk
+} = algorithmAttributes
 
 const questionnaireCore = {
   name: Type.String(),
@@ -108,7 +119,7 @@ const createAnswerResponseSchema = Type.Object({
   answers
 })
 
-const getQuestionnaireParamsSchema = Type.Object({
+const getIdParamsSchema = Type.Object({
   id
 })
 
@@ -130,6 +141,21 @@ const errorResponseSchema = Type.Object({
   message
 })
 
+const getAlgorithmResponseSchema = Type.Object({
+  stopBangWarning: Type.Optional(stopBangWarning),
+  epworthSleepinessScaleWarning: Type.Optional(epworthSleepinessScaleWarning),
+  insomniaSeverityIndexWarning: Type.Optional(insomniaSeverityIndexWarning),
+  athensInsomniaScale: Type.Optional(athensInsomniaScale),
+  epworthSleepinessScaleRisk: Type.Optional(epworthSleepinessScaleRisk),
+  insomniaSeverityIndexRisk: Type.Optional(insomniaSeverityIndexRisk),
+  internationalRestlessLegsScale: Type.Optional(internationalRestlessLegsScale),
+  perceivedStressQuestionnaire: Type.Optional(perceivedStressQuestionnaire),
+  pittsburghSleepQualityIndex: Type.Optional(pittsburghSleepQualityIndex),
+  stopBangRisk: Type.Optional(stopBangRisk)
+})
+
+const getAlgorithmsResponseSchema = Type.Array(getAlgorithmResponseSchema)
+
 const createAlgorithmSchema = Type.Object(algorithmAttributes)
 
 const CreateQuestionnaireSchema = {
@@ -141,7 +167,7 @@ const CreateQuestionnaireSchema = {
 }
 
 const GetQuestionnaireSchema = {
-  params: getQuestionnaireParamsSchema,
+  params: getIdParamsSchema,
   response: {
     200: getQuestionnaireResponseSchema,
     404: errorResponseSchema,
@@ -165,6 +191,23 @@ const CreateAnswerSchema = {
   }
 }
 
+const GetAlgorithmSchema = {
+  params: getIdParamsSchema,
+  response: {
+    200: getAlgorithmResponseSchema,
+    404: errorResponseSchema,
+    500: Type.Any()
+  }
+}
+
+const GetAlgorithmsSchema = {
+  params: getIdParamsSchema,
+  response: {
+    200: getAlgorithmsResponseSchema,
+    500: Type.Any()
+  }
+}
+
 type CreateQuestionnaireInput = Static<typeof createQuestionnaireSchema>
 type Questions = Static<typeof questions>
 type QuestionType = Static<typeof questionType>
@@ -182,6 +225,8 @@ export {
   CreateAnswerSchema,
   GetQuestionnaireSchema,
   GetQuestionnairesInformationSchema,
+  GetAlgorithmSchema,
+  GetAlgorithmsSchema,
   type CreateQuestionnaireInput,
   type Questions,
   type QuestionType,

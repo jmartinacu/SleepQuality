@@ -75,6 +75,24 @@ async function findQuestionnaires (): Promise<Questionnaire[]> {
   return questionnaires
 }
 
+async function findQuestionnaireAlgorithmsOrderByCreatedAt (
+  userId: string,
+  questionnaireId: string
+): Promise<QuestionnaireAlgorithm[]> {
+  const result = await prisma.questionnaireAlgorithm.findMany({
+    where: {
+      AND: {
+        questionnaireId,
+        userId
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
+  return result
+}
+
 async function StopBangAlgorithm (
   answer: AnswerUser,
   questionnaireId: string,
@@ -143,7 +161,7 @@ async function EpworthSleepinessScaleAlgorithm (
   )
 }
 
-// TODO: ADD SCORES AS FIELD RELATION OF ADDITIONALINFORMATION IN DB
+// TODO: COMPROBAR LA RESPUESTAS DE FECHAS CUMPLEN EL FORMATO
 async function PittsburghSleepQualityIndexAlgorithm (
   answer: AnswerUser,
   questionnaireId: string,
@@ -351,5 +369,6 @@ export {
   createAlgorithmData,
   findQuestionnaireUnique,
   findQuestionnaires,
+  findQuestionnaireAlgorithmsOrderByCreatedAt,
   questionnairesAlgorithms
 }

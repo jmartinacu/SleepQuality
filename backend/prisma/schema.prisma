@@ -26,6 +26,8 @@ model User {
   session                Session?
   profilePicture         String?
   questionnairesToDo     String[]
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
   answers                Answer[] 
   questionnaireAlgorithm QuestionnaireAlgorithm[]
   // doctor             Doctor? @relation(fields: [doctorId], references: [id]) 
@@ -76,6 +78,8 @@ model QuestionnaireAlgorithm {
   InternationalRestlessLegsScale Int?
   InsomniaSeverityIndexWarning   String?
   InsomniaSeverityIndexRisk      Int?
+  createdAt                      DateTime @default(now())
+  updatedAt                      DateTime @updatedAt
   questionnaireId                String  @db.ObjectId
   quesionnaire                   Questionnaire @relation(fields: [questionnaireId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId                         String @db.ObjectId
@@ -86,7 +90,6 @@ model Answer {
   id              String @id @default(auto()) @map("_id") @db.ObjectId
   answers         Json
   createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
   userId          String @db.ObjectId
   user            User @relation(fields: [userId], references: [id])
   questionnaireId String @db.ObjectId
