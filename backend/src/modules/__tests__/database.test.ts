@@ -241,7 +241,7 @@ async function DatabaseTests (): Promise<void> {
     for (let i = 0; i < answersResponse.length; i++) {
       const answerResponse: any = answersResponse.at(i)
       const answer = correctAnswers.at(i)
-      const questionnaire = questionnairesBackend.at(i)
+      const questionnaire = questionnairesBackend.at(i) as Questionnaire
       const answerBackend = answersBackend.at(i)
 
       childTest.equal(answerResponse.statusCode, 201)

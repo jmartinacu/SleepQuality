@@ -14,6 +14,7 @@ import type { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import userRoutes from './modules/user/user.routes'
 import questionnaireRoutes from './modules/questionnaire/questionnaire.routes'
 import authPlugin from './plugins/auth/auth.plugin'
+import algorithmPlugin from './plugins/algorithm/algorithm.plugin'
 import { fileFilter, destination, filename } from './plugins/auth/auth.controller'
 import type { File } from './plugins/types.plugins'
 import { MAX_FILE_SIZE } from './modules/user/user.schemas'
@@ -23,6 +24,8 @@ import adminRoutes from './modules/admin/admin.routes'
 
 declare module 'fastify' {
   interface FastifyInstance {
+    algorithms: Record<string, any>
+    algorithmDefaults: Record<string, any>
     checkEmailAndPassword: any
     checkEmailAndPasswordAdmin: any
     checkUserVerification: any
@@ -92,6 +95,8 @@ const buildServer = (): FastifyInstance => {
   void server.register(upload.contentParser)
 
   void server.register(authPlugin)
+
+  void server.register(algorithmPlugin)
 
   server.after(() => {
     server.get('/', async (_request, _reply) => {

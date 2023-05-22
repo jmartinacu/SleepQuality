@@ -16,9 +16,7 @@ import {
   createQuestionnaire,
   findQuestionnaireAlgorithmsOrderByCreatedAt,
   findQuestionnaireUnique,
-  findQuestionnaires,
-  questionnairesAlgorithms,
-  questionnairesDefaultInformation
+  findQuestionnaires
 } from './questionnaire.services'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 import {
@@ -78,6 +76,7 @@ async function createAnswerHandler (
   try {
     const { userId } = request.user as { userId: string }
     const { answers, name } = request.body
+    const server = request.server
     const questionnaire = await findQuestionnaireUnique('name', name)
     if (questionnaire === null) {
       return await reply.code(400).send({
@@ -125,11 +124,7 @@ async function createAnswerHandler (
       answers[question] = answerUser
       index++
     }
-    await questionnairesAlgorithms[name as keyof typeof questionnairesAlgorithms](
-      answers,
-      questionnaire.id,
-      userId
-    )
+    await server.algorithms[name](answers, questionnaire.id, userId)
     const {
       id,
       answers: answersDB
@@ -189,11 +184,15 @@ async function getDefaultAlgorithmInformationHandler (
   try {
     const { id } = request.params
     const { userId } = request.user as { userId: string }
+    const server = request.server
     const questionnaire = await findQuestionnaireUnique('id', id)
     if (questionnaire === null) {
       return await reply.code(404).send({ message: 'Not found' })
     }
-    const defaultInformation = await questionnairesDefaultInformation[questionnaire.name as keyof typeof questionnairesDefaultInformation](questionnaire.id, userId)
+    const defaultInformation = await server.algorithmDefaults[questionnaire.name](
+      questionnaire.id,
+      userId
+    )
     return await reply.send(defaultInformation)
   } catch (error) {
     console.error(error)

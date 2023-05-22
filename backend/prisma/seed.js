@@ -125,7 +125,13 @@ const questionnaires = [
       {
         questions: [16],
         descriptions: '',
-        enum: ['No problem at all', 'Only a very slight problem', 'Somewhat of a problem', 'A very big problem']
+        enum: ['No problem at all', 'Only a very slight problem', 'Somewhat of a problem', 'A very big problem'],
+        relation: {
+          'No problem at all': 0,
+          'Only a very slight problem': 1,
+          'Somewhat of a problem': 2,
+          'A very big problem': 3
+        }
       },
       {
         questions: [17],
@@ -407,6 +413,7 @@ async function main () {
   await prisma.answer.deleteMany()
   await prisma.user.deleteMany()
   await prisma.questionnaire.deleteMany()
+  await prisma.questionnaireAlgorithm.deleteMany()
   // TODO: HASH ADMIN PASSWORD
   // IDEA ELIMINAR LA CREACION DEL ADMIN DE AQUI Y LUEGO CREAR EL ADMIN USANDO LA
   // UTILIDAD FASTIFY.INJECT
