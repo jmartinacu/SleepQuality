@@ -1,15 +1,14 @@
-import { View, Text, SafeAreaView, TouchableOpacity, Image, StyleSheet, Button } from 'react-native'
+import { View, StyleSheet, Button } from 'react-native'
 
 const Proffile = ({ navigation }) => {
   return (
-    <SafeAreaView>
-      <View>
-        <Button
-          onPress={() => navigation.push('Login')}
-          title='Log out'
-        />
-      </View>
-    </SafeAreaView>
+
+    <View>
+      <Button
+        onPress={() => navigation.push('Login')}
+        title='Log out'
+      />
+    </View>
 
   )
 }

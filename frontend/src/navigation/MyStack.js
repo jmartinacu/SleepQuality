@@ -10,6 +10,7 @@ import CalendarPage from '../screens/CalendarPage'
 import Login from '../screens/Login'
 import SignUp from '../screens/SignUp'
 import EmailVerification from '../screens/EmailVerification'
+import TextAndButton from '../components/users/TextAndButton'
 
 const Stack = createStackNavigator()
 
@@ -34,7 +35,8 @@ const MyStack = () => {
         name='SignUp'
         component={SignUp}
         options={{
-          headerShown: false
+          headerTransparent: true,
+          title: ''
         }}
       />
 
@@ -93,18 +95,17 @@ const MyStack = () => {
       />
 
       <Stack.Screen
-        name='RegisterVerification'
+        name='EmailVerification'
         component={EmailVerification}
-        initialParams={{ mode: 'Register' }}
         options={{
-          headerShown: false
+          headerTransparent: true,
+          title: ''
         }}
       />
 
       <Stack.Screen
-        name='PasswordChangeVerification'
-        component={EmailVerification}
-        initialParams={{ mode: 'Password' }}
+        name='TextAndButton'
+        component={TextAndButton}
         options={{
           headerShown: false
         }}

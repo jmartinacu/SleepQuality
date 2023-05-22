@@ -1,10 +1,10 @@
-import { SafeAreaView, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 
 const CalendarPage = () => {
   return (
-    <SafeAreaView style={styles.container}>
-      <View />
-    </SafeAreaView>
+
+    <View style={styles.container} />
+
   )
 }
 

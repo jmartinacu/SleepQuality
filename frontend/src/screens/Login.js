@@ -1,5 +1,5 @@
 import { Image, StyleSheet } from 'react-native'
-import LoginForm from '../components/LoginForm'
+import LoginForm from '../components/users/LoginForm'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 const Login = ({ navigation }) => {
