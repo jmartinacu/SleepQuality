@@ -10,8 +10,8 @@ import {
 import {
   CreateAnswerSchema,
   CreateQuestionnaireSchema,
+  GetLastAlgorithmSchema,
   GetAlgorithmSchema,
-  GetAlgorithmsSchema,
   GetQuestionnaireSchema,
   GetQuestionnairesInformationSchema
 } from './questionnaire.schemas'
@@ -62,7 +62,7 @@ async function questionnaireRoutes (server: FastifyInstance): Promise<void> {
     {
       onRequest: server.auth([server.authenticate]),
       preHandler: server.auth([server.checkUserVerification]),
-      schema: GetAlgorithmSchema
+      schema: GetLastAlgorithmSchema
     },
     getLastAlgorithmHandler
   )
@@ -71,7 +71,7 @@ async function questionnaireRoutes (server: FastifyInstance): Promise<void> {
     {
       onRequest: server.auth([server.authenticate]),
       preHandler: server.auth([server.checkUserVerification]),
-      schema: GetAlgorithmsSchema
+      schema: GetAlgorithmSchema
     },
     getAlgorithmHandler
   )

@@ -158,6 +158,17 @@ const getAlgorithmsResponseSchema = Type.Array(getAlgorithmResponseSchema)
 
 const createAlgorithmSchema = Type.Object(algorithmAttributes)
 
+const getDefaultAlgorithmInformationResponseSchema = Type.Array(Type.Object({
+  index: Type.Integer(),
+  question: Type.String(),
+  answer: Type.Boolean(),
+  dbInformation: Type.Union([
+    Type.String(),
+    Type.Number(),
+    Type.Boolean()
+  ])
+}))
+
 const CreateQuestionnaireSchema = {
   body: createQuestionnaireSchema,
   response: {
@@ -191,7 +202,7 @@ const CreateAnswerSchema = {
   }
 }
 
-const GetAlgorithmSchema = {
+const GetLastAlgorithmSchema = {
   params: getIdParamsSchema,
   response: {
     200: getAlgorithmResponseSchema,
@@ -200,10 +211,19 @@ const GetAlgorithmSchema = {
   }
 }
 
-const GetAlgorithmsSchema = {
+const GetAlgorithmSchema = {
   params: getIdParamsSchema,
   response: {
     200: getAlgorithmsResponseSchema,
+    500: Type.Any()
+  }
+}
+
+const GetDefaultAlgorithmInformationSchema = {
+  params: getIdParamsSchema,
+  response: {
+    200: getDefaultAlgorithmInformationResponseSchema,
+    404: errorResponseSchema,
     500: Type.Any()
   }
 }
@@ -219,14 +239,16 @@ type CreateAlgorithmInput = Partial<Static<typeof createAlgorithmSchema>>
 type StopBangWarning = Static<typeof stopBangWarning>
 type EpworthSleepinessScaleWarning = Static<typeof epworthSleepinessScaleWarning>
 type InsomniaSeverityIndexWarning = Static<typeof insomniaSeverityIndexWarning>
+type DefaultAlgorithmInformation = Static<typeof getDefaultAlgorithmInformationResponseSchema>
 
 export {
   CreateQuestionnaireSchema,
   CreateAnswerSchema,
   GetQuestionnaireSchema,
   GetQuestionnairesInformationSchema,
+  GetLastAlgorithmSchema,
   GetAlgorithmSchema,
-  GetAlgorithmsSchema,
+  GetDefaultAlgorithmInformationSchema,
   type CreateQuestionnaireInput,
   type Questions,
   type QuestionType,
@@ -237,5 +259,6 @@ export {
   type CreateAlgorithmInput,
   type StopBangWarning,
   type EpworthSleepinessScaleWarning,
-  type InsomniaSeverityIndexWarning
+  type InsomniaSeverityIndexWarning,
+  type DefaultAlgorithmInformation
 }

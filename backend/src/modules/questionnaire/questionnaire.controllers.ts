@@ -5,8 +5,10 @@ import {
   type Questions,
   type AdditionalInformation,
   GetQuestionnaireSchema,
+  GetLastAlgorithmSchema,
   GetAlgorithmSchema,
-  GetAlgorithmsSchema
+  GetDefaultAlgorithmInformationSchema,
+  DefaultAlgorithmInformation
 } from './questionnaire.schemas'
 import { Answer, Questionnaire, QuestionnaireAlgorithm } from '../../utils/database'
 import {
@@ -15,10 +17,15 @@ import {
   findQuestionnaireAlgorithmsOrderByCreatedAt,
   findQuestionnaireUnique,
   findQuestionnaires,
-  questionnairesAlgorithms
+  questionnairesAlgorithms,
+  questionnairesDefaultInformation
 } from './questionnaire.services'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
-import { checkAnswerTypes, checkAnswersEnums, convertToCorrectType } from '../../utils/helpers'
+import {
+  checkAnswerTypes,
+  checkAnswersEnums,
+  convertToCorrectType
+} from '../../utils/helpers'
 
 async function createQuestionnaireHandler (
   request: FastifyRequestTypebox<typeof CreateQuestionnaireSchema>,
@@ -83,37 +90,37 @@ async function createAnswerHandler (
     }
     // CHECK TYPES OF EACH ANSWER AND CHECK ENUM ANSWER QUESTIONS RESPONSES
     const questionIndexesToCheckEnums = (questionnaire.additionalInformation as AdditionalInformation)
-      .reduce((result, current) => {
+      .reduce((accumulator, current) => {
         if ('enum' in current) {
-          current.questions.forEach(questionIndex => result.add(questionIndex))
+          current.questions.forEach(questionIndexes => accumulator.add(questionIndexes))
         }
-        return result
+        return accumulator
       }, new Set<number>())
-    let index = 1
-    for (const [question, questionType] of Object.entries(questionnaire.questions as Questions)
-    ) {
+    let index = 0
+    for (const [question, questionType] of Object.entries(questionnaire.questions as Questions)) {
       let answerUser = answers[question]
       if (!checkAnswerTypes[questionType](answerUser)) {
         return await reply.code(400).send({ message: 'Answer responses does no have the right types' })
       }
       answerUser = convertToCorrectType[questionType](answerUser)
-      if (questionIndexesToCheckEnums.has(index) &&
+      if (
         !(
           (
             questionType === 'SECONDARY_BOOL' ||
             questionType === 'SECONDARY_NUMBER' ||
             questionType === 'SECONDARY_TEXT'
-          ) && answerUser === null
-        )
-      ) {
-        if (!checkAnswersEnums({
+          ) &&
+          answerUser === null
+        ) &&
+        questionIndexesToCheckEnums.has(index) &&
+        !checkAnswersEnums({
           additionalInformation: (questionnaire
             .additionalInformation as AdditionalInformation),
           answerUser: (answerUser as string),
           index
-        })) {
-          return await reply.code(400).send({ message: 'Answer does not have the right responses' })
-        }
+        })
+      ) {
+        return await reply.code(400).send({ message: 'Answer does not have the right responses' })
       }
       answers[question] = answerUser
       index++
@@ -135,13 +142,16 @@ async function createAnswerHandler (
     })
   } catch (error) {
     console.error(error)
+    if (error instanceof Error && error.message === 'Wrong date format') {
+      return await reply.code(400).send({ message: 'Answer does not have the right responses' })
+    }
     return await reply.code(500).send(error)
   }
 }
 
 async function getLastAlgorithmHandler (
-  request: FastifyRequestTypebox<typeof GetAlgorithmSchema>,
-  reply: FastifyReplyTypebox<typeof GetAlgorithmSchema>
+  request: FastifyRequestTypebox<typeof GetLastAlgorithmSchema>,
+  reply: FastifyReplyTypebox<typeof GetLastAlgorithmSchema>
 ): Promise<QuestionnaireAlgorithm> {
   try {
     const { userId } = request.user as { userId: string }
@@ -158,8 +168,8 @@ async function getLastAlgorithmHandler (
 }
 
 async function getAlgorithmHandler (
-  request: FastifyRequestTypebox<typeof GetAlgorithmsSchema>,
-  reply: FastifyReplyTypebox<typeof GetAlgorithmsSchema>
+  request: FastifyRequestTypebox<typeof GetAlgorithmSchema>,
+  reply: FastifyReplyTypebox<typeof GetAlgorithmSchema>
 ): Promise<QuestionnaireAlgorithm> {
   try {
     const { userId } = request.user as { userId: string }
@@ -172,11 +182,31 @@ async function getAlgorithmHandler (
   }
 }
 
+async function getDefaultAlgorithmInformationHandler (
+  request: FastifyRequestTypebox<typeof GetDefaultAlgorithmInformationSchema>,
+  reply: FastifyReplyTypebox<typeof GetDefaultAlgorithmInformationSchema>
+): Promise<DefaultAlgorithmInformation> {
+  try {
+    const { id } = request.params
+    const { userId } = request.user as { userId: string }
+    const questionnaire = await findQuestionnaireUnique('id', id)
+    if (questionnaire === null) {
+      return await reply.code(404).send({ message: 'Not found' })
+    }
+    const defaultInformation = await questionnairesDefaultInformation[questionnaire.name as keyof typeof questionnairesDefaultInformation](questionnaire.id, userId)
+    return await reply.send(defaultInformation)
+  } catch (error) {
+    console.error(error)
+    return await reply.code(500).send(error)
+  }
+}
+
 export {
   createQuestionnaireHandler,
   createAnswerHandler,
   getQuestionnaireHandler,
   getQuestionnairesInformationHandler,
   getLastAlgorithmHandler,
-  getAlgorithmHandler
+  getAlgorithmHandler,
+  getDefaultAlgorithmInformationHandler
 }

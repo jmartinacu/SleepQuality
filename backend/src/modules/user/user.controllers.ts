@@ -291,6 +291,7 @@ async function addProfilePictureHandler (
     return await reply.code(500).send(error)
   }
 }
+
 async function getProfilePictureHandler (
   request: FastifyRequestTypebox<typeof GetProfilePictureSchema>,
   reply: FastifyReplyTypebox<typeof GetProfilePictureSchema>

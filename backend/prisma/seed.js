@@ -30,11 +30,11 @@ const questionnaires = [
     },
     additionalInformation: [
       {
-        questions: [12],
+        questions: [11],
         enum: ['Very poor', 'Poor', 'Fair', 'Good', 'Very good']
       },
       {
-        questions: [13],
+        questions: [12],
         enum: ['Not at all rested', 'Slightly rested', 'Somewhat rested', 'Well-rested', 'Very well-rested']
       }
     ]
@@ -53,7 +53,7 @@ const questionnaires = [
     },
     additionalInformation: [
       {
-        questions: [6, 7, 9],
+        questions: [4, 5, 7],
         default: true
       }
     ]
@@ -72,7 +72,7 @@ const questionnaires = [
     },
     additionalInformation: [
       {
-        questions: [1, 2, 3, 4, 5, 6, 7, 8],
+        questions: [0, 1, 2, 3, 4, 5, 6, 7],
         relation: {
           'Would never fall asleep': 0,
           'Slight chance of falling asleep': 1,
@@ -85,9 +85,9 @@ const questionnaires = [
   {
     name: 'Pittsburgh Sleep Quality Index',
     questions: {
-      'During the past month, what time have you usually gone to bed at night?': 'PRIMARY_NUMBER',
+      'During the past month, what time have you usually gone to bed at night?': 'PRIMARY_TEXT',
       'During the past month, how long (in minutes) has it usually taken you to fall asleep each night?': 'PRIMARY_NUMBER',
-      'During the past month, what time have you usually gotten up in the morning?': 'PRIMARY_NUMBER',
+      'During the past month, what time have you usually gotten up in the morning?': 'PRIMARY_TEXT',
       'During the past month, how many hours of actual sleep did you get at night? (This may be different than the number of hours you spent in bed.)': 'PRIMARY_NUMBER',
       'Cannot get to sleep within 30 minutes': 'PRIMARY_TEXT',
       'Wake up in the middle of the night or early morning': 'PRIMARY_TEXT',
@@ -112,7 +112,7 @@ const questionnaires = [
     },
     additionalInformation: [
       {
-        questions: [5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16],
+        questions: [4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15],
         description: 'During the past month, how often have you had trouble sleeping because you...',
         enum: ['Not during the past month', 'Less than once a week', 'Once or twice a week', 'Three or more times a week'],
         relation: {
@@ -123,12 +123,12 @@ const questionnaires = [
         }
       },
       {
-        questions: [17],
+        questions: [16],
         descriptions: '',
         enum: ['No problem at all', 'Only a very slight problem', 'Somewhat of a problem', 'A very big problem']
       },
       {
-        questions: [18],
+        questions: [17],
         enum: ['Very good', 'Fairly good', 'Fairly bad', 'Very bad'],
         relation: {
           'Very good': 0,
@@ -138,12 +138,12 @@ const questionnaires = [
         }
       },
       {
-        questions: [19],
+        questions: [18],
         descriptions: '',
         enum: ['Not bed partner or room mate', 'Partner/room mate in other room', 'Partner in same room but not same bed', 'partner in same bed']
       },
       {
-        questions: [20, 21, 22, 23],
+        questions: [19, 20, 21, 22],
         descriptions: 'If you have a room mate or bed partner, ask him/her how often in the past month you have had:',
         enum: ['Not during the past month', 'Less than once a week', 'Once or twice a week', 'Three or more times a week']
       }
@@ -175,7 +175,7 @@ const questionnaires = [
     },
     additionalInformation: [
       {
-        questions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+        questions: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
         enum: ['Almost never', 'Some-times', 'Often', 'Usually'],
         relation: {
           'Almost never': 0,
@@ -200,7 +200,7 @@ const questionnaires = [
     },
     additionalInformation: [
       {
-        questions: [1],
+        questions: [0],
         enum: ['No problem', 'Slightly delayed', 'Markedly delayed', 'Very delayed or did not sleep at all'],
         relation: {
           'No problem': 0,
@@ -210,7 +210,7 @@ const questionnaires = [
         }
       },
       {
-        questions: [2],
+        questions: [1],
         enum: ['No problem', 'Minor problem', 'Considerable problem', 'Serious problem or did not sleep at all'],
         relation: {
           'No problem': 0,
@@ -220,7 +220,7 @@ const questionnaires = [
         }
       },
       {
-        questions: [3],
+        questions: [2],
         enum: ['No earlier', 'A little earlier', 'Markedly earlier', 'Much earlier or did not sleep at all'],
         relation: {
           'No earlier': 0,
@@ -230,7 +230,7 @@ const questionnaires = [
         }
       },
       {
-        questions: [4],
+        questions: [3],
         enum: ['Sufficient', 'Slightly insufficient', 'Markedly insufficient', 'Very insufficient or did not sleep at all'],
         relation: {
           Sufficient: 0,
@@ -240,7 +240,7 @@ const questionnaires = [
         }
       },
       {
-        questions: [5],
+        questions: [4],
         enum: ['Satisfactory', 'Slightly unsatisfactory', 'Markedly unsatisfactory', 'Very unsatisfactory or did not sleep at all'],
         relation: {
           Satisfactory: 0,
@@ -250,7 +250,7 @@ const questionnaires = [
         }
       },
       {
-        questions: [6, 7],
+        questions: [5, 6],
         enum: ['Normal', 'Slightly decreased', 'Markedly decreased', 'Very decreased'],
         relation: {
           Normal: 0,
@@ -260,7 +260,7 @@ const questionnaires = [
         }
       },
       {
-        questions: [8],
+        questions: [7],
         enum: ['None', 'Mild', 'Considerable', 'Intense'],
         relation: {
           None: 0,
@@ -287,7 +287,7 @@ const questionnaires = [
     },
     additionalInformation: [
       {
-        questions: [1, 2, 4, 5, 6, 9, 10],
+        questions: [0, 1, 3, 4, 5, 8, 9],
         enum: ['Very severe', 'Severe', 'Moderate', 'Mild', 'None'],
         relation: {
           'Very severe': 4,
@@ -298,7 +298,7 @@ const questionnaires = [
         }
       },
       {
-        questions: [3],
+        questions: [2],
         enum: ['No relief', 'Mild relief', 'Moderate relief', 'Either complete or almost complete relief', 'No RLS symptoms to be relieved'],
         relation: {
           'No relief': 4,
@@ -309,7 +309,7 @@ const questionnaires = [
         }
       },
       {
-        questions: [7],
+        questions: [6],
         enum: ['Very often (This means 6 to 7 days a week)', 'Often (this means 4 to 5 days a week)', 'Sometimes (This means 2 to 3 days a week)', 'Occasionally (This means 1 day a week)', 'Never'],
         relation: {
           'Very often (This means 6 to 7 days a week)': 4,
@@ -320,7 +320,7 @@ const questionnaires = [
         }
       },
       {
-        questions: [8],
+        questions: [7],
         enum: ['Very severe (This means 8 hours or more per 24 hour day)', 'Severe (this means 3 to 8 hours per 24 hour day)', 'Moderate (This means 1 to 3 hours per day 24 hour day)', 'Mild (This means less than 1 hour per 24 hour day)', 'None'],
         relation: {
           'Very severe (This means 8 hours or more per 24 hour day)': 4,
@@ -345,7 +345,7 @@ const questionnaires = [
     },
     additionalInformation: [
       {
-        questions: [1, 2, 3],
+        questions: [0, 1, 2],
         enum: ['None', 'Mild', 'Moderate', 'Severe', 'Very Severe'],
         relation: {
           None: 0,
@@ -356,7 +356,7 @@ const questionnaires = [
         }
       },
       {
-        questions: [4],
+        questions: [3],
         enum: ['Very Satisfied', 'Satisfied', 'Moderately Satisfied', 'Dissatisfied', 'Very Dissatisfied'],
         relation: {
           'Very Satisfied': 0,
@@ -367,7 +367,7 @@ const questionnaires = [
         }
       },
       {
-        questions: [5],
+        questions: [4],
         enum: ['No at all Noticeable', 'A little', 'Somewhat', 'Much', 'Very Much Noticeable'],
         relation: {
           'No at all Noticeable': 0,
@@ -378,7 +378,7 @@ const questionnaires = [
         }
       },
       {
-        questions: [6],
+        questions: [5],
         enum: ['No at all Worried', 'A little', 'Somewhat', 'Much', 'Very Much Worried'],
         relation: {
           'No at all Worried': 0,
@@ -389,7 +389,7 @@ const questionnaires = [
         }
       },
       {
-        questions: [7],
+        questions: [6],
         enum: ['No at all Interfering', 'A little', 'Somewhat', 'Much', 'Very Much Interfering'],
         relation: {
           'No at all Interfering': 0,

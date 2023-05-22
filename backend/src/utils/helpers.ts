@@ -1,7 +1,7 @@
 import {
   AdditionalInformation
 } from '../modules/questionnaire/questionnaire.schemas'
-import { ALLOWED_EXTENSIONS, JPEG_EXTENSIONS } from '../modules/user/user.schemas'
+import { ALLOWED_EXTENSIONS, JPEG_EXTENSIONS, regexDate } from '../modules/user/user.schemas'
 
 function calculateBMI ({
   weight,
@@ -108,6 +108,10 @@ function parseDateToString (date: Date): string {
 }
 
 function parseStringToDate (date: string): Date {
+  if (!regexDate.test(date)) {
+    console.log(regexDate.test(date))
+    throw new Error('Wrong date format')
+  }
   const [DayMonthYear, HourMinute] = date.split('-')
   const [day, month, year] = DayMonthYear.split('/')
   const [hour, minute] = HourMinute.split(':')
@@ -115,6 +119,16 @@ function parseStringToDate (date: string): Date {
   const newStringDate = `${year}-${month}-${day}T${hour}:${minute}`
 
   return new Date(newStringDate)
+}
+
+function calculateAgeFromBirthDate (birth: Date): number {
+  const today = new Date()
+  let result = today.getFullYear() - birth.getFullYear()
+  const m = today.getMonth() - birth.getMonth()
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+    result--
+  }
+  return result
 }
 
 function checkTimeDiffOfGivenDateUntilNow (date: Date, timeInHours: number): boolean {
@@ -185,5 +199,6 @@ export {
   checkAnswersEnums,
   checkBirth,
   parseDateToString,
-  parseStringToDate
+  parseStringToDate,
+  calculateAgeFromBirthDate
 }

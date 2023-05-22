@@ -1,5 +1,6 @@
-import prisma, { QuestionnaireAlgorithm, type Answer, type Questionnaire } from '../../utils/database'
-import { parseStringToDate } from '../../utils/helpers'
+import prisma, { QuestionnaireAlgorithm, type Answer, type Questionnaire, User } from '../../utils/database'
+import { calculateAgeFromBirthDate, parseDateToString, parseStringToDate } from '../../utils/helpers'
+import { findUserUnique } from '../user/user.services'
 import type {
   AdditionalInformation,
   AnswerEpworthSleepinessScale,
@@ -7,8 +8,10 @@ import type {
   AnswerUser,
   CreateAlgorithmInput,
   CreateQuestionnaireInput,
+  DefaultAlgorithmInformation,
   EpworthSleepinessScaleWarning,
   InsomniaSeverityIndexWarning,
+  Questions,
   StopBangWarning
 } from './questionnaire.schemas'
 
@@ -224,6 +227,8 @@ async function PittsburghSleepQualityIndexAlgorithm (
   else C3 += 3
   // INDEX 0, 2 AND 3 COMPONENT 4 QUESTION
   const hoursSlept = answerEntries.at(3)?.[1] as number
+  console.log(answerEntries.at(0)?.[1] as string)
+  console.log(answerEntries.at(2)?.[1] as string)
   const timeGoneToBed = parseStringToDate(answerEntries.at(0)?.[1] as string)
   const timeGottenUp = parseStringToDate(answerEntries.at(2)?.[1] as string)
   const timeDiff = Math.abs(timeGottenUp.getTime() - timeGoneToBed.getTime()) // in milliseconds
@@ -292,9 +297,8 @@ async function AthensInsomniaScaleAlgorithm (
   const { additionalInformation } = await findQuestionnaireUnique('id', questionnaireId) as Questionnaire
   const result = Object.entries(answer).reduce((accumulator, current, index) => {
     const scores = (additionalInformation as AdditionalInformation)
-      .find(information => {
-        return information.questions.includes(index) && information.enum?.includes(current[0])
-      })?.relation as Record<string, number>
+      .find(information => information.questions.includes(index))
+      ?.relation as Record<string, number>
     accumulator += scores[current[1] as string]
     return accumulator
   }, 0)
@@ -313,9 +317,8 @@ async function InternationalRestlessLegsScaleAlgorithm (
   const { additionalInformation } = await findQuestionnaireUnique('id', questionnaireId) as Questionnaire
   const result = Object.entries(answer).reduce((accumulator, current, index) => {
     const scores = (additionalInformation as AdditionalInformation)
-      .find(information => {
-        return information.questions.includes(index) && information.enum?.includes(current[0])
-      })?.relation as Record<string, number>
+      .find(information => information.questions.includes(index))
+      ?.relation as Record<string, number>
     accumulator += scores[current[1] as string]
     return accumulator
   }, 0)
@@ -334,9 +337,8 @@ async function InsomniaSeverityIndexAlgorithm (
   const { additionalInformation } = await findQuestionnaireUnique('id', questionnaireId) as Questionnaire
   const risk = Object.entries(answer).reduce((accumulator, current, index) => {
     const scores = (additionalInformation as AdditionalInformation)
-      .find(information => {
-        return information.questions.includes(index) && information.enum?.includes(current[0])
-      })?.relation as Record<string, number>
+      .find(information => information.questions.includes(index))
+      ?.relation as Record<string, number>
     accumulator += scores[current[1] as string]
     return accumulator
   }, 0)
@@ -363,6 +365,49 @@ const questionnairesAlgorithms = {
   'Insomnia Severity Index': InsomniaSeverityIndexAlgorithm
 }
 
+async function StopBangDefaultInformation (
+  questionnaireId: string,
+  userId: string
+): Promise<DefaultAlgorithmInformation> {
+  const result: DefaultAlgorithmInformation = []
+  const { BMI, birth, gender } = await findUserUnique('id', userId) as User
+  const { questions } = await findQuestionnaireUnique('id', questionnaireId) as Questionnaire
+  result.push({
+    index: 4,
+    question: Object.entries(questions as Questions).at(4)?.[0] as string,
+    answer: BMI > 35,
+    dbInformation: BMI
+  })
+  /**
+   * THIS IS NOT 100% ACCURATE IF WE NEED MORE PRECISION WE SHOULD USE
+   * A LIBRARY TO MANAGE DATES
+   */
+  result.push({
+    index: 5,
+    question: Object.entries(questions as Questions).at(5)?.[0] as string,
+    answer: calculateAgeFromBirthDate(birth) > 50,
+    dbInformation: parseDateToString(birth)
+  })
+  result.push({
+    index: 7,
+    question: Object.entries(questions as Questions).at(7)?.[0] as string,
+    answer: gender === 'MASCULINE',
+    dbInformation: gender
+  })
+  return result
+}
+
+const questionnairesDefaultInformation = {
+  'Consensus Sleep Diary': () => [],
+  'STOP-BANG': StopBangDefaultInformation,
+  'Epworth Sleepiness Scale': () => [],
+  'Pittsburgh Sleep Quality Index': () => [],
+  'Perceived Stress Questionnaire': () => [],
+  'Athens Insomnia Scale': () => [],
+  'International Restless Legs Scale': () => [],
+  'Insomnia Severity Index': () => []
+}
+
 export {
   createQuestionnaire,
   createAnswer,
@@ -370,5 +415,6 @@ export {
   findQuestionnaireUnique,
   findQuestionnaires,
   findQuestionnaireAlgorithmsOrderByCreatedAt,
-  questionnairesAlgorithms
+  questionnairesAlgorithms,
+  questionnairesDefaultInformation
 }

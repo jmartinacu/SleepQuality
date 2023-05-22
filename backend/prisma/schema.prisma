@@ -68,16 +68,16 @@ model Questionnaire {
 
 model QuestionnaireAlgorithm {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  StopBangWarning                String?
-  StopBangRisk                   Int?
-  EpworthSleepinessScaleRisk     Int?
-  EpworthSleepinessScaleWarning  String?
-  PittsburghSleepQualityIndex    Int?
-  PerceivedStressQuestionnaire   Int?
-  AthensInsomniaScale            Int?  
-  InternationalRestlessLegsScale Int?
-  InsomniaSeverityIndexWarning   String?
-  InsomniaSeverityIndexRisk      Int?
+  stopBangWarning                String?
+  stopBangRisk                   Int?
+  epworthSleepinessScaleRisk     Int?
+  epworthSleepinessScaleWarning  String?
+  pittsburghSleepQualityIndex    Int?
+  perceivedStressQuestionnaire   Int?
+  athensInsomniaScale            Int?  
+  internationalRestlessLegsScale Int?
+  insomniaSeverityIndexWarning   String?
+  insomniaSeverityIndexRisk      Int?
   createdAt                      DateTime @default(now())
   updatedAt                      DateTime @updatedAt
   questionnaireId                String  @db.ObjectId

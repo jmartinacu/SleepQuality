@@ -14,7 +14,7 @@ function fakeInputUser (): CreateUserInput {
   const genderIndex = random(0, 2)
   const email = faker.internet.email()
   const password = 'asdfR2&tr'
-  const birth = '15/01/1998'
+  const birth = '15/01/1998-15:34'
   const gender = genders.at(genderIndex) as Gender
   const height = faker.datatype.number({ min: 1, max: 2.5, precision: 0.01 })
   const weight = faker.datatype.number({ min: 20, max: 200, precision: 0.01 })
@@ -58,6 +58,8 @@ function fakeUser ({
   const role = roles.at(roleIndex) as Role
   const profilePicture = faker.datatype.string()
   const questionnairesToDo: string[] = []
+  const createdAt = new Date()
+  const updatedAt = new Date()
   return {
     ...rest,
     birth: new Date(birthString),
@@ -66,7 +68,9 @@ function fakeUser ({
     verified,
     role,
     profilePicture,
-    questionnairesToDo
+    questionnairesToDo,
+    createdAt,
+    updatedAt
   }
 }
 
@@ -124,15 +128,15 @@ const correctAnswers = [
       'If yes, how much earlier?': 30,
       'What time did you get out of bed for the day?': 'At 7:30 am',
       'In total, how long did you sleep?': 330,
-      'How would you rate the quality of your sleep?': 'Good', // ENUM
-      'How rested or refreshed did you feel when you woke-up for the day?': 'Slightly rested', // ENUM
+      'How would you rate the quality of your sleep?': 'Good',
+      'How rested or refreshed did you feel when you woke-up for the day?': 'Slightly rested',
       'How many times did you nap or doze': 2,
       'In total, how long did you nap or doze?': 40,
       'How many drinks containing alcohol did you have?': 2,
       'What time was your last alcohol drink?': 'Was three days ago',
       'How many caffeinated drinks (coffee, tea, soda, energy drinks) did you have?': 0,
       'What time was your last caffeinated drink?': null,
-      'Did you take any over-the-counter or prescription medication(s) to help you sleep': false,
+      'Did you take any over-the-counter or prescription medication(s) to help you sleep?': false,
       'If so, list medication(s), dose, and time taken': null,
       Comments: 'No Comments'
     }
@@ -166,68 +170,68 @@ const correctAnswers = [
   {
     name: 'Pittsburgh Sleep Quality Index',
     answers: {
-      'During the past month, what time have you usually gone to bed at night?': 'At 1 am',
+      'During the past month, what time have you usually gone to bed at night?': '17/05/2023-01:30',
       'During the past month, how long (in minutes) has it usually taken you to fall asleep each night?': 20,
-      'During the past month, what time have you usually gotten up in the morning?': 7.30,
+      'During the past month, what time have you usually gotten up in the morning?': '17/05/2023-07:30',
       'During the past month, how many hours of actual sleep did you get at night? (This may be different than the number of hours you spent in bed.)': 5,
-      'Cannot get to sleep within 30 minutes': 'Not during the past month', // ENUM
-      'Wake up in the middle of the night or early morning': 'Less than once a week', // ENUM
-      'Have to get up to use the bathroom': 'Not during the past month', // ENUM
-      'Cannot breathe comfortably': 'Not during the past month', // ENUM
-      'Cough or snore loudly': 'Not during the past month', // ENUM
-      'Feel too cold': 'Not during the past month', // ENUM
-      'Feel too hot': 'Not during the past month', // ENUM
-      'Have bad dreams': 'Less than once a week', // ENUM
-      'Have pain': 'Not during the past month', // ENUM
+      'Cannot get to sleep within 30 minutes': 'Not during the past month',
+      'Wake up in the middle of the night or early morning': 'Less than once a week',
+      'Have to get up to use the bathroom': 'Not during the past month',
+      'Cannot breathe comfortably': 'Not during the past month',
+      'Cough or snore loudly': 'Not during the past month',
+      'Feel too cold': 'Not during the past month',
+      'Feel too hot': 'Not during the past month',
+      'Have bad dreams': 'Less than once a week',
+      'Have pain': 'Not during the past month',
       'Other reason(s), please describe:': null,
-      'During the past month, how often have you taken medicine to help you sleep (prescribed or "over the counter")?': 'Not during the past month', // ENUM
-      'During the past month, how often have you had trouble staying awake while driving, eating meals, or engaging in social activity?': 'Not during the past month', // ENUM
-      'During the past month, how much of a problem has it been for you to keep up enough enthusiasm to get things done?': 'Somewhat of a problem', // ENUM
-      'During the past month, how would you rate your sleep quality overall?': 'Fairly good', // ENUM
-      'Do you have a bed partner or room mate': 'Not bed partner or room mate', // ENUM
-      'Loud snoring': null, // ENUM
-      'Long pauses between breaths while asleep': null, // ENUM
-      'Legs twitching or jerking while you sleep': null, // ENUM
-      'Episodes of disorientation or confusion during sleep': null, // ENUM
+      'During the past month, how often have you taken medicine to help you sleep (prescribed or "over the counter")?': 'Not during the past month',
+      'During the past month, how often have you had trouble staying awake while driving, eating meals, or engaging in social activity?': 'Not during the past month',
+      'During the past month, how much of a problem has it been for you to keep up enough enthusiasm to get things done?': 'Somewhat of a problem',
+      'During the past month, how would you rate your sleep quality overall?': 'Fairly good',
+      'Do you have a bed partner or room mate': 'Not bed partner or room mate',
+      'Loud snoring': null,
+      'Long pauses between breaths while asleep': null,
+      'Legs twitching or jerking while you sleep': null,
+      'Episodes of disorientation or confusion during sleep': null,
       'Other restlessness while you sleep, please describe:': 'I am so sleepy after lunch meal'
     }
   },
   {
     name: 'Perceived Stress Questionnaire',
     answers: {
-      'You feel rested': 3,
-      'You feel that too many demands are being made on you': 3,
-      'You have too many things to do': 3,
-      "You feel you're doing things you really like": 3,
-      'You fear you may not manage to attain your goals': 2,
-      'You feel calm': 2,
-      'You feel frustrated': 1,
-      'You are full of energy': 2,
-      'You feel tense': 2,
-      'Your problems seem to be pilling up': 2,
-      "You feel you're in a hurry": 3,
-      'You feel safe and protected': 3,
-      'You have many worries': 2,
-      'You enjoy yourself': 3,
-      'You are afraid for the future': 2,
-      'You are lighthearted': 3,
-      'You feel mentally relaxing': 2,
-      'You have trouble relaxing': 1,
-      'Yoy have enough time for yourself': 2,
-      'You feel under pressure from deadlines': 3
+      'You feel rested': 'Usually', // ENUM
+      'You feel that too many demands are being made on you': 'Usually', // ENUM
+      'You have too many things to do': 'Usually', // ENUM
+      "You feel you're doing things you really like": 'Usually', // ENUM
+      'You fear you may not manage to attain your goals': 'Often', // ENUM
+      'You feel calm': 'Often', // ENUM
+      'You feel frustrated': 'Some-times', // ENUM
+      'You are full of energy': 'Often', // ENUM
+      'You feel tense': 'Often', // ENUM
+      'Your problems seem to be pilling up': 'Often', // ENUM
+      "You feel you're in a hurry": 'Usually', // ENUM
+      'You feel safe and protected': 'Usually', // ENUM
+      'You have many worries': 'Often', // ENUM
+      'You enjoy yourself': 'Usually', // ENUM
+      'You are afraid for the future': 'Often', // ENUM
+      'You are lighthearted': 'Usually', // ENUM
+      'You feel mentally relaxing': 'Often', // ENUM
+      'You have trouble relaxing': 'Some-times', // ENUM
+      'Yoy have enough time for yourself': 'Often', // ENUM
+      'You feel under pressure from deadlines': 'Usually' // ENUM
     }
   },
   {
     name: 'Athens Insomnia Scale',
     answers: {
-      'Sleep induction (time it takes you to fall asleep after turning-off the lights)': 0,
-      'Awakenings during the night': 0,
-      'Final awakening earlier than desired': 1,
-      'Total sleep duration': 1,
-      'Overall quality of sleep (no matter how long you slept)': 1,
-      'Sense of well-being during the day': 1,
-      'Functioning (physical and mental) during the day': 1,
-      'Sleepiness during the day': 2
+      'Sleep induction (time it takes you to fall asleep after turning-off the lights)': 'No problem',
+      'Awakenings during the night': 'No problem',
+      'Final awakening earlier than desired': 'A little earlier',
+      'Total sleep duration': 'Slightly insufficient',
+      'Overall quality of sleep (no matter how long you slept)': 'Slightly unsatisfactory',
+      'Sense of well-being during the day': 'Slightly decreased',
+      'Functioning (physical and mental) during the day': 'Slightly decreased',
+      'Sleepiness during the day': 'Considerable'
     }
   },
   {
@@ -248,13 +252,13 @@ const correctAnswers = [
   {
     name: 'Insomnia Severity Index',
     answers: {
-      'Difficulty falling asleep': 1,
-      'Difficulty staying asleep': 2,
-      'Problems waking up too early': 2,
-      'How SATISFIED/DISSATISFIED are you with your CURRENT sleep pattern?': 2,
-      'How NOTICEABLE to others do you think you sleep problem is in terms of impairing the quality of your life?': 1,
-      'How WORRIED/DISTRESSED are you about your current sleep problem?': 2,
-      'To what extent do you consider your sleep problem to INTERFERE with your daily functioning (e.g. daytime fatigue, mood, ability to function at work/daily chores, concentration, memory, etc.) CURRENTLY?': 1
+      'Difficulty falling asleep': 'Mild', // ENUM
+      'Difficulty staying asleep': 'Moderate', // ENUM
+      'Problems waking up too early': 'Moderate', // ENUM
+      'How SATISFIED/DISSATISFIED are you with your CURRENT sleep pattern?': 'Moderately Satisfied', // ENUM
+      'How NOTICEABLE to others do you think you sleep problem is in terms of impairing the quality of your life?': 'A little', // ENUM
+      'How WORRIED/DISTRESSED are you about your current sleep problem?': 'Somewhat', // ENUM
+      'To what extent do you consider your sleep problem to INTERFERE with your daily functioning (e.g. daytime fatigue, mood, ability to function at work/daily chores, concentration, memory, etc.) CURRENTLY?': 'A little' // ENUM
     }
   }
 ]
