@@ -6,6 +6,7 @@ import { userLogin, userRegister } from '../../api/ApiUser'
 import { Eye, EyeActive } from '../../assests/eyes'
 import { Input } from 'react-native-elements'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import { parseDateToString } from '../../utils/Utils'
 
 const RegisterForm = ({ navigation }) => {
   const [status, setStatus] = useState('')
@@ -180,11 +181,7 @@ const RegisterForm = ({ navigation }) => {
         gender,
         height,
         weight,
-        birth: birthDate.toLocaleDateString('es-ES', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        }),
+        birth: parseDateToString(birthDate),
         chronicDisorders: chronicDisorders === '' ? null : chronicDisorders,
         password
       })

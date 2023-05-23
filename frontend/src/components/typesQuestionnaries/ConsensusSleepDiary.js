@@ -1,19 +1,12 @@
-import { FlatList, Platform, StyleSheet, Text, TextInput, View } from 'react-native'
+import { FlatList, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useState } from 'react'
 import { Picker } from '@react-native-picker/picker'
+import { createAswer } from '../../api/ApiQuestionnaries'
 
-const ConsensusSleepDiary = ({ name, questions, additionalInfo }) => {
+const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additionalInfo }) => {
   const [answers, setAnswers] = useState(new Array(22).fill(''))
 
-  const result = Object.entries(questions)
-    .reduce((accumulator, current) => {
-      const obj = {
-        question: current[0],
-        types: current[1]
-      }
-      accumulator.push(obj)
-      return accumulator
-    }, [])
+  const [status, setStatus] = useState('')
 
   const EnumForEachQuestion = new Map()
   for (const obj of additionalInfo) {
@@ -30,6 +23,44 @@ const ConsensusSleepDiary = ({ name, questions, additionalInfo }) => {
     const copyAnswers = [...answers]
     copyAnswers[index] = answer
     setAnswers(copyAnswers)
+  }
+
+  const result = Object.entries(questions)
+    .reduce((accumulator, current) => {
+      const obj = {
+        question: current[0],
+        type: current[1]
+      }
+      accumulator.push(obj)
+      return accumulator
+    }, [])
+
+  const handleSubmitAnswer = () => {
+    const submit = {}
+    let i = 0
+    for (const obj of result) {
+      submit.set(obj.question, answers[i])
+      i++
+    }
+    createAswer(accessToken, {
+      name,
+      answers: submit
+    })
+      .then(result => {
+        if (result.status === 200) {
+          console.log(result)
+          setStatus('')
+          navigation.replace('TextAndButton', { text: 'Answers Successfully Submitted', button: 'Go Home', direction: 'Home' })
+        } else {
+          console.log(result)
+          setStatus(result.message)
+        }
+      })
+      .catch(err => {
+        console.error(err)
+      })
+
+    return submit
   }
 
   const renderQuestion = ({ index, item }) => {
@@ -78,7 +109,7 @@ const ConsensusSleepDiary = ({ name, questions, additionalInfo }) => {
 
     )
   }
-
+  const prueba = true
   return (
     <View>
       <Text>{name}</Text>
@@ -87,6 +118,21 @@ const ConsensusSleepDiary = ({ name, questions, additionalInfo }) => {
         renderItem={renderQuestion}
         keyExtractor={(item, index) => index}
       />
+      {prueba
+        ? (
+          <TouchableOpacity
+            disabled
+            style={styles.buttonDisable}
+            onPress={() => handleSubmitAnswer}
+          >
+            <Text style={styles.text}>Submit</Text>
+          </TouchableOpacity>
+          )
+        : (
+          <TouchableOpacity style={styles.button} onPress={() => handleSubmitAnswer}>
+            <Text style={styles.text}>Submit</Text>
+          </TouchableOpacity>
+          )}
     </View>
   )
 }

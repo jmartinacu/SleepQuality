@@ -39,7 +39,7 @@ const Questionnarie = ({ navigation, id }) => {
           )
         : (
           <View>
-            {name === 'Consensus Sleep Diary' && <ConsensusSleepDiary name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'Consensus Sleep Diary' && <ConsensusSleepDiary navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
           </View>
           )}
     </KeyboardAwareScrollView>

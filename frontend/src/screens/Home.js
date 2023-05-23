@@ -3,6 +3,7 @@ import { View, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { getQuestionnarieById } from '../api/ApiQuestionnaries'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import ConsensusSleepDiary from '../components/typesQuestionnaries/ConsensusSleepDiary'
+import { getItemFromStorage } from '../utils/Utils'
 
 const Home = ({ navigation }) => {
   const [name, setName] = useState('')
@@ -13,24 +14,10 @@ const Home = ({ navigation }) => {
 
   const [accessToken, setAccessToken] = useState(null)
 
-  const getItemFromStorage = async () => {
-    try {
-      await AsyncStorage.getItem('accessToken', (error, result) => {
-        if (result) {
-          setAccessToken(result)
-        } else {
-          console.log(JSON.stringfy(error))
-        }
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   useEffect(() => {
-    getItemFromStorage().then()
+    getItemFromStorage('accessToken', setAccessToken).then()
     if (accessToken !== null) {
-      getQuestionnarieById('64622c5020a7d02abbfc957b', accessToken)
+      getQuestionnarieById('646c7cfbe9d3b0045b061873', accessToken)
         .then(result => {
           console.log(accessToken)
           console.log(result)
@@ -53,7 +40,7 @@ const Home = ({ navigation }) => {
 
   return (
     <View style={styles.tabBarStyle}>
-      <ConsensusSleepDiary name={name} questions={questions} additionalInfo={additionalInfo} />
+      <ConsensusSleepDiary accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />
     </View>
   )
 }
