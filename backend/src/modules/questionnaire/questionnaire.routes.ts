@@ -3,6 +3,7 @@ import {
   createAnswerHandler,
   createQuestionnaireHandler,
   getAlgorithmHandler,
+  getDefaultAlgorithmInformationHandler,
   getLastAlgorithmHandler,
   getQuestionnaireHandler,
   getQuestionnairesInformationHandler
@@ -13,7 +14,8 @@ import {
   GetLastAlgorithmSchema,
   GetAlgorithmSchema,
   GetQuestionnaireSchema,
-  GetQuestionnairesInformationSchema
+  GetQuestionnairesInformationSchema,
+  GetDefaultAlgorithmInformationSchema
 } from './questionnaire.schemas'
 
 async function questionnaireRoutes (server: FastifyInstance): Promise<void> {
@@ -49,6 +51,7 @@ async function questionnaireRoutes (server: FastifyInstance): Promise<void> {
     getQuestionnairesInformationHandler
   )
 
+  // TODO: ADD ERROR MANAGEMENT WITH ERROR CLASSES
   server.post('/answer',
     {
       onRequest: server.auth([server.authenticate]),
@@ -57,7 +60,7 @@ async function questionnaireRoutes (server: FastifyInstance): Promise<void> {
     },
     createAnswerHandler
   )
-  // TODO: ADD ROUTE TO SEND DEFAULT INFORMATION
+
   server.get('/algorithm/last/:id',
     {
       onRequest: server.auth([server.authenticate]),
@@ -74,6 +77,15 @@ async function questionnaireRoutes (server: FastifyInstance): Promise<void> {
       schema: GetAlgorithmSchema
     },
     getAlgorithmHandler
+  )
+
+  server.get('/algorithm/default/:id',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkUserVerification]),
+      schema: GetDefaultAlgorithmInformationSchema
+    },
+    getDefaultAlgorithmInformationHandler
   )
 }
 

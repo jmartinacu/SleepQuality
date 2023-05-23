@@ -24,6 +24,7 @@ import {
   checkAnswersEnums,
   convertToCorrectType
 } from '../../utils/helpers'
+import { errorCodeAndMessage } from '../../utils/error'
 
 async function createQuestionnaireHandler (
   request: FastifyRequestTypebox<typeof CreateQuestionnaireSchema>,
@@ -34,8 +35,15 @@ async function createQuestionnaireHandler (
     const questionnaire = await createQuestionnaire(data)
     return await reply.code(201).send(questionnaire)
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -51,8 +59,15 @@ async function getQuestionnaireHandler (
     }
     return await reply.send(questionnaire)
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -64,8 +79,15 @@ async function getQuestionnairesInformationHandler (
     const questionnaires = await findQuestionnaires()
     return await reply.send(questionnaires)
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -136,11 +158,15 @@ async function createAnswerHandler (
       answers: answersDB
     })
   } catch (error) {
-    console.error(error)
-    if (error instanceof Error && error.message === 'Wrong date format') {
-      return await reply.code(400).send({ message: 'Answer does not have the right responses' })
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
     }
-    return await reply.code(500).send(error)
+    return await reply.code(code).send(message)
   }
 }
 
@@ -157,8 +183,15 @@ async function getLastAlgorithmHandler (
     }
     return await reply.send(algorithmData.at(0))
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -172,8 +205,15 @@ async function getAlgorithmHandler (
     const algorithmData = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, id)
     return await reply.send(algorithmData)
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -195,8 +235,15 @@ async function getDefaultAlgorithmInformationHandler (
     )
     return await reply.send(defaultInformation)
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 

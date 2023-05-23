@@ -2,6 +2,7 @@ import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 import { findUserUnique, updateUser, updateUsers } from '../user/user.services'
 import { UpdateUserServiceInput } from '../user/user.schemas'
 import { CreateAdminDoctorSchema, CreateManyDoctorsSchema, MessageResponseSchema } from './admin.schemas'
+import { errorCodeAndMessage } from '../../utils/error'
 
 async function createAdminHandler (
   request: FastifyRequestTypebox<typeof CreateAdminDoctorSchema>,
@@ -16,8 +17,15 @@ async function createAdminHandler (
     await updateUser(id, { role: 'ADMIN' })
     return await reply.code(201).send({ message: 'Admin created' })
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -34,8 +42,15 @@ async function createDoctorHandler (
     await updateUser(id, { role: 'DOCTOR' })
     return await reply.code(201).send({ message: 'Doctor created' })
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -57,8 +72,15 @@ async function createManyDoctorHandler (
     await updateUsers(ids, dataToUpdate)
     return await reply.code(201).send({ message: 'Doctors created' })
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 

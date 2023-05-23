@@ -1,7 +1,5 @@
 import type { Questionnaire } from '../../utils/database'
-import {
-  parseStringToDate
-} from '../../utils/helpers'
+import { parseStringToDate } from '../../utils/helpers'
 import type {
   AdditionalInformation,
   AnswerEpworthSleepinessScale,
@@ -199,19 +197,8 @@ async function PittsburghSleepQualityIndexAlgorithm (
     default:
       C7 = 0
   }
-  console.log('-----------------------')
-  console.log(C1)
-  console.log(C2)
-  console.log(C3)
-  console.log(C4)
-  console.log(C5)
-  console.log(C6)
-  console.log(C7)
-  console.log('-----------------------')
-  const result = C1 + C2 + C3 + C4 + C5 + C6 + C7
-  console.log(result)
   await createAlgorithmData(
-    { pittsburghSleepQualityIndex: result },
+    { pittsburghSleepQualityIndex: C1 + C2 + C3 + C4 + C5 + C6 + C7 },
     userId,
     questionnaireId
   )

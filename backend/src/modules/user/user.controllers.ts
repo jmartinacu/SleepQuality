@@ -38,6 +38,7 @@ import {
   random
 } from '../../utils/helpers'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
+import { errorCodeAndMessage } from '../../utils/error'
 
 // CHECK EMAIL IS NOT IN DB
 async function createUserHandler (
@@ -83,8 +84,15 @@ async function createUserHandler (
 
     return await reply.code(201).send(user)
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -97,8 +105,15 @@ async function deleteUserHandler (
     await deleteUser(userId)
     return await reply.code(204).send()
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -112,8 +127,15 @@ async function updateUserHandler (
     await updateUser(userId, data)
     return await reply.send({ message: 'User updated' })
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -139,8 +161,15 @@ async function logInUserHandler (
       refreshToken
     }
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -153,8 +182,15 @@ async function getMeHandler (
     const user = await findUserUnique('id', userId) as User
     return await reply.send(user)
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -177,8 +213,15 @@ async function verifyAccountHandler (
     }
     return await reply.code(400).send({ message: 'Could not verified user' })
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -204,8 +247,15 @@ async function refreshAccessTokenHandler (
       accessToken
     }
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -235,8 +285,15 @@ async function forgotPasswordHandler (
     })
     return await reply.send({ message })
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 // TODO: HASH NEW PASSWORD PROVIDED BY USER
@@ -263,8 +320,15 @@ async function resetPasswordHandler (
     await updateUser(user.id, { passwordResetCode: null, password: passwordHash })
     return await reply.send({ message: 'Password reset' })
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -287,8 +351,15 @@ async function addProfilePictureHandler (
     await updateUser(userId, { profilePicture })
     return await reply.send({ message: 'Profile Picture saved' })
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -308,8 +379,15 @@ async function getProfilePictureHandler (
     const fileStream = fs.createReadStream(filePath)
     return await reply.type(MIMEType).send(fileStream)
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
