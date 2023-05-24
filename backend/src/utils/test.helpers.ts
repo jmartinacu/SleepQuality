@@ -70,7 +70,8 @@ function fakeUser ({
     profilePicture,
     questionnairesToDo,
     createdAt,
-    updatedAt
+    updatedAt,
+    doctorId: null
   }
 }
 
@@ -109,7 +110,8 @@ function fakerSession ({
     id,
     valid,
     updatedAt,
-    userId
+    userId,
+    doctorId: null
   }
 }
 
@@ -168,32 +170,30 @@ const correctAnswers = [
     }
   },
   {
-    name: 'Pittsburgh Sleep Quality Index',
+    name: 'Consensus Sleep Diary',
     answers: {
-      'During the past month, what time have you usually gone to bed at night?': '17/05/2023-01:30',
-      'During the past month, how long (in minutes) has it usually taken you to fall asleep each night?': 20,
-      'During the past month, what time have you usually gotten up in the morning?': '17/05/2023-07:30',
-      'During the past month, how many hours of actual sleep did you get at night? (This may be different than the number of hours you spent in bed.)': 5,
-      'Cannot get to sleep within 30 minutes': 'Not during the past month',
-      'Wake up in the middle of the night or early morning': 'Less than once a week',
-      'Have to get up to use the bathroom': 'Not during the past month',
-      'Cannot breathe comfortably': 'Not during the past month',
-      'Cough or snore loudly': 'Not during the past month',
-      'Feel too cold': 'Not during the past month',
-      'Feel too hot': 'Not during the past month',
-      'Have bad dreams': 'Less than once a week',
-      'Have pain': 'Not during the past month',
-      'Other reason(s), please describe:': null,
-      'During the past month, how often have you taken medicine to help you sleep (prescribed or "over the counter")?': 'Not during the past month',
-      'During the past month, how often have you had trouble staying awake while driving, eating meals, or engaging in social activity?': 'Not during the past month',
-      'During the past month, how much of a problem has it been for you to keep up enough enthusiasm to get things done?': 'Somewhat of a problem',
-      'During the past month, how would you rate your sleep quality overall?': 'Fairly good',
-      'Do you have a bed partner or room mate': 'Not bed partner or room mate',
-      'Loud snoring': null,
-      'Long pauses between breaths while asleep': null,
-      'Legs twitching or jerking while you sleep': null,
-      'Episodes of disorientation or confusion during sleep': null,
-      'Other restlessness while you sleep, please describe:': 'I am so sleepy after lunch meal'
+      'What time did you get into bed?': 'Around 1 am',
+      'What did you you try to go to sleep?': 'I went to sleep very late, at 1:30 am',
+      'How long did it take you to fall asleep?': 'I feel asleep in 10 minutes',
+      'How many times did you wake up, not counting your final awakening?': 0,
+      'In total, how long did these awakenings last?': "I didn't have any awakening",
+      'What time was your final awakening?': 'Around 7 am',
+      'After your final awakening, how long did you spend in bed trying to sleep?': "I don't try to sleep after the awakening",
+      'Did you wake up earlier than you planed?': true,
+      'If yes, how much earlier?': '30 minutes',
+      'What time did you get out of bed for the day?': 'At 7:30 am',
+      'In total, how long did you sleep?': '6 hours 12 minutes',
+      'How would you rate the quality of your sleep?': 'Good',
+      'How rested or refreshed did you feel when you woke-up for the day?': 'Slightly rested',
+      'How many times did you nap or doze': 2,
+      'In total, how long did you nap or doze?': '1 hour',
+      'How many drinks containing alcohol did you have?': 2,
+      'What time was your last alcohol drink?': 'Was three days ago',
+      'How many caffeinated drinks (coffee, tea, soda, energy drinks) did you have?': 0,
+      'What time was your last caffeinated drink?': null,
+      'Did you take any over-the-counter or prescription medication(s) to help you sleep?': false,
+      'If so, list medication(s), dose, and time taken': null,
+      Comments: 'No Comments'
     }
   },
   {

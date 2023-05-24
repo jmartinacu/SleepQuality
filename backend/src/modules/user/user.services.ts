@@ -38,10 +38,19 @@ async function createUser (
   return userCreated
 }
 
-async function createSession (userId: string): Promise<Session> {
+async function createUserSession (userId: string): Promise<Session> {
   const session = await prisma.session.create({
     data: {
       userId
+    }
+  })
+  return session
+}
+
+async function createDoctorSession (doctorId: string): Promise<Session> {
+  const session = await prisma.session.create({
+    data: {
+      doctorId
     }
   })
   return session
@@ -61,7 +70,9 @@ async function updateUser (
     verified: rest.verified,
     profilePicture: rest.profilePicture,
     chronicDisorders: rest.chronicDisorders,
-    role: rest.role
+    role: rest.role,
+    doctorId: rest.doctorId,
+    questionnairesToDo: rest.questionnairesToDo
   }
   if (typeof dataToUpdate.height !== 'undefined' || typeof dataToUpdate.weight !== 'undefined') {
     const { height, weight } = await findUserUnique('id', userId) as User
@@ -114,7 +125,7 @@ async function updateUsers (
         BMI
       }
     })
-  const users = await prisma.user.updateMany({
+  const updateCount = await prisma.user.updateMany({
     where: {
       id: {
         in: userIds
@@ -122,7 +133,7 @@ async function updateUsers (
     },
     data: newDataToUpdate
   })
-  return users.count
+  return updateCount.count
 }
 
 async function deleteUser (id: string): Promise<void> {
@@ -145,6 +156,29 @@ async function deleteUser (id: string): Promise<void> {
     const filePath = path.resolve(`images/${profilePicture}`)
     await fs.unlink(filePath)
   }
+}
+
+async function deleteUsers (ids: string[]): Promise<void> {
+  const users = await findUserMany('id', ids)
+  await prisma.user.deleteMany({
+    where: {
+      id: {
+        in: ids
+      }
+    }
+  })
+  await prisma.answer.deleteMany({
+    where: {
+      userId: {
+        in: ids
+      }
+    }
+  })
+  users.filter(user => user.profilePicture !== null)
+    .forEach((user) => {
+      const filePath = path.resolve(`images/${user.profilePicture as string}`)
+      void fs.unlink(filePath)
+    })
 }
 
 async function findUserUnique (
@@ -189,8 +223,33 @@ async function findUserUniqueOrThrow (
   return user
 }
 
+async function findUserMany (
+  uniqueIdentifier: 'email' | 'id',
+  values: string[]
+): Promise<User[]> {
+  let users: User[]
+  if (uniqueIdentifier === 'email') {
+    users = await prisma.user.findMany({
+      where: {
+        email: {
+          in: values
+        }
+      }
+    })
+  } else {
+    users = await prisma.user.findMany({
+      where: {
+        id: {
+          in: values
+        }
+      }
+    })
+  }
+  return users
+}
+
 async function findSessionUnique (
-  uniqueIdentifier: 'id' | 'userId',
+  uniqueIdentifier: 'id' | 'userId' | 'doctorId',
   value: string
 ): Promise<Session | null> {
   let session
@@ -200,10 +259,16 @@ async function findSessionUnique (
         id: value
       }
     })
-  } else {
+  } else if (uniqueIdentifier === 'userId') {
     session = await prisma.session.findUnique({
       where: {
         userId: value
+      }
+    })
+  } else {
+    session = await prisma.session.findUnique({
+      where: {
+        doctorId: value
       }
     })
   }
@@ -214,7 +279,7 @@ async function findSessionUnique (
 async function findSessionAndUserUnique (
   uniqueIdentifier: 'userId' | 'id',
   value: string
-): Promise<Session & { user: User } | null> {
+): Promise<Session & { user: User | null } | null> {
   let sessionWithUser
   if (uniqueIdentifier === 'userId') {
     sessionWithUser = await prisma.session.findUnique({
@@ -253,12 +318,15 @@ async function updateSession (
 
 export {
   createUser,
-  createSession,
+  createUserSession,
+  createDoctorSession,
   updateUser,
   updateUsers,
   deleteUser,
+  deleteUsers,
   findUserUnique,
   findUserUniqueOrThrow,
+  findUserMany,
   findSessionUnique,
   updateSession,
   findSessionAndUserUnique

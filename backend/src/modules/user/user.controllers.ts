@@ -18,8 +18,8 @@ import type {
   VerifyUserSchema
 } from './user.schemas'
 import {
-  createSession,
   createUser,
+  createUserSession,
   deleteUser,
   findSessionUnique,
   findUserUnique,
@@ -151,7 +151,7 @@ async function logInUserHandler (
       const { id } = await updateSession(session.id, { valid: true })
       sessionId = id
     } else {
-      const { id } = await createSession(userId)
+      const { id } = await createUserSession(userId)
       sessionId = id
     }
     const accessToken = await reply.accessSign({ userId })

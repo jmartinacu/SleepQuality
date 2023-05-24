@@ -21,15 +21,18 @@ import { MAX_FILE_SIZE } from './modules/user/user.schemas'
 import type { RouteGenericInterface } from 'fastify/types/route'
 import type { FastifySchema } from 'fastify/types/schema'
 import adminRoutes from './modules/admin/admin.routes'
+import doctorRoutes from './modules/doctor/doctor.routes'
 
 declare module 'fastify' {
   interface FastifyInstance {
     algorithms: Record<string, any>
     algorithmDefaults: Record<string, any>
     checkEmailAndPassword: any
-    checkEmailAndPasswordAdmin: any
     checkUserVerification: any
+    checkUsersVerification: any
     checkUserVerificationWithoutAuthorization: any
+    checkDoctorVerification: any
+    checkDoctorVerificationWithoutAuthorization: any
     checkAdmin: any
     checkSession: any
     authenticate: any
@@ -109,7 +112,8 @@ const buildServer = (): FastifyInstance => {
 
     void server.register(userRoutes, { prefix: 'api/users' })
     void server.register(questionnaireRoutes, { prefix: 'api/questionnaires' })
-    void server.register(adminRoutes, { prefix: '/admin' })
+    void server.register(adminRoutes, { prefix: 'api/admins' })
+    void server.register(doctorRoutes, { prefix: 'api/doctors' })
   })
 
   return server

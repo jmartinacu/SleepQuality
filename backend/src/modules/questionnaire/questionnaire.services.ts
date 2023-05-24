@@ -67,8 +67,30 @@ async function findQuestionnaireUnique (
   return questionnaire
 }
 
-async function findQuestionnaires (): Promise<Questionnaire[]> {
-  const questionnaires = await prisma.questionnaire.findMany()
+async function findQuestionnaireMany (
+  uniqueIdentifier: 'id' | 'name' | 'all',
+  values: string[]
+): Promise<Questionnaire[]> {
+  let questionnaires: Questionnaire[]
+  if (uniqueIdentifier === 'all') {
+    questionnaires = await prisma.questionnaire.findMany()
+  } else if (uniqueIdentifier === 'id') {
+    questionnaires = await prisma.questionnaire.findMany({
+      where: {
+        id: {
+          in: values
+        }
+      }
+    })
+  } else {
+    questionnaires = await prisma.questionnaire.findMany({
+      where: {
+        name: {
+          in: values
+        }
+      }
+    })
+  }
   return questionnaires
 }
 
@@ -95,6 +117,6 @@ export {
   createAnswer,
   createAlgorithmData,
   findQuestionnaireUnique,
-  findQuestionnaires,
+  findQuestionnaireMany,
   findQuestionnaireAlgorithmsOrderByCreatedAt
 }

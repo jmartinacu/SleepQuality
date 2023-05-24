@@ -6,7 +6,7 @@ import {
   getDefaultAlgorithmInformationHandler,
   getLastAlgorithmHandler,
   getQuestionnaireHandler,
-  getQuestionnairesInformationHandler
+  getUserQuestionnairesInformationHandler
 } from './questionnaire.controllers'
 import {
   CreateAnswerSchema,
@@ -48,10 +48,10 @@ async function questionnaireRoutes (server: FastifyInstance): Promise<void> {
       preHandler: server.auth([server.checkUserVerification]),
       schema: GetQuestionnairesInformationSchema
     },
-    getQuestionnairesInformationHandler
+    getUserQuestionnairesInformationHandler
   )
 
-  // TODO: ADD ERROR MANAGEMENT WITH ERROR CLASSES
+  // TODO: ADD TESTING ALGORITHMS
   server.post('/answer',
     {
       onRequest: server.auth([server.authenticate]),

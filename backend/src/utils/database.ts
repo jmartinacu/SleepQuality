@@ -4,7 +4,8 @@ import {
   type Session,
   type Answer,
   type Questionnaire,
-  type QuestionnaireAlgorithm
+  type QuestionnaireAlgorithm,
+  type Doctor
 } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -16,5 +17,6 @@ export type {
   Session,
   Answer,
   Questionnaire,
-  QuestionnaireAlgorithm
+  QuestionnaireAlgorithm,
+  Doctor
 }

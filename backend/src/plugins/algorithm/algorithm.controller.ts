@@ -13,6 +13,7 @@ import {
   createAlgorithmData,
   findQuestionnaireUnique
 } from '../../modules/questionnaire/questionnaire.services'
+import { QuestionnaireAlgorithmError } from '../../utils/error'
 
 async function StopBangAlgorithm (
   answer: AnswerUser,
@@ -88,7 +89,7 @@ async function PittsburghSleepQualityIndexAlgorithm (
   questionnaireId: string,
   userId: string
 ): Promise<void> {
-  const { additionalInformation } = await findQuestionnaireUnique('id', questionnaireId) as Questionnaire
+  const { additionalInformation, name } = await findQuestionnaireUnique('id', questionnaireId) as Questionnaire
   const scores = (additionalInformation as AdditionalInformation)
     .reduce<Array<{ questions: number[], relation: Record<string, number> }>>(
     (accumulator, current) => {
@@ -103,28 +104,26 @@ async function PittsburghSleepQualityIndexAlgorithm (
       }
       return accumulator
     }, [])
-  // INDEX 17 COMPONENT 1 QUESTION Array<{ questions: number[], relation: Record<string, number> }
   const answerEntries = Object.entries(answer)
   const q17Scores = scores.find(information => information.questions.includes(17))?.relation
   if (typeof q17Scores === 'undefined') {
-    console.log('Pregunta 17')
-    console.log(scores)
-    console.log(additionalInformation)
-    console.error('Error database information')
-    return
+    throw new QuestionnaireAlgorithmError(
+      'Database error',
+      name,
+      answerEntries.at(17)?.[0] as string
+    )
   }
   const C1 = q17Scores[answerEntries.at(17)?.[1] as string]
-  // INDEX 1 AND 4 COMPONENT 2 QUESTION
   const q4Scores = scores.find(information => information.questions.includes(4))?.relation
   if (typeof q4Scores === 'undefined') {
-    console.log('Pregunta 4')
-    console.log(scores)
-    console.log(additionalInformation)
-    console.error('Error database information')
-    return
+    throw new QuestionnaireAlgorithmError(
+      'Database error',
+      name,
+      answerEntries.at(4)?.[0] as string
+    )
   }
   const q1Value = answerEntries.at(1)?.[1] as number
-  let C2Aux = q4Scores[answerEntries.at(4)?.[0] as string]
+  let C2Aux = q4Scores[answerEntries.at(4)?.[1] as string]
   let C2: number
   if (q1Value > 60) C2Aux += 3
   else if (q1Value >= 31 && q1Value <= 60) C2Aux += 2
@@ -142,13 +141,11 @@ async function PittsburghSleepQualityIndexAlgorithm (
     default:
       C2 = 0
   }
-  // INDEX 3 COMPONENT 3 QUESTION
   const q3Value = answerEntries.at(3)?.[1] as number
   let C3 = 0
   if (q3Value > 6 && q3Value <= 7) C3 += 1
   else if (q3Value >= 5 && q3Value <= 6) C3 += 2
   else C3 += 3
-  // INDEX 0, 2 AND 3 COMPONENT 4 QUESTION
   const hoursSlept = answerEntries.at(3)?.[1] as number
   const timeGoneToBed = parseStringToDate(answerEntries.at(0)?.[1] as string)
   const timeGottenUp = parseStringToDate(answerEntries.at(2)?.[1] as string)
@@ -159,10 +156,9 @@ async function PittsburghSleepQualityIndexAlgorithm (
   if (sleepEfficiency >= 75 && sleepEfficiency <= 84) C4 += 1
   else if (sleepEfficiency >= 65 && sleepEfficiency <= 74) C4 += 2
   else C4 += 3
-  // INDEX 5, 6, 7, 8, 9 , 10, 11, 12 AND 13 COMPONENT 5 QUESTION
   const C5Aux = answerEntries.reduce((accumulator, current, index) => {
     if ([5, 6, 7, 8, 9, 10, 11, 12, 13].includes(index)) {
-      accumulator += q4Scores[current[0]]
+      accumulator += q4Scores[current[1] as string]
     }
     return accumulator
   }, 0)
@@ -170,20 +166,18 @@ async function PittsburghSleepQualityIndexAlgorithm (
   if (C5Aux >= 1 && C5Aux <= 9) C5 += 1
   else if (C5Aux >= 10 && C5Aux <= 18) C5 += 2
   else C5 += 3
-  // INDEX 14 COMPONENT 6 QUESTION
   const C6 = q4Scores[answerEntries.at(14)?.[1] as string]
-  // INDEX 15 AND 16 COMPONENT 7 QUESTION
   const q16Scores = scores.find(information => information.questions.includes(16))?.relation
   if (typeof q16Scores === 'undefined') {
-    console.log('Pregunta 16')
-    console.log(scores)
-    console.log(additionalInformation)
-    console.error('Error database information')
-    return
+    throw new QuestionnaireAlgorithmError(
+      'Database error',
+      name,
+      answerEntries.at(16)?.[0] as string
+    )
   }
   let C7: number
-  let C7Aux = q4Scores[answerEntries.at(15)?.[0] as string]
-  C7Aux += q16Scores[answerEntries.at(16)?.[0] as string]
+  let C7Aux = q4Scores[answerEntries.at(15)?.[1] as string]
+  C7Aux += q16Scores[answerEntries.at(16)?.[1] as string]
   switch (C7Aux) {
     case 1: case 2:
       C7 = 1

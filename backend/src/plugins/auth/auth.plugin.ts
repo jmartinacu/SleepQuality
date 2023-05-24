@@ -15,7 +15,9 @@ import {
   verifySession,
   verifyAuthorizationHeader,
   userVerifiedWithoutAuthorization,
-  verifyEmailAndPasswordAdminHandler
+  usersVerified,
+  doctorVerified,
+  doctorVerifiedWithoutAuthorization
 } from './auth.controller'
 
 const pluginAuthorization: FastifyPluginAsync = async (
@@ -59,14 +61,21 @@ const pluginAuthorization: FastifyPluginAsync = async (
 
   fastify.decorate('checkEmailAndPassword', verifyEmailAndPasswordHandler)
 
-  fastify.decorate('checkEmailAndPasswordAdmin', verifyEmailAndPasswordAdminHandler)
+  fastify.decorate('checkDoctorVerification', doctorVerified)
+
+  fastify.decorate(
+    'checkDoctorVerificationWithoutAuthorization',
+    doctorVerifiedWithoutAuthorization
+  )
+
+  fastify.decorate('checkUserVerification', userVerified)
+
+  fastify.decorate('checkUsersVerification', usersVerified)
 
   fastify.decorate(
     'checkUserVerificationWithoutAuthorization',
     userVerifiedWithoutAuthorization
   )
-
-  fastify.decorate('checkUserVerification', userVerified)
 
   fastify.decorate('checkAdmin', isAdmin)
 

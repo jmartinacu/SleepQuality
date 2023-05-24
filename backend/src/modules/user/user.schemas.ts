@@ -1,6 +1,6 @@
 import { Static, Type } from '@fastify/type-provider-typebox'
 
-const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹])([A-Za-z\d~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹]|[^ ]){8,15}$/
+export const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹])([A-Za-z\d~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹]|[^ ]){8,15}$/
 export const regexObjectId = /^[a-fA-F0-9]{24}$/
 export const regexDate = /^[0-9]{2}\/[0-9]{2}\/[0-9]{4}-[0-9]{2}:[0-9]{2}$/ // DD/MM/YYYY-HH:MM
 // new Date(year, monthIndex -> {0 - 11}, day, hours, minutes)
@@ -48,13 +48,13 @@ const userAttributes = {
   }),
   role: Type.Union([
     Type.Literal('ADMIN'),
-    Type.Literal('USER'),
-    Type.Literal('DOCTOR')
+    Type.Literal('USER')
   ], { default: 'USER' }),
   questionnairesToDo: Type.Array(Type.RegEx(regexObjectId)),
   verificationCode: Type.String({ format: 'uuid' }),
   verified: Type.Boolean({ default: false }),
   id: Type.RegEx(regexObjectId),
+  ids: Type.Array(Type.RegEx(regexObjectId)),
   accessToken: Type.String(),
   refreshToken: Type.String(),
   passwordResetCode: Type.Integer({
@@ -62,6 +62,7 @@ const userAttributes = {
     maximum: 99999
   }),
   profilePictureString: Type.String(),
+  doctorId: Type.RegEx(regexObjectId),
   profilePicturePNG: Type.String({
     contentEncoding: 'base64',
     contentMediaType: 'image/png'
@@ -74,7 +75,6 @@ const userAttributes = {
     contentEncoding: 'base64',
     contentMediaType: 'image/webp'
   }),
-  isDoctor: Type.Boolean(),
   message: Type.String()
 }
 
@@ -96,7 +96,9 @@ const {
   profilePicturePNG,
   profilePictureWEBP,
   verified,
-  questionnairesToDo
+  questionnairesToDo,
+  ids,
+  doctorId
 } = userAttributes
 
 const { BMI, birth, ...userCoreExceptBMIAndBirth } = userCore
@@ -204,7 +206,9 @@ const updateUserServiceSchema = Type.Object({
     Type.Null()
   ])),
   password: Type.Optional(password),
-  profilePicture: Type.Optional(profilePictureString)
+  profilePicture: Type.Optional(profilePictureString),
+  doctorId: Type.Optional(doctorId),
+  questionnairesToDo: Type.Optional(questionnairesToDo)
 })
 
 const updateUserSchema = Type.Omit(updateUserServiceSchema, [
@@ -237,6 +241,10 @@ const getProfilePictureResponseSchema = Type.Union([
   profilePicturePNG,
   profilePictureWEBP
 ])
+
+const idsUserSchema = Type.Object({
+  ids
+})
 
 const CreateUserSchema = {
   body: createUserSchema,
@@ -345,6 +353,7 @@ type EmailUserInput = Static<typeof emailUserSchema>
 type UpdateUserStrictSchema = Required<Static<typeof updateUserSchema>>
 type UpdateUserServiceInput = Static<typeof updateUserServiceSchema>
 type VerifyAccountResponse = Static<typeof verifyAccountResponseSchema>
+type IdsUserInput = Static<typeof idsUserSchema>
 type UpdateSessionInput = Static<typeof updateSessionSchema>
 type RefreshTokenResponse = Static<typeof refreshTokenResponseSchema>
 type Gender = Static<typeof gender>
@@ -375,5 +384,6 @@ export {
   type UpdateUserServiceInput,
   type UpdateUserStrictSchema,
   type UpdateSessionInput,
-  type RefreshTokenResponse
+  type RefreshTokenResponse,
+  type IdsUserInput
 }

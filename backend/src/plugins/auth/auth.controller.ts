@@ -1,5 +1,5 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
-import type { EmailUserInput, LogInUserInput } from '../../modules/user/user.schemas'
+import type { EmailUserInput, IdsUserInput, LogInUserInput } from '../../modules/user/user.schemas'
 import type {
   File,
   FileDestinationCallback,
@@ -8,10 +8,13 @@ import type {
 } from '../types.plugins'
 import {
   findSessionUnique,
+  findUserMany,
   findUserUnique
 } from '../../modules/user/user.services'
-import type { User } from '../../utils/database'
+import type { Doctor, User } from '../../utils/database'
 import { getFileExtension, checkFileExtension } from '../../utils/helpers'
+import { findDoctorUnique } from '../../modules/doctor/doctor.services'
+import { ValidationError, errorCodeAndMessage } from '../../utils/error'
 
 async function verifyAuthorizationHeader (
   request: FastifyRequest,
@@ -20,8 +23,15 @@ async function verifyAuthorizationHeader (
   try {
     await request.accessVerify()
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -32,43 +42,40 @@ async function verifyEmailAndPasswordHandler (
   reply: FastifyReply
 ): Promise<void> {
   try {
+    const [, , secondUrlParam] = request.url.split('/')
     const { email, password } = request.body
 
-    const user = await findUserUnique('email', email)
-    if (user === null) {
+    let check: User | Doctor | null
+    if (secondUrlParam === 'users') {
+      check = await findUserUnique('email', email)
+    } else if (secondUrlParam === 'doctors') {
+      check = await findDoctorUnique('email', email)
+    } else {
+      throw new ValidationError(
+        'Something went wrong',
+        'checkEmailAndPassword',
+        `URL: ${request.url} is not /api/users or /api/doctors`,
+        500
+      )
+    }
+    if (check === null) {
       return await reply.code(401).send({ message: 'Email or password wrong' })
     }
-    const passwordCheck = await request.bcryptCompare(password, user.password)
+    const passwordCheck = await request.bcryptCompare(password, check.password)
     if (!passwordCheck) {
       return await reply.code(401).send({ message: 'Email or password wrong' })
     }
-    request.user = { userId: user.id }
+    request.user = { userId: check.id }
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
-  }
-}
-
-async function verifyEmailAndPasswordAdminHandler (
-  request: FastifyRequest<{
-    Body: LogInUserInput
-  }>,
-  reply: FastifyReply
-): Promise<void> {
-  try {
-    const { email, password } = request.body
-
-    const user = await findUserUnique('email', email)
-    if (user === null) {
-      return await reply.code(403).send({ message: 'Email or password wrong' })
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
     }
-    if (password === user.password) {
-      return await reply.code(403).send({ message: 'Email or password wrong' })
-    }
-    request.user = { userId: user.id }
-  } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    return await reply.code(code).send(message)
   }
 }
 
@@ -88,8 +95,15 @@ async function userVerifiedWithoutAuthorization (
       return await reply.code(401).send({ message: 'Please verify your account' })
     }
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -107,8 +121,97 @@ async function userVerified (
       return await reply.code(401).send({ message: 'Please verify your account' })
     }
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
+async function usersVerified (
+  request: FastifyRequest<{
+    Body: IdsUserInput
+  }>,
+  reply: FastifyReply
+): Promise<void> {
+  try {
+    const { ids } = request.body
+    const users = await findUserMany('id', ids)
+    if (users.length !== ids.length) {
+      return await reply.code(404).send({ message: 'Users not found' })
+    }
+    if (users.some(user => !user.verified)) {
+      return await reply.code(401).send({ message: 'Please verify users' })
+    }
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
+async function doctorVerified (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<void> {
+  try {
+    const { userId: doctorId } = request.user
+    if (typeof doctorId === 'undefined') {
+      return await reply.code(401).send({ message: 'Please login your account' })
+    }
+    const doctor = await findDoctorUnique('id', doctorId) as Doctor
+    if (!doctor.verified) {
+      return await reply.code(401).send({ message: 'Please verify your account' })
+    }
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
+async function doctorVerifiedWithoutAuthorization (
+  request: FastifyRequest<{
+    Body: EmailUserInput
+  }>,
+  reply: FastifyReply
+): Promise<void> {
+  try {
+    const { email } = request.body
+    const doctor = await findDoctorUnique('email', email)
+    if (doctor === null) {
+      return await reply.code(404).send({ message: 'Doctor not found' })
+    }
+    if (!doctor.verified) {
+      return await reply.code(401).send({ message: 'Please verify your account' })
+    }
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -126,8 +229,15 @@ async function isAdmin (
       return await reply.code(403).send({ message: 'Not enough privileges' })
     }
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -148,8 +258,15 @@ async function verifySession (
       return await reply.code(401).send({ message: 'Invalid session. Please login' })
     }
   } catch (error) {
-    console.error(error)
-    return await reply.code(500).send(error)
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
   }
 }
 
@@ -188,9 +305,11 @@ function filename (
 export {
   verifyAuthorizationHeader,
   verifyEmailAndPasswordHandler,
-  verifyEmailAndPasswordAdminHandler,
   userVerifiedWithoutAuthorization,
   userVerified,
+  usersVerified,
+  doctorVerified,
+  doctorVerifiedWithoutAuthorization,
   isAdmin,
   verifySession,
   fileFilter,

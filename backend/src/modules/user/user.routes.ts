@@ -126,6 +126,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     },
     getProfilePictureHandler
   )
+  // TODO: CSV DATA ENDPOINT
 }
 
 export default userRoutes

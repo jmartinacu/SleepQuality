@@ -2,6 +2,7 @@ import {
   AdditionalInformation
 } from '../modules/questionnaire/questionnaire.schemas'
 import { ALLOWED_EXTENSIONS, JPEG_EXTENSIONS, regexDate } from '../modules/user/user.schemas'
+import { DateFormatError } from './error'
 
 function calculateBMI ({
   weight,
@@ -109,8 +110,7 @@ function parseDateToString (date: Date): string {
 
 function parseStringToDate (date: string): Date {
   if (!regexDate.test(date)) {
-    console.log(regexDate.test(date))
-    throw new Error('Wrong date format')
+    throw new DateFormatError('Wrong date format')
   }
   const [DayMonthYear, HourMinute] = date.split('-')
   const [day, month, year] = DayMonthYear.split('/')

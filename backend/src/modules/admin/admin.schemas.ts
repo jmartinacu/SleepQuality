@@ -7,14 +7,10 @@ const adminAttributes = {
   message: Type.String()
 }
 
-const { id, ids, message } = adminAttributes
+const { id, message } = adminAttributes
 
 const createAdminParamsSchema = Type.Object({
   id
-})
-
-const createManyDoctorsBodySchema = Type.Object({
-  ids
 })
 
 const messageResponseSchema = Type.Object({
@@ -25,17 +21,8 @@ const errorResponseSchema = Type.Object({
   message
 })
 
-const CreateAdminDoctorSchema = {
+const CreateAdminSchema = {
   params: createAdminParamsSchema,
-  response: {
-    201: messageResponseSchema,
-    404: errorResponseSchema,
-    500: Type.Unknown()
-  }
-}
-
-const CreateManyDoctorsSchema = {
-  body: createManyDoctorsBodySchema,
   response: {
     201: messageResponseSchema,
     404: errorResponseSchema,
@@ -46,7 +33,6 @@ const CreateManyDoctorsSchema = {
 type MessageResponseSchema = Static<typeof messageResponseSchema>
 
 export {
-  CreateAdminDoctorSchema,
-  CreateManyDoctorsSchema,
+  CreateAdminSchema,
   MessageResponseSchema
 }

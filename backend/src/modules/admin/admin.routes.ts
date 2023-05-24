@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify'
-import { CreateAdminDoctorSchema } from './admin.schemas'
-import { createAdminHandler, createDoctorHandler } from './admin.controllers'
+import { CreateAdminSchema } from './admin.schemas'
+import { createAdminHandler, createDoctorHandler, createManyDoctorHandler } from './admin.controllers'
+import { CreateDoctorSchema, CreateManyDoctorsSchema } from '../doctor/doctor.schemas'
 
 async function adminRoutes (server: FastifyInstance): Promise<void> {
   server.addHook('preHandler', server.auth([server.checkAdmin]))
@@ -8,10 +9,8 @@ async function adminRoutes (server: FastifyInstance): Promise<void> {
   server.post('/:id',
     {
       onRequest: server.auth([server.authenticate]),
-      preHandler: server.auth([
-        server.checkUserVerification
-      ]),
-      schema: CreateAdminDoctorSchema
+      preHandler: server.auth([server.checkUserVerification]),
+      schema: CreateAdminSchema
     },
     createAdminHandler
   )
@@ -19,12 +18,19 @@ async function adminRoutes (server: FastifyInstance): Promise<void> {
   server.post('/doctor/:id',
     {
       onRequest: server.auth([server.authenticate]),
-      preHandler: server.auth([
-        server.checkUserVerification
-      ]),
-      schema: CreateAdminDoctorSchema
+      preHandler: server.auth([server.checkUserVerification]),
+      schema: CreateDoctorSchema
     },
     createDoctorHandler
+  )
+
+  server.post('/doctors',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkUsersVerification]),
+      schema: CreateManyDoctorsSchema
+    },
+    createManyDoctorHandler
   )
 }
 

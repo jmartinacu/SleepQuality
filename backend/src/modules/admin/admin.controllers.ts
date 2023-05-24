@@ -1,12 +1,17 @@
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
-import { findUserUnique, updateUser, updateUsers } from '../user/user.services'
-import { UpdateUserServiceInput } from '../user/user.schemas'
-import { CreateAdminDoctorSchema, CreateManyDoctorsSchema, MessageResponseSchema } from './admin.schemas'
+import { findUserUnique, updateUser } from '../user/user.services'
+import {
+  CreateAdminSchema,
+  MessageResponseSchema
+} from './admin.schemas'
 import { errorCodeAndMessage } from '../../utils/error'
+import { createDoctor, createManyDoctors } from '../doctor/doctor.services'
+import { Doctor } from '../../utils/database'
+import { CreateDoctorSchema, CreateManyDoctorsSchema } from '../doctor/doctor.schemas'
 
 async function createAdminHandler (
-  request: FastifyRequestTypebox<typeof CreateAdminDoctorSchema>,
-  reply: FastifyReplyTypebox<typeof CreateAdminDoctorSchema>
+  request: FastifyRequestTypebox<typeof CreateAdminSchema>,
+  reply: FastifyReplyTypebox<typeof CreateAdminSchema>
 ): Promise<MessageResponseSchema> {
   try {
     const { id } = request.params
@@ -30,17 +35,17 @@ async function createAdminHandler (
 }
 
 async function createDoctorHandler (
-  request: FastifyRequestTypebox<typeof CreateAdminDoctorSchema>,
-  reply: FastifyReplyTypebox<typeof CreateAdminDoctorSchema>
-): Promise<MessageResponseSchema> {
+  request: FastifyRequestTypebox<typeof CreateDoctorSchema>,
+  reply: FastifyReplyTypebox<typeof CreateDoctorSchema>
+): Promise<Doctor> {
   try {
     const { id } = request.params
     const user = await findUserUnique('id', id)
-    if (user == null) {
+    if (user === null) {
       return await reply.code(404).send({ message: 'User not found' })
     }
-    await updateUser(id, { role: 'DOCTOR' })
-    return await reply.code(201).send({ message: 'Doctor created' })
+    const doctor = await createDoctor(id)
+    return await reply.code(201).send(doctor)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
     let code = 500
@@ -60,17 +65,14 @@ async function createManyDoctorHandler (
 ): Promise<MessageResponseSchema> {
   try {
     const { ids } = request.body
-    const dataToUpdate: UpdateUserServiceInput[] = []
-    for (let i = 0; i < ids.length; i++) {
-      const id = ids.at(i) as string
+    if (ids.some(async (id) => {
       const user = await findUserUnique('id', id)
-      if (user == null) {
-        return await reply.code(404).send({ message: 'User not found' })
-      }
-      dataToUpdate.push({ role: 'DOCTOR' })
+      return user === null
+    })) {
+      return await reply.code(404).send({ message: 'Users not found' })
     }
-    await updateUsers(ids, dataToUpdate)
-    return await reply.code(201).send({ message: 'Doctors created' })
+    const doctors = await createManyDoctors(ids)
+    return await reply.code(201).send(doctors)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
     let code = 500

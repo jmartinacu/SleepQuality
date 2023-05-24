@@ -1,4 +1,3 @@
-import { FastifyRequest, FastifyReply } from 'fastify'
 import {
   CreateQuestionnaireSchema,
   CreateAnswerSchema,
@@ -8,15 +7,16 @@ import {
   GetLastAlgorithmSchema,
   GetAlgorithmSchema,
   GetDefaultAlgorithmInformationSchema,
-  DefaultAlgorithmInformation
+  DefaultAlgorithmInformation,
+  GetQuestionnairesInformationSchema
 } from './questionnaire.schemas'
-import { Answer, Questionnaire, QuestionnaireAlgorithm } from '../../utils/database'
+import { Answer, Questionnaire, QuestionnaireAlgorithm, User } from '../../utils/database'
 import {
   createAnswer,
   createQuestionnaire,
   findQuestionnaireAlgorithmsOrderByCreatedAt,
   findQuestionnaireUnique,
-  findQuestionnaires
+  findQuestionnaireMany
 } from './questionnaire.services'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 import {
@@ -25,6 +25,7 @@ import {
   convertToCorrectType
 } from '../../utils/helpers'
 import { errorCodeAndMessage } from '../../utils/error'
+import { findUserUnique } from '../user/user.services'
 
 async function createQuestionnaireHandler (
   request: FastifyRequestTypebox<typeof CreateQuestionnaireSchema>,
@@ -71,12 +72,14 @@ async function getQuestionnaireHandler (
   }
 }
 
-async function getQuestionnairesInformationHandler (
-  _request: FastifyRequest,
-  reply: FastifyReply
+async function getUserQuestionnairesInformationHandler (
+  request: FastifyRequestTypebox<typeof GetQuestionnairesInformationSchema>,
+  reply: FastifyReplyTypebox<typeof GetQuestionnairesInformationSchema>
 ): Promise<Questionnaire[]> {
   try {
-    const questionnaires = await findQuestionnaires()
+    const { userId } = request.user as { userId: string }
+    const { questionnairesToDo } = await findUserUnique('id', userId) as User
+    const questionnaires = await findQuestionnaireMany('id', questionnairesToDo)
     return await reply.send(questionnaires)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
@@ -107,7 +110,7 @@ async function createAnswerHandler (
     }
     // CHECK THAT THE QUESTIONS IN QUESTIONNAIRE AND THE QUESTIONS IN ANSWER ARE THE SAME
     if (JSON.stringify(Object.keys(questionnaire.questions as object)) !== JSON.stringify(Object.keys(answers))) {
-      return await reply.code(400).send({ message: 'Answer does not have the right questions' })
+      return await reply.code(400).send({ message: 'Answer does not have the right questions or answer questions are not in the correct order' })
     }
     // CHECK TYPES OF EACH ANSWER AND CHECK ENUM ANSWER QUESTIONS RESPONSES
     const questionIndexesToCheckEnums = (questionnaire.additionalInformation as AdditionalInformation)
@@ -251,7 +254,7 @@ export {
   createQuestionnaireHandler,
   createAnswerHandler,
   getQuestionnaireHandler,
-  getQuestionnairesInformationHandler,
+  getUserQuestionnairesInformationHandler,
   getLastAlgorithmHandler,
   getAlgorithmHandler,
   getDefaultAlgorithmInformationHandler
