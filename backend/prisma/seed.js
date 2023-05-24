@@ -61,18 +61,19 @@ const questionnaires = [
   {
     name: 'Epworth Sleepiness Scale',
     questions: {
-      'Sitting and reading': 'PRIMARY_NUMBER',
-      'Sitting and watching TV or a video': 'PRIMARY_NUMBER',
-      'Sitting in a classroom at school during the morning': 'PRIMARY_NUMBER',
-      'Sitting and riding in a car or bus for about half an hour': 'PRIMARY_NUMBER',
-      'Lying down to rest or nap in the afternoon': 'PRIMARY_NUMBER',
-      'Sitting and talking to someone': 'PRIMARY_NUMBER',
-      'Sitting quietly by yourself after lunch': 'PRIMARY_NUMBER',
-      'Sitting and eating a meal': 'PRIMARY_NUMBER'
+      'Sitting and reading': 'PRIMARY_TEXT',
+      'Sitting and watching TV or a video': 'PRIMARY_TEXT',
+      'Sitting in a classroom at school during the morning': 'PRIMARY_TEXT',
+      'Sitting and riding in a car or bus for about half an hour': 'PRIMARY_TEXT',
+      'Lying down to rest or nap in the afternoon': 'PRIMARY_TEXT',
+      'Sitting and talking to someone': 'PRIMARY_TEXT',
+      'Sitting quietly by yourself after lunch': 'PRIMARY_TEXT',
+      'Sitting and eating a meal': 'PRIMARY_TEXT'
     },
     additionalInformation: [
       {
         questions: [0, 1, 2, 3, 4, 5, 6, 7],
+        enum: ['Would never fall asleep', 'Slight chance of falling asleep', 'Moderate chance of falling asleep', 'High chance of falling asleep'],
         relation: {
           'Would never fall asleep': 0,
           'Slight chance of falling asleep': 1,

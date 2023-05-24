@@ -153,6 +153,7 @@ const correctAnswers = [
     }
   },
   {
+    // TODO: CHANGE THIS TO ENUMS
     name: 'Epworth Sleepiness Scale',
     answers: {
       'Sitting and reading': 1,
