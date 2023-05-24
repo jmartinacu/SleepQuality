@@ -92,11 +92,21 @@ const AddQuestionnairesToUserSchema = {
   }
 }
 
+const AddDoctorToUserSchema = {
+  params: createDoctorParamsSchema,
+  response: {
+    200: messageResponseSchema,
+    404: errorResponseSchema,
+    500: Type.Any()
+  }
+}
+
 type MessageResponse = Static<typeof messageResponseSchema>
 
 export {
   CreateDoctorSchema,
   CreateManyDoctorsSchema,
   AddQuestionnairesToUserSchema,
+  AddDoctorToUserSchema,
   type MessageResponse
 }

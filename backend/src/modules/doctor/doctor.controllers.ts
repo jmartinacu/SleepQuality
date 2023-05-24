@@ -17,7 +17,7 @@ import {
   updateUser
 } from '../user/user.services'
 import { checkTimeDiffOfGivenDateUntilNow } from '../../utils/helpers'
-import { AddQuestionnairesToUserSchema, MessageResponse } from './doctor.schemas'
+import { AddDoctorToUserSchema, AddQuestionnairesToUserSchema, MessageResponse } from './doctor.schemas'
 import { findQuestionnaireMany } from '../questionnaire/questionnaire.services'
 
 async function logInDoctorHandler (
@@ -108,7 +108,33 @@ async function addQuestionnaireToUserHandler (
       return await reply.code(403).send({ message: `Doctor ${doctorId} does not have enough privileges over user ${userId}` })
     }
     await updateUser(userId, { questionnairesToDo: questionnaireIds })
-    return await reply.send({ message: `Doctor ${doctorId} assigned to user ${userId}` })
+    return await reply.send({ message: `Questionnaires added to user ${userId}` })
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
+async function addDoctorToUserHandler (
+  request: FastifyRequestTypebox<typeof AddDoctorToUserSchema>,
+  reply: FastifyReplyTypebox<typeof AddDoctorToUserSchema>
+): Promise<MessageResponse> {
+  try {
+    const { userId: doctorId } = request.user as { userId: string }
+    const { id: userId } = request.params
+    const user = await findUserUnique('id', userId)
+    if (user === null) {
+      return await reply.code(404).send({ message: 'User not found' })
+    }
+    await updateUser(userId, { doctorId })
+    return await reply.send({ message: `Doctor ${doctorId} assigned to user ${userId} ` })
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
     let code = 500
@@ -125,5 +151,6 @@ async function addQuestionnaireToUserHandler (
 export {
   logInDoctorHandler,
   refreshAccessTokenHandler,
-  addQuestionnaireToUserHandler
+  addQuestionnaireToUserHandler,
+  addDoctorToUserHandler
 }
