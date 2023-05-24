@@ -11,6 +11,7 @@ import Login from '../screens/Login'
 import SignUp from '../screens/SignUp'
 import EmailVerification from '../screens/EmailVerification'
 import TextAndButton from '../components/users/TextAndButton'
+import Questionnarie from '../screens/Questionnarie'
 
 const Stack = createStackNavigator()
 
@@ -91,6 +92,15 @@ const MyStack = () => {
           backgroundColor: 'yellow',
           title: '',
           headerTitleAlign: 'center'
+        }}
+      />
+
+      <Stack.Screen
+        name='Questionnaire'
+        component={Questionnarie}
+        options={{
+          headerTransparent: true,
+          title: ''
         }}
       />
 

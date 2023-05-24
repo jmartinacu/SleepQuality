@@ -1,21 +1,51 @@
-import { FlatList, Platform, StyleSheet, Text, TextInput, View } from 'react-native'
-import { useState } from 'react'
+import { FlatList, KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { useEffect, useState } from 'react'
 import { Picker } from '@react-native-picker/picker'
+import { createAswer } from '../../api/ApiQuestionnaries'
+import { ScrollView } from 'react-native-gesture-handler'
 
-const ConsensusSleepDiary = ({ name, questions, additionalInfo }) => {
-  const [answers, setAnswers] = useState(new Array(22).fill(''))
-
+const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additionalInfo }) => {
   const result = Object.entries(questions)
     .reduce((accumulator, current) => {
       const obj = {
         question: current[0],
-        types: current[1]
+        type: current[1]
       }
       accumulator.push(obj)
       return accumulator
     }, [])
+  const isText = []
+  const isBoolean = []
+  const isNumber = []
+  const isSecondary = []
 
   const EnumForEachQuestion = new Map()
+
+  const [answers, setAnswers] = useState(new Array(22).fill(''))
+  const [isError, setIsError] = useState(new Array(22).fill(false))
+
+  const [status, setStatus] = useState('')
+
+  for (const obj of result) {
+    if (obj.type.split('_')[0] === 'SECONDARY') {
+      isSecondary.push(true)
+    } else {
+      isSecondary.push(false)
+    }
+    if (obj.type.split('_')[1] === 'TEXT') {
+      isText.push(true)
+      isBoolean.push(false)
+      isNumber.push(false)
+    } else if (obj.type.split('_')[1] === 'BOOL') {
+      isBoolean.push(true)
+      isText.push(false)
+      isNumber.push(false)
+    } else if (obj.type.split('_')[1] === 'NUMBER') {
+      isBoolean.push(false)
+      isText.push(false)
+      isNumber.push(true)
+    }
+  }
   for (const obj of additionalInfo) {
     if (obj.questions !== []) {
       for (const number of obj.questions) {
@@ -32,16 +62,52 @@ const ConsensusSleepDiary = ({ name, questions, additionalInfo }) => {
     setAnswers(copyAnswers)
   }
 
+  const handleSubmitAnswer = () => {
+    const submit = []
+    let i = 0
+    for (const obj of result) {
+      if (isBoolean[i] && answers[i] === '') {
+        const listInList = [obj.question, true]
+        submit.push(listInList)
+      } else if (keys.includes(i)) {
+        const listInList = [obj.question, EnumForEachQuestion.get(i)[0]]
+        submit.push(listInList)
+      } else {
+        const listInList = [obj.question, answers[i]]
+        submit.push(listInList)
+      }
+      i++
+    }
+    createAswer(accessToken, {
+      name,
+      answers: Object.fromEntries(submit)
+    })
+      .then(result => {
+        if (result.status === 201) {
+          setStatus('')
+          navigation.replace('TextAndButton', { text: 'Answers Successfully Submitted', button: 'Go Home', direction: 'Home' })
+        } else {
+          console.log(result)
+          setStatus(result.message)
+        }
+      })
+      .catch(err => {
+        console.error(err)
+      })
+
+    return submit
+  }
+
   const renderQuestion = ({ index, item }) => {
-    let esEnum = false
+    let isEnum = false
     if (keys.includes(index)) {
-      esEnum = true
+      isEnum = true
     }
 
     return (
       <View>
         <Text>{item.question}</Text>
-        {esEnum
+        {isEnum
           ? (
             <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
               <Picker
@@ -63,39 +129,102 @@ const ConsensusSleepDiary = ({ name, questions, additionalInfo }) => {
             </View>
             )
           : (
-            <View style={styles.wrapperInput}>
-              <TextInput
-                style={styles.input}
-                placeholder=''
-                value={answers[index]}
-                onChangeText={text => handleAddAnswer(text, index)}
-                returnKeyType='done'
-                maxLength={40}
-              />
+            <View>
+              {isText[index] &&
+                <View style={styles.wrapperInput}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder=''
+                    value={answers[index]}
+                    onChangeText={text => handleAddAnswer(text, index)}
+                    returnKeyType='done'
+                    maxLength={20}
+                  />
+                </View>}
+              {isNumber[index] &&
+                <View style={styles.wrapperInput}>
+                  <TextInput
+                    style={styles.input}
+                    inputMode='numeric'
+                    keyboardType='numeric'
+                    placeholder=''
+                    value={answers[index]}
+                    onChangeText={text => handleAddAnswer(text, index)}
+                    returnKeyType='done'
+                    maxLength={3}
+                  />
+                </View>}
+              {isBoolean[index] &&
+                <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
+                  <Picker
+                    selectedValue={answers[index]}
+                    onValueChange={(itemValue, itemIndex) => handleAddAnswer(itemValue, index)}
+                    prompt='Answer'
+                    mode='dropdown'
+                  >
+                    <Picker.Item
+                      label='Yes'
+                      value='true'
+                    />
+                    <Picker.Item
+                      label='No'
+                      value='false'
+                    />
+                  </Picker>
+                </View>}
             </View>
+
             )}
       </View>
 
     )
   }
+  const prueba = false
 
+  const renderSubmitButton = () => {
+    return (
+      <View>
+        {prueba
+          ? (
+            <TouchableOpacity
+              disabled
+              style={styles.buttonDisable}
+              onPress={handleSubmitAnswer}
+            >
+              <Text style={styles.text}>Submit</Text>
+            </TouchableOpacity>
+            )
+          : (
+            <TouchableOpacity style={styles.button} onPress={handleSubmitAnswer}>
+              <Text style={styles.text}>Submit</Text>
+            </TouchableOpacity>
+            )}
+      </View>
+    )
+  }
   return (
-    <View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={styles.container}
+    >
       <Text>{name}</Text>
       <FlatList
         data={result}
         renderItem={renderQuestion}
         keyExtractor={(item, index) => index}
+        nestedScrollEnabled
+        ListFooterComponent={renderSubmitButton}
+        removeClippedSubviews={false}
       />
-    </View>
+
+    </KeyboardAvoidingView>
+
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
-    marginHorizontal: 20,
     marginBottom: 50
   },
   wrapperInput: {
