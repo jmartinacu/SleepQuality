@@ -67,9 +67,11 @@ async function EpworthSleepinessScaleAlgorithm (
   userId: string
 ): Promise<void> {
   let result: EpworthSleepinessScaleWarning
-  const risk = Object.values(answer as AnswerEpworthSleepinessScale)
+  const { additionalInformation } = await findQuestionnaireUnique('id', questionnaireId) as Questionnaire
+  const scores = (additionalInformation as AdditionalInformation).at(0)?.relation as Record<string, number>
+  const risk = Object.entries((answer as AnswerEpworthSleepinessScale))
     .reduce((accumulator, current) => {
-      return accumulator + current
+      return accumulator + scores[current[1]]
     }, 0)
   if (risk >= 0 && risk <= 5) result = 'Lower Normal Daytime Sleepiness'
   else if (risk >= 6 && risk <= 10) result = 'Higher Normal Daytime Sleepiness'

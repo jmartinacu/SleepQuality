@@ -153,17 +153,16 @@ const correctAnswers = [
     }
   },
   {
-    // TODO: CHANGE THIS TO ENUMS
     name: 'Epworth Sleepiness Scale',
     answers: {
-      'Sitting and reading': 1,
-      'Sitting and watching TV or a video': 2,
-      'Sitting in a classroom at school during the morning': 1,
-      'Sitting and riding in a car or bus for about half an hour': 2,
-      'Lying down to rest or nap in the afternoon': 3,
-      'Sitting and talking to someone': 0,
-      'Sitting quietly by yourself after lunch': 2,
-      'Sitting and eating a meal': 0
+      'Sitting and reading': 'Slight chance of falling asleep',
+      'Sitting and watching TV or a video': 'Moderate chance of falling asleep',
+      'Sitting in a classroom at school during the morning': 'Slight chance of falling asleep',
+      'Sitting and riding in a car or bus for about half an hour': 'Moderate chance of falling asleep',
+      'Lying down to rest or nap in the afternoon': 'High chance of falling asleep',
+      'Sitting and talking to someone': 'Would never fall asleep',
+      'Sitting quietly by yourself after lunch': 'Moderate chance of falling asleep',
+      'Sitting and eating a meal': 'Would never fall asleep'
     }
   },
   {
