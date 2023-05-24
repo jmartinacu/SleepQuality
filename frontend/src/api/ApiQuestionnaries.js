@@ -37,7 +37,24 @@ export const createAswer = async (token, data) => {
 
 export const getQuestionnaires = async (token) => {
   try {
-    const result = await ApiManager('/questionnaires', {
+    const result = await ApiManager('/questionnaires?dev=true', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        Authorization: 'Bearer ' + token
+      }
+    })
+    return result
+  } catch (err) {
+    console.log(err.response)
+    return err.response
+  }
+}
+
+export const getDefaultInfo = async (token, id) => {
+  try {
+    const result = await ApiManager(`questionnaires/algorithm/default/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

@@ -202,6 +202,7 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
       </View>
     )
   }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -225,7 +226,8 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
 const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
-    marginBottom: 50
+    marginBottom: 50,
+    marginHorizontal: 20
   },
   wrapperInput: {
     borderWidth: 0.5,
@@ -233,7 +235,8 @@ const styles = StyleSheet.create({
     borderColor: 'grey',
     marginTop: 10,
     alignItems: 'center',
-    height: 50
+    height: 50,
+    width: '75%'
   },
   wrapperInputWrong: {
     borderWidth: 0.5,
