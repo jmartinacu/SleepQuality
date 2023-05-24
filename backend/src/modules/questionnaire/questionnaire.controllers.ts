@@ -72,12 +72,21 @@ async function getQuestionnaireHandler (
   }
 }
 
+// TODO: CHANGE DEV PARAMETERS
 async function getUserQuestionnairesInformationHandler (
   request: FastifyRequestTypebox<typeof GetQuestionnairesInformationSchema>,
   reply: FastifyReplyTypebox<typeof GetQuestionnairesInformationSchema>
 ): Promise<Questionnaire[]> {
   try {
     const { userId } = request.user as { userId: string }
+    /// ELIMINAR DESDE AQUI
+    const { dev } = request.query
+    console.log(dev)
+    if (typeof dev !== 'undefined') {
+      const resultDEV = await findQuestionnaireMany('all', [])
+      return await reply.send(resultDEV)
+    }
+    // HASTA AQUI
     const { questionnairesToDo } = await findUserUnique('id', userId) as User
     const questionnaires = await findQuestionnaireMany('id', questionnairesToDo)
     return await reply.send(questionnaires)

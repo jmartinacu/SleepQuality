@@ -187,6 +187,7 @@ const GetQuestionnaireSchema = {
 }
 
 const GetQuestionnairesInformationSchema = {
+  querystring: Type.Object({ dev: Type.Optional(Type.Boolean()) }),
   response: {
     200: getQuestionnairesInformationResponseSchema,
     500: Type.Any()
