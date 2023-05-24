@@ -1,55 +1,66 @@
 import { useEffect, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { getQuestionnarieById } from '../api/ApiQuestionnaries'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import ConsensusSleepDiary from '../components/questionnaries/ConsensusSleepDiary'
+import { getItemFromStorage } from '../utils/Utils'
+import ConsensusSleepDiary from '../components/typesQuestionnaries/ConsensusSleepDiary'
 
-const Questionnarie = ({ navigation, id }) => {
+const Questionnarie = ({ navigation, route }) => {
   const [name, setName] = useState('')
   const [questions, setQuestions] = useState({})
   const [additionalInfo, setAdditionalInfo] = useState([])
 
   const [error, setError] = useState(false)
 
+  const [accessToken, setAccessToken] = useState(null)
+
   useEffect(() => {
-    getQuestionnarieById(id, AsyncStorage.getItem('AccessToken'))
-      .then(result => {
-        if (result.data.status === 200) {
-          setError(false)
-          setName(result.body.name)
-          setQuestions(result.body.questions)
-          setAdditionalInfo(result.body.additionalInformation)
-        } else {
+    getItemFromStorage('accessToken', setAccessToken).then()
+    if (accessToken !== null) {
+      getQuestionnarieById('646c7cfbe9d3b0045b061873', accessToken)
+        .then(result => {
+          console.log(accessToken)
+          console.log(result)
+          if (result.status === 200) {
+            setError(false)
+            setName(result.data.name)
+            setQuestions(result.data.questions)
+            setAdditionalInfo(result.data.additionalInformation)
+          } else {
+            setError(true)
+            console.log(result.data.message)
+          }
+        })
+        .catch(err => {
           setError(true)
-          console.log(result.data.message)
-        }
-      })
-      .catch(err => {
-        setError(true)
-        console.error(err)
-      })
-  }, [])
+          console.error(err)
+        })
+    }
+  }, [accessToken])
 
   return (
-    <KeyboardAwareScrollView style={styles.container}>
+
+    <SafeAreaView style={styles.container}>
       {error
         ? (
           <Text>An error ocurried. Refresh</Text>
           )
         : (
           <View>
-            {name === 'Consensus Sleep Diary' && <ConsensusSleepDiary navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'Consensus Sleep Diary' && <ConsensusSleepDiary accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
           </View>
           )}
-    </KeyboardAwareScrollView>
+    </SafeAreaView>
+
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 50
+    marginTop: 50,
+    textAlign: 'center'
   }
 })
 

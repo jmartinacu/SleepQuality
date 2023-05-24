@@ -17,7 +17,7 @@ const RegisterForm = ({ navigation }) => {
   const [confirmedPassword, setConfirmedPassword] = useState('')
 
   const [birthDate, setBirthDate] = useState(new Date(1598051730000))
-  const [gender, setGender] = useState('MASCULINE')
+  const [gender, setGender] = useState('NEUTER')
   const [height, setHeight] = useState('')
   const [weight, setWeight] = useState('')
   const [chronicDisorders, setChronicDisorders] = useState('')
