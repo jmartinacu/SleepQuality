@@ -30,7 +30,6 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
     },
     addQuestionnaireToUserHandler
   )
-// TODO: ADD QUESTINNAIRES TO USERS
 }
 
 export default doctorRoutes

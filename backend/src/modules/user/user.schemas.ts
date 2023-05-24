@@ -216,7 +216,10 @@ const updateUserSchema = Type.Omit(updateUserServiceSchema, [
   'verified',
   'passwordResetCode',
   'password',
-  'profilePicture'
+  'profilePicture',
+  'questionnairesToDo',
+  'doctorId',
+  'role'
 ])
 
 const verifyAccountResponseSchema = Type.Object({

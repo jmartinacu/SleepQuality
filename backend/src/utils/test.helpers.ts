@@ -77,13 +77,9 @@ function fakeUser ({
 
 function fakeUpdateUser (): UpdateUserStrictSchema {
   const user = fakeInputUser()
-  const roles = ['USER', 'DOCTOR']
-  const roleIndex = random(0, 1)
-  const role = roles.at(roleIndex) as Role
   const { birth, email, name, password, ...rest } = user
   return {
-    ...rest,
-    role
+    ...rest
   }
 }
 
