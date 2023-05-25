@@ -10,7 +10,8 @@ import {
   addProfilePictureHandler,
   getProfilePictureHandler,
   deleteUserHandler,
-  updateUserHandler
+  updateUserHandler,
+  acceptDoctorHandler
 } from './user.controllers'
 import {
   CreateUserSchema,
@@ -23,7 +24,8 @@ import {
   ForgotPasswordSchema,
   ResetPasswordSchema,
   AddProfilePictureSchema,
-  GetProfilePictureSchema
+  GetProfilePictureSchema,
+  AcceptDoctorSchema
 } from './user.schemas'
 import { upload } from '../../server'
 
@@ -102,6 +104,15 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       schema: ResetPasswordSchema
     },
     resetPasswordHandler
+  )
+
+  server.post('/doctor/:id/:doctorCode',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkUserVerification]),
+      schema: AcceptDoctorSchema
+    },
+    acceptDoctorHandler
   )
 
   // TODO TESTING HAPPY PATH

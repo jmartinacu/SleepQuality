@@ -185,6 +185,20 @@ function htmlResetPasswordUser (passwordResetCode: number): string {
     `
 }
 
+function htmlAddDoctor (doctorCode: number): string {
+  return `
+    <div class="reset-user-password-card">
+      <p>The code of the new doctor is: ${doctorCode}</p>
+    </div>
+    <style>
+      .reset-user-password-card {
+        display: grid;
+        align-items: center;
+      }
+    </style>
+    `
+}
+
 export {
   calculateBMI,
   checkTimeDiffOfGivenDateUntilNow,
@@ -194,6 +208,7 @@ export {
   getMIMEType,
   htmlVerifyUser,
   htmlResetPasswordUser,
+  htmlAddDoctor,
   checkAnswerTypes,
   convertToCorrectType,
   checkAnswersEnums,

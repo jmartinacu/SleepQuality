@@ -87,6 +87,8 @@ async function questionnaireRoutes (server: FastifyInstance): Promise<void> {
     },
     getDefaultAlgorithmInformationHandler
   )
+  // TODO: AÑADIR RUTA PARA MANDAR INFORMACION SOBRE COMO HACER LAS PREGUNTSA DE LOS QUESTIONARIOS
+  // TODO: SEPARAR CONSESUS SEPARA EN DOS QUESTIONARIOS DE DIA Y NOCHE
 }
 
 export default questionnaireRoutes

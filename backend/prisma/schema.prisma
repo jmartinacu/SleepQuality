@@ -22,6 +22,7 @@ model User {
   role                   Role @default(USER)
   verificationCode       String @default(uuid())
   passwordResetCode      Int?
+  doctorCode             Int?
   verified               Boolean @default(false)
   session                Session?
   profilePicture         String?

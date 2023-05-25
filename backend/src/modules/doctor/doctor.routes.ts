@@ -36,6 +36,8 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
     addQuestionnaireToUserHandler
   )
 
+  // TODO: EL DOCTOR DEBERIA MANDAR UN EMAIL AL USUARIO, CLICANDO UN ENLACE
+  // EN EL EMAIL, SE AGREGARA ESTE DOCTOR AL USUARIO
   server.post('/users/:id',
     {
       onRequest: server.auth([server.authenticate]),
@@ -44,6 +46,7 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
     },
     addDoctorToUserHandler
   )
+  // TODO: SEND INFORMATION OF THE USER TO THE DOCTOR
 }
 
 export default doctorRoutes

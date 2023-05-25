@@ -61,6 +61,10 @@ const userAttributes = {
     minimum: 10000,
     maximum: 99999
   }),
+  doctorCode: Type.Integer({
+    minimum: 10000,
+    maximum: 99999
+  }),
   profilePictureString: Type.String(),
   doctorId: Type.RegEx(regexObjectId),
   profilePicturePNG: Type.String({
@@ -98,7 +102,8 @@ const {
   verified,
   questionnairesToDo,
   ids,
-  doctorId
+  doctorId,
+  doctorCode
 } = userAttributes
 
 const { BMI, birth, ...userCoreExceptBMIAndBirth } = userCore
@@ -193,6 +198,11 @@ const resetPasswordBodySchema = Type.Object({
   email
 })
 
+const acceptDoctorParamsSchema = Type.Object({
+  doctorCode,
+  id
+})
+
 const updateUserServiceSchema = Type.Object({
   gender: Type.Optional(gender),
   role: Type.Optional(role),
@@ -208,7 +218,8 @@ const updateUserServiceSchema = Type.Object({
   password: Type.Optional(password),
   profilePicture: Type.Optional(profilePictureString),
   doctorId: Type.Optional(doctorId),
-  questionnairesToDo: Type.Optional(questionnairesToDo)
+  questionnairesToDo: Type.Optional(questionnairesToDo),
+  doctorCode: Type.Optional(doctorCode)
 })
 
 const updateUserSchema = Type.Omit(updateUserServiceSchema, [
@@ -219,7 +230,8 @@ const updateUserSchema = Type.Omit(updateUserServiceSchema, [
   'profilePicture',
   'questionnairesToDo',
   'doctorId',
-  'role'
+  'role',
+  'doctorCode'
 ])
 
 const verifyAccountResponseSchema = Type.Object({
@@ -249,6 +261,7 @@ const idsUserSchema = Type.Object({
   ids
 })
 
+// TODO CHECK RESPONSES PREHANDLERS
 const CreateUserSchema = {
   body: createUserSchema,
   response: {
@@ -330,6 +343,15 @@ const ResetPasswordSchema = {
   }
 }
 
+const AcceptDoctorSchema = {
+  params: acceptDoctorParamsSchema,
+  response: {
+    200: verifyAccountResponseSchema,
+    403: errorResponseSchema,
+    500: Type.Unknown()
+  }
+}
+
 const AddProfilePictureSchema = {
   response: {
     200: verifyAccountResponseSchema,
@@ -373,6 +395,7 @@ export {
   UpdateUserAuthenticatedSchema,
   VerifyUserSchema,
   ForgotPasswordSchema,
+  AcceptDoctorSchema,
   ResetPasswordSchema,
   AddProfilePictureSchema,
   GetProfilePictureSchema,

@@ -16,9 +16,10 @@ import {
   updateSession,
   updateUser
 } from '../user/user.services'
-import { checkTimeDiffOfGivenDateUntilNow } from '../../utils/helpers'
+import { checkTimeDiffOfGivenDateUntilNow, htmlAddDoctor, random } from '../../utils/helpers'
 import { AddDoctorToUserSchema, AddQuestionnairesToUserSchema, MessageResponse } from './doctor.schemas'
 import { findQuestionnaireMany } from '../questionnaire/questionnaire.services'
+import sendEmail from '../../utils/mailer'
 
 async function logInDoctorHandler (
   request: FastifyRequestTypebox<typeof LogInSchema>,
@@ -127,14 +128,24 @@ async function addDoctorToUserHandler (
   reply: FastifyReplyTypebox<typeof AddDoctorToUserSchema>
 ): Promise<MessageResponse> {
   try {
-    const { userId: doctorId } = request.user as { userId: string }
     const { id: userId } = request.params
     const user = await findUserUnique('id', userId)
     if (user === null) {
       return await reply.code(404).send({ message: 'User not found' })
     }
-    await updateUser(userId, { doctorId })
-    return await reply.send({ message: `Doctor ${doctorId} assigned to user ${userId} ` })
+
+    const doctorCode = random(10000, 99999)
+    await updateUser(user.id, { doctorCode })
+
+    const html = htmlAddDoctor(doctorCode)
+
+    await sendEmail({
+      from: 'test@example.com',
+      to: user.email,
+      html
+    })
+
+    return await reply.send({ message: `User with email ${user.email} has received an email to accept you as his doctor` })
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
     let code = 500

@@ -22,10 +22,10 @@ async function DatabaseTests (): Promise<void> {
 
   t.teardown(async () => {
     await fastify.close()
-    await prisma.session.deleteMany()
-    await prisma.answer.deleteMany()
-    await prisma.user.deleteMany()
-    await prisma.questionnaire.deleteMany()
+    // await prisma.session.deleteMany()
+    // await prisma.answer.deleteMany()
+    // await prisma.user.deleteMany()
+    // await prisma.questionnaire.deleteMany()
     await prisma.$disconnect()
   })
 
