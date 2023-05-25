@@ -204,353 +204,356 @@ const RegisterForm = ({ navigation }) => {
   return (
     <View style={styles.container}>
 
-      {/* INPUT NAME */}
-      {checkValidName
-        ? (
-          <View>
-            <View style={styles.wrapperInputWrong}>
-              <TextInput
-                style={styles.input}
-                placeholder='Name Lastname'
-                value={name}
-                onChangeText={text => handleCheckName(text)}
-                returnKeyType='done'
-                maxLength={40}
-              />
-            </View>
-            <Text style={styles.textFailed}>Name can not contain Numbers or Symbols</Text>
-          </View>
-          )
-        : (
-          <View>
-            <View style={styles.wrapperInput}>
-              <TextInput
-                style={styles.input}
-                placeholder='Name'
-                value={name}
-                onChangeText={text => handleCheckName(text)}
-                returnKeyType='done'
-                maxLength={40}
-              />
-            </View>
-          </View>
+      <View style={styles.container}>
 
-          )}
-
-      {/* INPUT EMAIL */}
-      {checkValidEmail
-        ? (
-          <View>
-            <View style={styles.wrapperInputWrong}>
-              <TextInput
-                style={styles.input}
-                placeholder='Email'
-                inputMode='email'
-                keyboardType='email-address'
-                value={email}
-                onChangeText={text => handleCheckEmail(text)}
-                returnKeyType='done'
-                maxLength={40}
-              />
-            </View>
-            <Text style={styles.textFailed}>Wrong format email</Text>
-          </View>
-
-          )
-        : (
-          <View>
-            <View style={styles.wrapperInput}>
-              <TextInput
-                style={styles.input}
-                placeholder='Email'
-                inputMode='email'
-                keyboardType='email-address'
-                value={email}
-                onChangeText={text => handleCheckEmail(text)}
-                returnKeyType='done'
-                maxLength={40}
-              />
-            </View>
-            <Text style={styles.textFailed}> </Text>
-          </View>
-
-          )}
-
-      {/* INPUT PASSWORD */}
-      {checkValidPassword
-        ? (
-          <View>
-            <View style={styles.wrapperInputWrong}>
-              <TextInput
-                style={styles.input}
-                placeholder='Password'
-                value={password}
-                secureTextEntry={seePassword}
-                onChangeText={text => handleCheckPasswordValidity(text)}
-                returnKeyType='done'
-                maxLength={15}
-              />
-              <TouchableOpacity
-                style={styles.wrapperIcon}
-                onPress={() => setSeePassword(!seePassword)}
-              >
-                <Image source={seePassword ? Eye : EyeActive} style={styles.icon} />
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.textFailed}>{checkPasswordValidity(password)}</Text>
-          </View>
-          )
-        : (
-          <View>
-            <View style={styles.wrapperInput}>
-              <TextInput
-                style={styles.input}
-                placeholder='Password'
-                value={password}
-                secureTextEntry={seePassword}
-                onChangeText={text => handleCheckPasswordValidity(text)}
-                returnKeyType='done'
-                maxLength={15}
-              />
-              <TouchableOpacity
-                style={styles.wrapperIcon}
-                onPress={() => setSeePassword(!seePassword)}
-              >
-                <Image source={seePassword ? Eye : EyeActive} style={styles.icon} />
-              </TouchableOpacity>
-            </View>
-          </View>
-          )}
-
-      {/* INPUT CONFIRM PASSWORD */}
-      {checkValidConfirmedPassword
-        ? (
-          <View>
-            <View style={styles.wrapperInputWrong}>
-              <TextInput
-                style={styles.input}
-                placeholder='Confirm Password'
-                value={confirmedPassword}
-                secureTextEntry={seeConfirmedPassword}
-                onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
-                returnKeyType='done'
-                maxLength={15}
-              />
-              <TouchableOpacity
-                style={styles.wrapperIcon}
-                onPress={() => setSeeConfirmedPassword(!seeConfirmedPassword)}
-              >
-                <Image source={seeConfirmedPassword ? Eye : EyeActive} style={styles.icon} />
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.textFailed}>Passwords must coincide</Text>
-          </View>
-          )
-        : (
-          <View>
-            <View style={styles.wrapperInput}>
-              <TextInput
-                style={styles.input}
-                placeholder='Confirm Password'
-                value={confirmedPassword}
-                secureTextEntry={seeConfirmedPassword}
-                onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
-                returnKeyType='done'
-                maxLength={15}
-              />
-              <TouchableOpacity
-                style={styles.wrapperIcon}
-                onPress={() => setSeeConfirmedPassword(!seeConfirmedPassword)}
-              >
-                <Image source={seeConfirmedPassword ? Eye : EyeActive} style={styles.icon} />
-              </TouchableOpacity>
-            </View>
-          </View>
-          )}
-
-      {/* HORIZONTAL LINE */}
-      <View
-        style={{
-          marginTop: 20,
-          borderBottomColor: 'black',
-          borderBottomWidth: StyleSheet.hairlineWidth
-        }}
-      />
-
-      <View style={styles.wrapperInputRow}>
-
-        {/* INPUT HEIGHT */}
-        {checkValidHeight
+        {/* INPUT NAME */}
+        {checkValidName
           ? (
-            <View style={styles.wrapperInputWrong}>
-              <TextInput
-                style={styles.input}
-                inputMode='numeric'
-                keyboardType='numeric'
-                placeholder='Height'
-                value={height}
-                onChangeText={text => handleCheckHeightValidity(text)}
-                returnKeyType='done'
-                maxLength={3}
-              />
+            <View>
+              <View style={styles.wrapperInputWrong}>
+                <TextInput
+                  style={styles.input}
+                  placeholder='Name Lastname'
+                  value={name}
+                  onChangeText={text => handleCheckName(text)}
+                  returnKeyType='done'
+                  maxLength={40}
+                />
+              </View>
+              <Text style={styles.textFailed}>Name can not contain Numbers or Symbols</Text>
             </View>
             )
           : (
-            <View style={styles.wrapperInput}>
-              <TextInput
-                style={styles.input}
-                inputMode='numeric'
-                keyboardType='numeric'
-                placeholder='Height'
-                value={height}
-                onChangeText={text => handleCheckHeightValidity(text)}
-                returnKeyType='done'
-                maxLength={3}
-              />
+            <View>
+              <View style={styles.wrapperInput}>
+                <TextInput
+                  style={styles.input}
+                  placeholder='Name'
+                  value={name}
+                  onChangeText={text => handleCheckName(text)}
+                  returnKeyType='done'
+                  maxLength={40}
+                />
+              </View>
             </View>
+
             )}
 
-        {/* INPUT WEIGHT */}
-        {checkValidWeight
+        {/* INPUT EMAIL */}
+        {checkValidEmail
           ? (
-            <View style={styles.wrapperInputWrong}>
-              <TextInput
-                style={styles.input}
-                inputMode='numeric'
-                keyboardType='numeric'
-                placeholder='Weight'
-                value={weight}
-                onChangeText={text => handleCheckWeightValidity(text)}
-                returnKeyType='done'
-                maxLength={3}
-              />
+            <View>
+              <View style={styles.wrapperInputWrong}>
+                <TextInput
+                  style={styles.input}
+                  placeholder='Email'
+                  inputMode='email'
+                  keyboardType='email-address'
+                  value={email}
+                  onChangeText={text => handleCheckEmail(text)}
+                  returnKeyType='done'
+                  maxLength={40}
+                />
+              </View>
+              <Text style={styles.textFailed}>Wrong format email</Text>
+            </View>
+
+            )
+          : (
+            <View>
+              <View style={styles.wrapperInput}>
+                <TextInput
+                  style={styles.input}
+                  placeholder='Email'
+                  inputMode='email'
+                  keyboardType='email-address'
+                  value={email}
+                  onChangeText={text => handleCheckEmail(text)}
+                  returnKeyType='done'
+                  maxLength={40}
+                />
+              </View>
+              <Text style={styles.textFailed}> </Text>
+            </View>
+
+            )}
+
+        {/* INPUT PASSWORD */}
+        {checkValidPassword
+          ? (
+            <View>
+              <View style={styles.wrapperInputWrong}>
+                <TextInput
+                  style={styles.input}
+                  placeholder='Password'
+                  value={password}
+                  secureTextEntry={seePassword}
+                  onChangeText={text => handleCheckPasswordValidity(text)}
+                  returnKeyType='done'
+                  maxLength={15}
+                />
+                <TouchableOpacity
+                  style={styles.wrapperIcon}
+                  onPress={() => setSeePassword(!seePassword)}
+                >
+                  <Image source={seePassword ? Eye : EyeActive} style={styles.icon} />
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.textFailed}>{checkPasswordValidity(password)}</Text>
             </View>
             )
           : (
-            <View style={styles.wrapperInput}>
-              <TextInput
-                style={styles.input}
-                inputMode='numeric'
-                keyboardType='numeric'
-                placeholder='Weight'
-                value={weight}
-                onChangeText={text => handleCheckWeightValidity(text)}
-                returnKeyType='done'
-                maxLength={3}
-              />
+            <View>
+              <View style={styles.wrapperInput}>
+                <TextInput
+                  style={styles.input}
+                  placeholder='Password'
+                  value={password}
+                  secureTextEntry={seePassword}
+                  onChangeText={text => handleCheckPasswordValidity(text)}
+                  returnKeyType='done'
+                  maxLength={15}
+                />
+                <TouchableOpacity
+                  style={styles.wrapperIcon}
+                  onPress={() => setSeePassword(!seePassword)}
+                >
+                  <Image source={seePassword ? Eye : EyeActive} style={styles.icon} />
+                </TouchableOpacity>
+              </View>
             </View>
             )}
 
-        {/* INPUT BIRTHDATE */}
-        <View style={styles.birthdate}>
-          <Text style={styles.input}>Introduce your birhdate:</Text>
-          {!(Platform.OS === 'ios') &&
-            <Button
-              onPress={showDatepicker}
-              title={birthDate.toLocaleDateString()}
-            />}
-          {show && !(Platform.OS === 'ios') &&
-            <DateTimePicker
-              testID='dateTimePicker'
-              value={birthDate}
-              mode='date'
-              is24Hour
-              onChange={onChange}
-              maximumDate={new Date(Date.now())}
-            />}
-          {Platform.OS === 'ios' &&
-            <DateTimePicker
-              testID='dateTimePicker'
-              value={birthDate}
-              mode='date'
-              is24Hour
-              onChange={(event, selectedDate) => handleCheckBirthdateValidity(selectedDate)}
-              maximumDate={new Date(Date.now())}
-            />}
+        {/* INPUT CONFIRM PASSWORD */}
+        {checkValidConfirmedPassword
+          ? (
+            <View>
+              <View style={styles.wrapperInputWrong}>
+                <TextInput
+                  style={styles.input}
+                  placeholder='Confirm Password'
+                  value={confirmedPassword}
+                  secureTextEntry={seeConfirmedPassword}
+                  onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
+                  returnKeyType='done'
+                  maxLength={15}
+                />
+                <TouchableOpacity
+                  style={styles.wrapperIcon}
+                  onPress={() => setSeeConfirmedPassword(!seeConfirmedPassword)}
+                >
+                  <Image source={seeConfirmedPassword ? Eye : EyeActive} style={styles.icon} />
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.textFailed}>Passwords must coincide</Text>
+            </View>
+            )
+          : (
+            <View>
+              <View style={styles.wrapperInput}>
+                <TextInput
+                  style={styles.input}
+                  placeholder='Confirm Password'
+                  value={confirmedPassword}
+                  secureTextEntry={seeConfirmedPassword}
+                  onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
+                  returnKeyType='done'
+                  maxLength={15}
+                />
+                <TouchableOpacity
+                  style={styles.wrapperIcon}
+                  onPress={() => setSeeConfirmedPassword(!seeConfirmedPassword)}
+                >
+                  <Image source={seeConfirmedPassword ? Eye : EyeActive} style={styles.icon} />
+                </TouchableOpacity>
+              </View>
+            </View>
+            )}
+
+        {/* HORIZONTAL LINE */}
+        <View
+          style={{
+            marginTop: 20,
+            borderBottomColor: 'black',
+            borderBottomWidth: StyleSheet.hairlineWidth
+          }}
+        />
+
+        <View style={styles.wrapperInputRow}>
+
+          {/* INPUT HEIGHT */}
+          {checkValidHeight
+            ? (
+              <View style={styles.wrapperInputWrong}>
+                <TextInput
+                  style={styles.input}
+                  inputMode='numeric'
+                  keyboardType='numeric'
+                  placeholder='Height'
+                  value={height}
+                  onChangeText={text => handleCheckHeightValidity(text)}
+                  returnKeyType='done'
+                  maxLength={3}
+                />
+              </View>
+              )
+            : (
+              <View style={styles.wrapperInput}>
+                <TextInput
+                  style={styles.input}
+                  inputMode='numeric'
+                  keyboardType='numeric'
+                  placeholder='Height'
+                  value={height}
+                  onChangeText={text => handleCheckHeightValidity(text)}
+                  returnKeyType='done'
+                  maxLength={3}
+                />
+              </View>
+              )}
+
+          {/* INPUT WEIGHT */}
+          {checkValidWeight
+            ? (
+              <View style={styles.wrapperInputWrong}>
+                <TextInput
+                  style={styles.input}
+                  inputMode='numeric'
+                  keyboardType='numeric'
+                  placeholder='Weight'
+                  value={weight}
+                  onChangeText={text => handleCheckWeightValidity(text)}
+                  returnKeyType='done'
+                  maxLength={3}
+                />
+              </View>
+              )
+            : (
+              <View style={styles.wrapperInput}>
+                <TextInput
+                  style={styles.input}
+                  inputMode='numeric'
+                  keyboardType='numeric'
+                  placeholder='Weight'
+                  value={weight}
+                  onChangeText={text => handleCheckWeightValidity(text)}
+                  returnKeyType='done'
+                  maxLength={3}
+                />
+              </View>
+              )}
+
+          {/* INPUT BIRTHDATE */}
+          <View style={styles.birthdate}>
+            <Text style={styles.input}>Introduce your birhdate:</Text>
+            {!(Platform.OS === 'ios') &&
+              <Button
+                onPress={showDatepicker}
+                title={birthDate.toLocaleDateString()}
+              />}
+            {show && !(Platform.OS === 'ios') &&
+              <DateTimePicker
+                testID='dateTimePicker'
+                value={birthDate}
+                mode='date'
+                is24Hour
+                onChange={onChange}
+                maximumDate={new Date(Date.now())}
+              />}
+            {Platform.OS === 'ios' &&
+              <DateTimePicker
+                testID='dateTimePicker'
+                value={birthDate}
+                mode='date'
+                is24Hour
+                onChange={(event, selectedDate) => handleCheckBirthdateValidity(selectedDate)}
+                maximumDate={new Date(Date.now())}
+              />}
+          </View>
         </View>
-      </View>
 
-      {/* ERROR MESSAGES HEIGHT AND WEIGHT VALIDATION */}
-      {checkValidWeight &&
-        (
-          <Text style={styles.textFailed}>Weight must be bigger than 0 and less than 600kg</Text>
-        )}
-      {checkValidHeight &&
-        (
-          <Text style={styles.textFailed}>Height must be bigger than 0 and less than 300cm</Text>
-        )}
+        {/* ERROR MESSAGES HEIGHT AND WEIGHT VALIDATION */}
+        {checkValidWeight &&
+  (
+    <Text style={styles.textFailed}>Weight must be bigger than 0 and less than 600kg</Text>
+  )}
+        {checkValidHeight &&
+  (
+    <Text style={styles.textFailed}>Height must be bigger than 0 and less than 300cm</Text>
+  )}
 
-      {/* HORIZONTAL LINE */}
-      <View
-        style={{
-          marginTop: 20,
-          borderBottomColor: 'black',
-          borderBottomWidth: StyleSheet.hairlineWidth
-        }}
-      />
+        {/* HORIZONTAL LINE */}
+        <View
+          style={{
+            marginTop: 20,
+            borderBottomColor: 'black',
+            borderBottomWidth: StyleSheet.hairlineWidth
+          }}
+        />
 
-      {/* INPUT GENDER */}
-      <View>
-        <Text style={styles.input}>Introduce your gender:</Text>
-        <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
-          <Picker
-            selectedValue={gender}
-            onValueChange={(itemValue, itemIndex) => setGender(itemValue)}
-            prompt='Gender'
-            mode='dropdown'
-          >
-            <Picker.Item
-              label='Male'
-              value='MASCULINE'
-            />
-            <Picker.Item
-              label='Female'
-              value='FEMININE'
-            />
-            <Picker.Item
-              label='Other'
-              value='NEUTER'
-            />
-          </Picker>
-        </View>
-
-        {/* INPUT CHRONICAL DISORDER */}
+        {/* INPUT GENDER */}
         <View>
-          <Text style={styles.input}>Any chronical disorder?</Text>
-          <View style={styles.wrapperInput}>
-            <TextInput
-              style={styles.input}
-              multiline
-              inputMode='text'
-              value={chronicDisorders}
-              onChangeText={text => setChronicDisorders(text)}
-              returnKeyType='done'
-            />
+          <Text style={styles.input}>Introduce your gender:</Text>
+          <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
+            <Picker
+              selectedValue={gender}
+              onValueChange={(itemValue, itemIndex) => setGender(itemValue)}
+              prompt='Gender'
+              mode='dropdown'
+            >
+              <Picker.Item
+                label='Male'
+                value='MASCULINE'
+              />
+              <Picker.Item
+                label='Female'
+                value='FEMININE'
+              />
+              <Picker.Item
+                label='Other'
+                value='NEUTER'
+              />
+            </Picker>
           </View>
 
-        </View>
-      </View>
+          {/* INPUT CHRONICAL DISORDER */}
+          <View>
+            <Text style={styles.input}>Any chronical disorder?</Text>
+            <View style={styles.wrapperInput}>
+              <TextInput
+                style={styles.input}
+                multiline
+                inputMode='text'
+                value={chronicDisorders}
+                onChangeText={text => setChronicDisorders(text)}
+                returnKeyType='done'
+              />
+            </View>
 
-      {/* CREATE ACCOUNT BUTTON */}
-      {name === '' || password === '' || email === '' || confirmedPassword === '' ||
-      height === '' || weight === '' || checkValidPassword || checkValidEmail ||
-      checkValidName || checkValidConfirmedPassword || checkValidHeight || checkValidWeight || checkValidBirthdate
-        ? (
-          <TouchableOpacity
-            disabled
-            style={styles.buttonDisable}
-            onPress={handleRegister}
-          >
-            <Text style={styles.text}>Create Account</Text>
-          </TouchableOpacity>
-          )
-        : (
-          <TouchableOpacity style={styles.button} onPress={handleRegister}>
-            <Text style={styles.text}>Create Account</Text>
-          </TouchableOpacity>
-          )}
-      {status !== '' &&
-        <Text style={styles.textFailed}>{status}</Text>}
+          </View>
+        </View>
+
+        {/* CREATE ACCOUNT BUTTON */}
+        {name === '' || password === '' || email === '' || confirmedPassword === '' ||
+height === '' || weight === '' || checkValidPassword || checkValidEmail ||
+checkValidName || checkValidConfirmedPassword || checkValidHeight || checkValidWeight || checkValidBirthdate
+          ? (
+            <TouchableOpacity
+              disabled
+              style={styles.buttonDisable}
+              onPress={handleRegister}
+            >
+              <Text style={styles.textCreate}>Create Account</Text>
+            </TouchableOpacity>
+            )
+          : (
+            <TouchableOpacity style={styles.button} onPress={handleRegister}>
+              <Text style={styles.textCreate}>Create Account</Text>
+            </TouchableOpacity>
+            )}
+        {status !== '' &&
+          <Text style={styles.textFailed}>{status}</Text>}
+      </View>
     </View>
   )
 }
@@ -565,7 +568,7 @@ const styles = StyleSheet.create({
   wrapperInput: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'grey',
+    borderColor: 'white',
     marginTop: 10,
     alignItems: 'center',
     height: 50
@@ -585,7 +588,10 @@ const styles = StyleSheet.create({
   },
   input: {
     padding: 10,
-    width: '100%'
+    width: '100%',
+    color: 'white',
+    fontWeight: '400',
+    height: 50
   },
   wrapperIcon: {
     position: 'absolute',
@@ -600,7 +606,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'orange',
+    backgroundColor: '#FF7F50',
     borderRadius: 5,
     marginTop: 25
   },
@@ -608,7 +614,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'grey',
+    backgroundColor: 'white',
     borderRadius: 5,
     marginTop: 25
   },
@@ -618,7 +624,7 @@ const styles = StyleSheet.create({
   },
   textFailed: {
     alignSelf: 'flex-end',
-    color: 'red'
+    color: '#FF7F50'
   },
   activeButton: {
     color: 'white'
@@ -626,13 +632,17 @@ const styles = StyleSheet.create({
   picker: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'grey',
+    borderColor: '#191970',
     marginTop: 10
   },
   birthdate: {
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10
+  },
+  textCreate: {
+    color: '#191970',
+    fontWeight: '700'
   }
 })
 

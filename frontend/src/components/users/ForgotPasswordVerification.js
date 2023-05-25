@@ -43,10 +43,10 @@ const ForgotPasswordVerification = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text>
-        Did tou forget your Password?
+      <Text style={styles.text}>
+        Did you forget your Password?
       </Text>
-      <Text>
+      <Text style={styles.text}>
         Introduce your email and we will send you and email with a code:
       </Text>
       {checkValidEmail
@@ -91,71 +91,89 @@ const ForgotPasswordVerification = ({ navigation }) => {
             style={styles.buttonDisable}
             onPress={handleVerification}
           >
-            <Text style={styles.text}>Send me an email</Text>
+            <Text style={styles.textSend}>Send me an email</Text>
           </TouchableOpacity>
           )
         : (
           <TouchableOpacity style={styles.button} onPress={handleVerification}>
-            <Text style={styles.text}>Send me an email</Text>
+            <Text style={styles.textSend}>Send me an email</Text>
           </TouchableOpacity>
           )}
       {status !== '' &&
         <Text style={styles.textFailed}>{status}</Text>}
     </View>
+
   )
 }
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     justifyContent: 'center',
     marginHorizontal: 20,
     marginBottom: 50
+
   },
+
   wrapperInput: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'grey',
+    borderColor: 'white',
     marginTop: 10,
     alignItems: 'center',
     height: 50
   },
+
   wrapperInputWrong: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'red',
+    borderColor: '#FF7F50',
     marginTop: 10,
     alignItems: 'center',
     height: 50
   },
+
   input: {
     padding: 10,
-    width: '100%'
+    width: '100%',
+    color: 'white',
+    fontWeight: '400'
   },
+
   button: {
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'orange',
+    backgroundColor: '#FF7F50',
     borderRadius: 5,
     marginTop: 25
   },
+
   buttonDisable: {
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'grey',
+    backgroundColor: 'white',
     borderRadius: 5,
     marginTop: 25
   },
+
   text: {
     color: 'white',
-    fontWeight: '700'
+    fontWeight: '300'
+
   },
   textFailed: {
     alignSelf: 'flex-end',
-    color: 'red'
+    color: '#FF7F50'
+  },
+
+  textSend: {
+    color: '#191970',
+    fontWeight: '700'
   }
+
 })
 
 export default ForgotPasswordVerification

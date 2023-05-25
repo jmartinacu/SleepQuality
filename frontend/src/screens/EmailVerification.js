@@ -3,13 +3,13 @@ import { View, StyleSheet, Image } from 'react-native'
 import RegisterVerification from '../components/users/RegisterVerification'
 import ForgotPasswordVerification from '../components/users/ForgotPasswordVerification'
 import PasswordChangeVerification from '../components/users/PasswordChangeVerification'
-import { Eye } from '../assests/eyes'
+import { Sheep } from '../assests/questionnarieLogo'
 
 const EmailVerification = ({ navigation, route }) => {
   return (
     <KeyboardAwareScrollView style={styles.container}>
       <Image
-        source={Eye}
+        source={Sheep}
         resizeMode='contain'
         style={styles.image}
       />
@@ -23,8 +23,13 @@ const EmailVerification = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 50
-    // backgroundColor: '#191970'
+    marginTop: 50,
+    backgroundColor: '#191970'
+  },
+  image: {
+    height: 150,
+    width: '100%',
+    marginBottom: 20
   }
 })
 
