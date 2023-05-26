@@ -5,6 +5,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { getItemFromStorage } from '../utils/Utils'
 import ConsensusSleepDiary from '../components/typesQuestionnaries/ConsensusSleepDiary'
+import StopBang from '../components/typesQuestionnaries/StopBang'
+import EpworthSleepinessScale from '../components/typesQuestionnaries/EpworthSleepinessScale'
+import PerceivedStress from '../components/typesQuestionnaries/PerceivedStress'
+import AthensInsomniaScale from '../components/typesQuestionnaries/AthensInsomniaScale'
+import InternationalRestlessLegsScale from '../components/typesQuestionnaries/InternationalRestlessLegsScale'
 
 const Questionnarie = ({ navigation, route }) => {
   const [name, setName] = useState('')
@@ -18,10 +23,8 @@ const Questionnarie = ({ navigation, route }) => {
   useEffect(() => {
     getItemFromStorage('accessToken', setAccessToken).then()
     if (accessToken !== null) {
-      getQuestionnarieById('646c7cfbe9d3b0045b061873', accessToken)
+      getQuestionnarieById(route.params.id, accessToken)
         .then(result => {
-          console.log(accessToken)
-          console.log(result)
           if (result.status === 200) {
             setError(false)
             setName(result.data.name)
@@ -49,6 +52,13 @@ const Questionnarie = ({ navigation, route }) => {
         : (
           <View>
             {name === 'Consensus Sleep Diary' && <ConsensusSleepDiary accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'STOP-BANG' && <StopBang id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'Epworth Sleepiness Scale' && <EpworthSleepinessScale id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+
+            {name === 'Perceived Stress Questionnaire' && <PerceivedStress id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'Athens Insomnia Scale' && <AthensInsomniaScale id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'International Restless Legs Scale' && <InternationalRestlessLegsScale id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'Insomnia Severity Index' && <InternationalRestlessLegsScale id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
           </View>
           )}
     </SafeAreaView>

@@ -20,6 +20,7 @@ const Home = ({ navigation }) => {
         .then(result => {
           if (result.status === 200) {
             setError(false)
+            console.log(result)
             setQuestionnaires(result.data)
           } else {
             setError(true)

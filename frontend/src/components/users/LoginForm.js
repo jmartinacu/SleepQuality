@@ -109,6 +109,7 @@ const LoginForm = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+
       <View style={styles.wrapperInput}>
         <TextInput
           style={styles.input}
@@ -143,7 +144,7 @@ const LoginForm = ({ navigation }) => {
         style={styles.forgotPass}
         onPress={handlePasswordForgotten}
       >
-        <Text>Forgot password?</Text>
+        <Text style={styles.underline}>Forgot password?</Text>
       </TouchableOpacity>
       {email === '' || password === '' || checkValidEmail === true
         ? (
@@ -152,23 +153,24 @@ const LoginForm = ({ navigation }) => {
             style={styles.buttonDisable}
             onPress={handleLogin}
           >
-            <Text style={styles.text}>Login</Text>
+            <Text style={styles.textLogin}>Login</Text>
           </TouchableOpacity>
           )
         : (
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.text}>Login</Text>
+            <Text style={styles.textLogin}>Login</Text>
           </TouchableOpacity>
           )}
       {status !== '' &&
         <Text style={styles.textFailed}>{status}</Text>}
+
       <TouchableOpacity
         style={styles.forgotPass}
         onPress={handleRegister}
       >
-        <Text>Don't have an account? </Text>
-        <Text style={styles.underline}>Register</Text>
+        <Text style={styles.underline}>Don't have an account?</Text>
       </TouchableOpacity>
+
     </View>
   )
 }
@@ -178,17 +180,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: 20
   },
+
   wrapperInput: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'grey',
+    borderColor: 'white',
     marginTop: 10,
     flexDirection: 'row',
     alignItems: 'center'
   },
   input: {
     padding: 10,
-    width: '100%'
+    width: '100%',
+    color: 'white',
+    fontWeight: '400'
   },
   wrapperIcon: {
     position: 'absolute',
@@ -208,7 +213,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'orange',
+    backgroundColor: '#FF7F50',
     borderRadius: 5,
     marginTop: 25
   },
@@ -216,20 +221,29 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'grey',
+    backgroundColor: 'white',
     borderRadius: 5,
     marginTop: 25
   },
+
   text: {
     color: 'white',
+    fontWeight: '300'
+  },
+
+  textLogin: {
+    color: '#191970',
     fontWeight: '700'
   },
+
   textFailed: {
     alignSelf: 'flex-end',
-    color: 'red'
+    color: '#FF7F50'
   },
+
   underline: {
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
+    color: 'white'
   }
 })
 
