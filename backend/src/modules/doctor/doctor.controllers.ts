@@ -7,7 +7,10 @@ import {
   RefreshTokenSchema
 } from '../user/user.schemas'
 import {
-  Session
+  Answer,
+  Session,
+  QuestionnaireAlgorithm,
+  Doctor
 } from '../../utils/database'
 import {
   createDoctorSession,
@@ -16,17 +19,27 @@ import {
   updateSession,
   updateUser
 } from '../user/user.services'
-import { checkTimeDiffOfGivenDateUntilNow, htmlAddDoctor, random } from '../../utils/helpers'
-import { AddDoctorToUserSchema, AddQuestionnairesToUserSchema, MessageResponse } from './doctor.schemas'
-import { findQuestionnaireMany } from '../questionnaire/questionnaire.services'
+import { checkTimeDiffOfGivenDateUntilNow, htmlAddDoctor, parseDateToString, random } from '../../utils/helpers'
+import {
+  AddDoctorToUserSchema,
+  AddQuestionnairesToUserSchema,
+  DoctorResponse,
+  GetDoctorAuthenticatedSchema,
+  GetUserAlgorithmsSchema,
+  GetUserAnswerSchema,
+  GetUserInformationSchema,
+  MessageResponse
+} from './doctor.schemas'
+import { findAnswers, findLastAnswer, findLastQuestionnaireAlgorithms, findQuestionnaireAlgorithmsOrderByCreatedAt, findQuestionnaireMany } from '../questionnaire/questionnaire.services'
 import sendEmail from '../../utils/mailer'
+import { findDoctorUnique, findUsersDoctor } from './doctor.services'
 
 async function logInDoctorHandler (
   request: FastifyRequestTypebox<typeof LogInSchema>,
   reply: FastifyReplyTypebox<typeof LogInSchema>
 ): Promise<LogInUserResponse> {
   try {
-    const { userId: doctorId } = request.user as { userId: string }
+    const { doctorId } = request.user as { doctorId: string }
     let sessionId
     const session = await findSessionUnique('doctorId', doctorId)
     if (session !== null) {
@@ -64,7 +77,12 @@ async function refreshAccessTokenHandler (
     const { refresh } = request.headers
     await jwtRefreshFunctionality.verify(refresh)
     const { sessionId } = jwtRefreshFunctionality.decode(refresh) as { sessionId: string }
-    const { id, valid, updatedAt, userId } = await findSessionUnique('id', sessionId) as Session
+    const {
+      id,
+      valid,
+      updatedAt,
+      doctorId
+    } = await findSessionUnique('id', sessionId) as Session
     if (!valid) {
       return await reply.code(401).send({ message: 'Could not refresh Access Token' })
     }
@@ -72,7 +90,7 @@ async function refreshAccessTokenHandler (
       await updateSession(id, { valid: false })
       return await reply.code(400).send({ message: 'Refresh Token time limit exceeded, please login' })
     }
-    const accessToken = await reply.accessSign({ userId })
+    const accessToken = await reply.accessSign({ doctorId })
     return {
       accessToken
     }
@@ -94,7 +112,7 @@ async function addQuestionnaireToUserHandler (
   reply: FastifyReplyTypebox<typeof AddQuestionnairesToUserSchema>
 ): Promise<MessageResponse> {
   try {
-    const { userId: doctorId } = request.user as { userId: string }
+    const { doctorId } = request.user as { doctorId: string }
     const { id: userId } = request.params
     const { questionnaires: questionnaireIds } = request.body
     const user = await findUserUnique('id', userId)
@@ -123,11 +141,37 @@ async function addQuestionnaireToUserHandler (
   }
 }
 
+async function getDoctorAuthenticatedHandler (
+  request: FastifyRequestTypebox<typeof GetDoctorAuthenticatedSchema>,
+  reply: FastifyReplyTypebox<typeof GetDoctorAuthenticatedSchema>
+): Promise<DoctorResponse> {
+  try {
+    const { doctorId } = request.user as { doctorId: string }
+    const doctor = await findDoctorUnique('id', doctorId) as Doctor
+    const { birth, ...rest } = doctor
+    return await reply.send({
+      ...rest,
+      birth: parseDateToString(birth)
+    })
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
 async function addDoctorToUserHandler (
   request: FastifyRequestTypebox<typeof AddDoctorToUserSchema>,
   reply: FastifyReplyTypebox<typeof AddDoctorToUserSchema>
 ): Promise<MessageResponse> {
   try {
+    console.log('Estoy en add Doctor to User')
     const { id: userId } = request.params
     const user = await findUserUnique('id', userId)
     if (user === null) {
@@ -159,9 +203,140 @@ async function addDoctorToUserHandler (
   }
 }
 
+async function GetUserAnswersHandler (
+  request: FastifyRequestTypebox<typeof GetUserAnswerSchema>,
+  reply: FastifyReplyTypebox<typeof GetUserAnswerSchema>
+): Promise<Answer | Answer[]> {
+  try {
+    const { doctorId } = request.user as { doctorId: string }
+    const { userId, questionnaireId } = request.params
+    const { all } = request.query
+    console.log(all)
+    let answer: Answer | Answer[] | null
+    const user = await findUserUnique('id', userId)
+    if (user === null) {
+      return await reply.code(404).send({ message: 'User not found' })
+    }
+    const doctorUsers = await findUsersDoctor('id', doctorId)
+    if (!doctorUsers.some(user => user.doctorId === userId)) {
+      return await reply.code(403).send({ message: `Not enough privileges over user ${userId}` })
+    }
+    if (typeof all === 'undefined' || !all) {
+      answer = await findAnswers(questionnaireId, userId)
+    } else answer = await findLastAnswer(questionnaireId, userId)
+
+    if (answer === null) {
+      return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
+    }
+    return await reply.send(answer)
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
+async function GetUserAlgorithmsHandler (
+  request: FastifyRequestTypebox<typeof GetUserAlgorithmsSchema>,
+  reply: FastifyReplyTypebox<typeof GetUserAlgorithmsSchema>
+): Promise<QuestionnaireAlgorithm | QuestionnaireAlgorithm[]> {
+  try {
+    const { doctorId } = request.user as { doctorId: string }
+    const { userId, questionnaireId } = request.params
+    const { all } = request.query
+    console.log(all)
+    let algorithms: QuestionnaireAlgorithm | QuestionnaireAlgorithm[] | null
+    const user = await findUserUnique('id', userId)
+    if (user === null) {
+      return await reply.code(404).send({ message: 'User not found' })
+    }
+    const doctorUsers = await findUsersDoctor('id', doctorId)
+    if (!doctorUsers.some(user => user.doctorId === userId)) {
+      return await reply.code(403).send({ message: `Not enough privileges over user ${userId}` })
+    }
+    if (typeof all === 'undefined' || !all) {
+      algorithms = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
+    } else algorithms = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
+
+    if (algorithms === null) {
+      return await reply.send({ message: `The user ${userId} does not have algorithms of the questionnaire ${questionnaireId} ` })
+    }
+    return await reply.send(algorithms)
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
+async function getUserInformationHandler (
+  request: FastifyRequestTypebox<typeof GetUserInformationSchema>,
+  reply: FastifyReplyTypebox<typeof GetUserInformationSchema>
+): Promise<Answer | Answer[] | QuestionnaireAlgorithm | QuestionnaireAlgorithm[]> {
+  try {
+    const { doctorId } = request.user as { doctorId: string }
+    const { userId, questionnaireId } = request.params
+    const { all, info } = request.query
+    console.log(all, info)
+    let result: Answer | Answer[] | QuestionnaireAlgorithm | QuestionnaireAlgorithm[] | null = []
+    const user = await findUserUnique('id', userId)
+    if (user === null) {
+      return await reply.code(404).send({ message: 'User not found' })
+    }
+    const doctorUsers = await findUsersDoctor('id', doctorId)
+    if (!doctorUsers.some(user => user.doctorId === userId)) {
+      return await reply.code(403).send({ message: `Not enough privileges over user ${userId}` })
+    }
+    if (info === 'algorithms') {
+      if (typeof all === 'undefined' || !all) {
+        result = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
+      } else result = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
+
+      if (result === null) {
+        return await reply.send({ message: `The user ${userId} does not have algorithms of the questionnaire ${questionnaireId} ` })
+      }
+    } else if (info === 'answers') {
+      if (typeof all === 'undefined' || !all) {
+        result = await findAnswers(questionnaireId, userId)
+      } else result = await findLastAnswer(questionnaireId, userId)
+
+      if (result === null) {
+        return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
+      }
+    }
+    return await reply.send(result)
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
 export {
   logInDoctorHandler,
   refreshAccessTokenHandler,
   addQuestionnaireToUserHandler,
-  addDoctorToUserHandler
+  addDoctorToUserHandler,
+  GetUserAnswersHandler,
+  GetUserAlgorithmsHandler,
+  getUserInformationHandler,
+  getDoctorAuthenticatedHandler
 }

@@ -1,14 +1,30 @@
 import { FastifyInstance } from 'fastify'
 import { LogInSchema, RefreshTokenSchema } from '../user/user.schemas'
 import {
+  getUserInformationHandler,
   addDoctorToUserHandler,
   addQuestionnaireToUserHandler,
   logInDoctorHandler,
-  refreshAccessTokenHandler
+  refreshAccessTokenHandler,
+  getDoctorAuthenticatedHandler
 } from './doctor.controllers'
-import { AddDoctorToUserSchema, AddQuestionnairesToUserSchema } from './doctor.schemas'
+import {
+  AddDoctorToUserSchema,
+  AddQuestionnairesToUserSchema,
+  GetDoctorAuthenticatedSchema,
+  GetUserInformationSchema
+} from './doctor.schemas'
 
 async function doctorRoutes (server: FastifyInstance): Promise<void> {
+  server.get('/',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkDoctorVerification]),
+      schema: GetDoctorAuthenticatedSchema
+    },
+    getDoctorAuthenticatedHandler
+  )
+
   server.post('/login',
     {
       preHandler: server.auth([
@@ -20,6 +36,7 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
     logInDoctorHandler
   )
 
+  // TODO: HANDLE FASTIFY TokenError: The token signature is invalid.
   server.post('/refresh',
     {
       schema: RefreshTokenSchema
@@ -27,7 +44,7 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
     refreshAccessTokenHandler
   )
 
-  server.post('/questionnaires/users/:id',
+  server.post('/users/questionnaires/:id',
     {
       onRequest: server.auth([server.authenticate]),
       preHandler: server.auth([server.checkDoctorVerification]),
@@ -36,8 +53,6 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
     addQuestionnaireToUserHandler
   )
 
-  // TODO: EL DOCTOR DEBERIA MANDAR UN EMAIL AL USUARIO, CLICANDO UN ENLACE
-  // EN EL EMAIL, SE AGREGARA ESTE DOCTOR AL USUARIO
   server.post('/users/:id',
     {
       onRequest: server.auth([server.authenticate]),
@@ -47,6 +62,14 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
     addDoctorToUserHandler
   )
   // TODO: SEND INFORMATION OF THE USER TO THE DOCTOR
+  server.get('/users/:userId/:questionnaireId',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkDoctorVerification]),
+      schema: GetUserInformationSchema
+    },
+    getUserInformationHandler
+  )
 }
 
 export default doctorRoutes

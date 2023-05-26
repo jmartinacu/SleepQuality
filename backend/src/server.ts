@@ -52,7 +52,10 @@ declare module 'fastify' {
 declare module '@fastify/jwt' {
   interface FastifyJWT {
     payload: { id: string }
-    user: { userId?: string }
+    user: {
+      userId?: string
+      doctorId?: string
+    }
   }
   interface JWT {
     access: any

@@ -219,7 +219,10 @@ const updateUserServiceSchema = Type.Object({
   profilePicture: Type.Optional(profilePictureString),
   doctorId: Type.Optional(doctorId),
   questionnairesToDo: Type.Optional(questionnairesToDo),
-  doctorCode: Type.Optional(doctorCode)
+  doctorCode: Type.Optional(Type.Union([
+    doctorCode,
+    Type.Null()
+  ]))
 })
 
 const updateUserSchema = Type.Omit(updateUserServiceSchema, [

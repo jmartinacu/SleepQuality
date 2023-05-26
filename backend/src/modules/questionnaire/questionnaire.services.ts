@@ -94,6 +94,42 @@ async function findQuestionnaireMany (
   return questionnaires
 }
 
+async function findLastAnswer (
+  questionnaireId: string,
+  userId: string
+): Promise<Answer | null> {
+  let answer: Answer | null
+  const answers = await prisma.answer.findMany({
+    where: {
+      AND: {
+        questionnaireId,
+        userId
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
+  if (typeof answers.at(0) === 'undefined') answer = null
+  else answer = answers.at(0) as Answer
+  return answer
+}
+
+async function findAnswers (
+  questionnaireId: string,
+  userId: string
+): Promise<Answer[]> {
+  const answers = await prisma.answer.findMany({
+    where: {
+      AND: {
+        questionnaireId,
+        userId
+      }
+    }
+  })
+  return answers
+}
+
 async function findQuestionnaireAlgorithmsOrderByCreatedAt (
   userId: string,
   questionnaireId: string
@@ -112,11 +148,35 @@ async function findQuestionnaireAlgorithmsOrderByCreatedAt (
   return result
 }
 
+async function findLastQuestionnaireAlgorithms (
+  userId: string,
+  questionnaireId: string
+): Promise<QuestionnaireAlgorithm | null> {
+  let result: QuestionnaireAlgorithm | null
+  const algorithms = await prisma.questionnaireAlgorithm.findMany({
+    where: {
+      AND: {
+        questionnaireId,
+        userId
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
+  if (typeof algorithms.at(0) === 'undefined') result = null
+  else result = algorithms.at(0) as QuestionnaireAlgorithm
+  return result
+}
+
 export {
   createQuestionnaire,
   createAnswer,
   createAlgorithmData,
   findQuestionnaireUnique,
   findQuestionnaireMany,
-  findQuestionnaireAlgorithmsOrderByCreatedAt
+  findLastAnswer,
+  findAnswers,
+  findQuestionnaireAlgorithmsOrderByCreatedAt,
+  findLastQuestionnaireAlgorithms
 }

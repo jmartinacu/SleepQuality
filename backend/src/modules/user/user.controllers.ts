@@ -41,7 +41,7 @@ import {
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 import { errorCodeAndMessage } from '../../utils/error'
 
-// CHECK EMAIL IS NOT IN DB
+// TODO: CHECK EMAIL IS NOT UNIQUE IN DB
 async function createUserHandler (
   request: FastifyRequestTypebox<typeof CreateUserSchema>,
   reply: FastifyReplyTypebox<typeof CreateUserSchema>
@@ -348,7 +348,7 @@ async function acceptDoctorHandler (
     if (user.doctorCode !== Number(doctorCode)) {
       return await reply.code(403).send({ message: 'Doctor Code invalid' })
     }
-    await updateUser(user.id, { doctorId })
+    await updateUser(user.id, { doctorId, doctorCode: null })
     return await reply.send({ message: `Doctor ${doctorId} accepted` })
   } catch (error) {
     const processedError = errorCodeAndMessage(error)

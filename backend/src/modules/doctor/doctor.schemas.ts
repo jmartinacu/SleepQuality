@@ -1,5 +1,11 @@
 import { Type, Static } from '@fastify/type-provider-typebox'
 import { regexDate, regexPassword, regexObjectId } from '../user/user.schemas'
+import {
+  answerResponseSchema,
+  answersResponseSchema,
+  getAlgorithmResponseSchema,
+  getAlgorithmsResponseSchema
+} from '../questionnaire/questionnaire.schemas'
 
 const doctorCore = {
   birth: Type.Date(),
@@ -30,21 +36,26 @@ const doctorAttributes = {
   ids: Type.Array(Type.RegEx(regexObjectId))
 }
 
-const { birth, gender, height, weight } = doctorCore
-const { id, message, name, email, password, ids } = doctorAttributes
+const { gender, height, weight } = doctorCore
+const { id, message, name, email, ids, birthInput } = doctorAttributes
 
 const createDoctorParamsSchema = Type.Object({
   id
 })
 
+const getUserQuestionnaireIdParamsSchema = Type.Object({
+  userId: id,
+  questionnaireId: id
+})
+
 const createDoctorResponseSchema = Type.Object({
-  birth,
+  birth: birthInput,
   email,
   gender,
   height,
   name,
-  password,
-  weight
+  weight,
+  id
 })
 
 const createManyDoctorsBodySchema = Type.Object({
@@ -63,6 +74,18 @@ const errorResponseSchema = Type.Object({
   message
 })
 
+const getUserAnswerQueryStringSchema = Type.Object({
+  all: Type.Optional(Type.Boolean())
+})
+
+const getUserInformationQueryStringSchema = Type.Object({
+  all: Type.Optional(Type.Boolean()),
+  info: Type.Union([
+    Type.Literal('answers'),
+    Type.Literal('algorithms')
+  ])
+})
+
 const CreateDoctorSchema = {
   params: createDoctorParamsSchema,
   response: {
@@ -77,6 +100,13 @@ const CreateManyDoctorsSchema = {
   response: {
     201: Type.Array(createDoctorResponseSchema),
     404: errorResponseSchema,
+    500: Type.Unknown()
+  }
+}
+
+const GetDoctorAuthenticatedSchema = {
+  response: {
+    200: createDoctorResponseSchema,
     500: Type.Unknown()
   }
 }
@@ -101,12 +131,65 @@ const AddDoctorToUserSchema = {
   }
 }
 
+const GetUserAnswerSchema = {
+  params: getUserQuestionnaireIdParamsSchema,
+  querystring: getUserAnswerQueryStringSchema,
+  response: {
+    200: Type.Union([
+      answerResponseSchema,
+      answersResponseSchema,
+      messageResponseSchema
+    ]),
+    403: errorResponseSchema,
+    404: errorResponseSchema,
+    500: Type.Unknown()
+  }
+}
+
+const GetUserInformationSchema = {
+  params: getUserQuestionnaireIdParamsSchema,
+  querystring: getUserInformationQueryStringSchema,
+  response: {
+    200: Type.Union([
+      answerResponseSchema,
+      answersResponseSchema,
+      getAlgorithmResponseSchema,
+      getAlgorithmsResponseSchema,
+      messageResponseSchema
+    ]),
+    403: errorResponseSchema,
+    404: errorResponseSchema,
+    500: Type.Unknown()
+  }
+}
+
+const GetUserAlgorithmsSchema = {
+  params: getUserQuestionnaireIdParamsSchema,
+  querystring: getUserAnswerQueryStringSchema,
+  response: {
+    200: Type.Union([
+      getAlgorithmResponseSchema,
+      getAlgorithmsResponseSchema,
+      messageResponseSchema
+    ]),
+    403: errorResponseSchema,
+    404: errorResponseSchema,
+    500: Type.Unknown()
+  }
+}
+
 type MessageResponse = Static<typeof messageResponseSchema>
+type DoctorResponse = Static<typeof createDoctorResponseSchema>
 
 export {
   CreateDoctorSchema,
   CreateManyDoctorsSchema,
+  GetDoctorAuthenticatedSchema,
   AddQuestionnairesToUserSchema,
   AddDoctorToUserSchema,
-  type MessageResponse
+  GetUserAnswerSchema,
+  GetUserAlgorithmsSchema,
+  GetUserInformationSchema,
+  type MessageResponse,
+  type DoctorResponse
 }

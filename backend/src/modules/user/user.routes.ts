@@ -106,7 +106,8 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     resetPasswordHandler
   )
 
-  server.post('/doctor/:id/:doctorCode',
+  // TODO: USER NEED TO KNOW THE ID OF THE DOCTOR WHO HAS SENDED THE EMAIL TO HIM
+  server.post('/doctors/:id/:doctorCode',
     {
       onRequest: server.auth([server.authenticate]),
       preHandler: server.auth([server.checkUserVerification]),

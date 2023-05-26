@@ -65,7 +65,11 @@ async function verifyEmailAndPasswordHandler (
     if (!passwordCheck) {
       return await reply.code(401).send({ message: 'Email or password wrong' })
     }
-    request.user = { userId: check.id }
+    if (secondUrlParam === 'users') {
+      request.user = { userId: check.id }
+    } else {
+      request.user = { doctorId: check.id }
+    }
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
     let code = 500
@@ -166,7 +170,7 @@ async function doctorVerified (
   reply: FastifyReply
 ): Promise<void> {
   try {
-    const { userId: doctorId } = request.user
+    const { doctorId } = request.user
     if (typeof doctorId === 'undefined') {
       return await reply.code(401).send({ message: 'Please login your account' })
     }

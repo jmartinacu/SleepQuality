@@ -88,9 +88,38 @@ async function findDoctorMany (
   return doctors
 }
 
+async function findUsersDoctor (
+  uniqueIdentifier: 'email' | 'id',
+  value: string
+): Promise<User[]> {
+  let users: User[] = []
+  if (uniqueIdentifier === 'email') {
+    const doctor = await prisma.doctor.findUnique({
+      where: {
+        email: value
+      }
+    })
+    if (doctor !== null) {
+      users = await prisma.user.findMany({
+        where: {
+          doctorId: value
+        }
+      })
+    }
+  } else {
+    users = await prisma.user.findMany({
+      where: {
+        doctorId: value
+      }
+    })
+  }
+  return users
+}
+
 export {
   createDoctor,
   createManyDoctors,
   findDoctorUnique,
-  findDoctorMany
+  findDoctorMany,
+  findUsersDoctor
 }
