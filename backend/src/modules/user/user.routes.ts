@@ -107,7 +107,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
   )
 
   // TODO: USER NEED TO KNOW THE ID OF THE DOCTOR WHO HAS SENDED THE EMAIL TO HIM
-  server.post('/doctors/:id/:doctorCode',
+  server.post('/doctors/:doctorCode',
     {
       onRequest: server.auth([server.authenticate]),
       preHandler: server.auth([server.checkUserVerification]),

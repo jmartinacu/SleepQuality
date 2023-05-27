@@ -19,7 +19,12 @@ import {
   updateSession,
   updateUser
 } from '../user/user.services'
-import { checkTimeDiffOfGivenDateUntilNow, htmlAddDoctor, parseDateToString, random } from '../../utils/helpers'
+import {
+  checkTimeDiffOfGivenDateUntilNow,
+  htmlAddDoctor,
+  parseDateToString,
+  random
+} from '../../utils/helpers'
 import {
   AddDoctorToUserSchema,
   AddQuestionnairesToUserSchema,
@@ -171,15 +176,19 @@ async function addDoctorToUserHandler (
   reply: FastifyReplyTypebox<typeof AddDoctorToUserSchema>
 ): Promise<MessageResponse> {
   try {
-    console.log('Estoy en add Doctor to User')
+    const { doctorId } = request.user as { doctorId: string }
     const { id: userId } = request.params
     const user = await findUserUnique('id', userId)
     if (user === null) {
       return await reply.code(404).send({ message: 'User not found' })
     }
-
     const doctorCode = random(10000, 99999)
-    await updateUser(user.id, { doctorCode })
+    await updateUser(user.id, {
+      acceptDoctor: {
+        code: doctorCode,
+        id: doctorId
+      }
+    })
 
     const html = htmlAddDoctor(doctorCode)
 

@@ -2,6 +2,8 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 const questionnaires = [
+  // TODO SPLIT CONSENSUS SLEEP DIARY IN MORNING AND NIGHT DIARY
+  // TODO ADD INFORMATION TO ALL DIARIES
   {
     name: 'Consensus Sleep Diary',
     questions: {
@@ -413,6 +415,8 @@ const questionnaires = [
 async function main () {
   await prisma.answer.deleteMany()
   await prisma.user.deleteMany()
+  await prisma.doctor.deleteMany()
+  await prisma.session.deleteMany()
   await prisma.questionnaire.deleteMany()
   await prisma.questionnaireAlgorithm.deleteMany()
   // TODO: HASH ADMIN PASSWORD

@@ -106,6 +106,14 @@ const {
   doctorCode
 } = userAttributes
 
+const acceptDoctor = Type.Union([
+  Type.Object({
+    code: doctorCode,
+    id: doctorId
+  }),
+  Type.Null()
+])
+
 const { BMI, birth, ...userCoreExceptBMIAndBirth } = userCore
 
 const {
@@ -199,8 +207,7 @@ const resetPasswordBodySchema = Type.Object({
 })
 
 const acceptDoctorParamsSchema = Type.Object({
-  doctorCode,
-  id
+  doctorCode
 })
 
 const updateUserServiceSchema = Type.Object({
@@ -219,10 +226,7 @@ const updateUserServiceSchema = Type.Object({
   profilePicture: Type.Optional(profilePictureString),
   doctorId: Type.Optional(doctorId),
   questionnairesToDo: Type.Optional(questionnairesToDo),
-  doctorCode: Type.Optional(Type.Union([
-    doctorCode,
-    Type.Null()
-  ]))
+  acceptDoctor: Type.Optional(acceptDoctor)
 })
 
 const updateUserSchema = Type.Omit(updateUserServiceSchema, [
@@ -234,7 +238,7 @@ const updateUserSchema = Type.Omit(updateUserServiceSchema, [
   'questionnairesToDo',
   'doctorId',
   'role',
-  'doctorCode'
+  'acceptDoctor'
 ])
 
 const verifyAccountResponseSchema = Type.Object({
@@ -384,6 +388,7 @@ type VerifyAccountResponse = Static<typeof verifyAccountResponseSchema>
 type IdsUserInput = Static<typeof idsUserSchema>
 type UpdateSessionInput = Static<typeof updateSessionSchema>
 type RefreshTokenResponse = Static<typeof refreshTokenResponseSchema>
+type AcceptDoctor = Static<typeof acceptDoctor>
 type Gender = Static<typeof gender>
 type Role = Static<typeof role>
 
@@ -414,5 +419,6 @@ export {
   type UpdateUserStrictSchema,
   type UpdateSessionInput,
   type RefreshTokenResponse,
-  type IdsUserInput
+  type IdsUserInput,
+  type AcceptDoctor
 }

@@ -1,6 +1,7 @@
 import fs, { type ReadStream } from 'node:fs'
 import path from 'node:path'
 import type {
+  AcceptDoctor,
   AcceptDoctorSchema,
   AddProfilePictureSchema,
   CreateUserResponse,
@@ -338,18 +339,21 @@ async function acceptDoctorHandler (
 ): Promise<VerifyAccountResponse> {
   try {
     const { userId } = request.user as { userId: string }
-    const { id: doctorId, doctorCode } = request.params
-    const user = await findUserUnique('id', userId) as User
-    console.log(`doctorCode ${doctorCode}, type ${typeof doctorCode}`)
-    console.log(`Type doctorId: ${typeof user.doctorId}`)
-    if (typeof user.doctorId !== 'undefined') {
+    const { doctorCode } = request.params
+    const { id, doctorId, acceptDoctor } = await findUserUnique('id', userId) as User
+    if (doctorId !== null) {
       return await reply.code(403).send({ message: 'User already has a doctor' })
     }
-    if (user.doctorCode !== Number(doctorCode)) {
+    if (acceptDoctor as AcceptDoctor === null) {
+      return await reply.send({ message: 'User has not been chosen by any doctor. Please wait' })
+    }
+    if ((acceptDoctor as AcceptDoctor)?.code !== Number(doctorCode)) {
       return await reply.code(403).send({ message: 'Doctor Code invalid' })
     }
-    await updateUser(user.id, { doctorId, doctorCode: null })
-    return await reply.send({ message: `Doctor ${doctorId} accepted` })
+    await updateUser(id, { doctorId: (acceptDoctor as AcceptDoctor)?.id, acceptDoctor: null })
+    return await reply.send({
+      message: `Doctor ${(acceptDoctor as AcceptDoctor)?.id as string} accepted`
+    })
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
     let code = 500

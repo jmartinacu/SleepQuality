@@ -5,4 +5,3 @@ backend/.env.test
 backend/node_modules/
 backend/.nyc_output
 images/
-createAdmin.js
