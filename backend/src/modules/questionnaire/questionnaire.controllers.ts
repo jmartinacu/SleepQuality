@@ -53,11 +53,13 @@ async function getQuestionnaireHandler (
   reply: FastifyReplyTypebox<typeof GetQuestionnaireSchema>
 ): Promise<Questionnaire> {
   try {
+    console.log('He llegaod a este handler getQuestionnaireHanlder')
     const { id } = request.params
     const questionnaire = await findQuestionnaireUnique('id', id)
     if (questionnaire === null) {
       return await reply.code(404).send({ message: 'Not found' })
     }
+    console.log(questionnaire.additionalInformation)
     return await reply.send(questionnaire)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
@@ -81,12 +83,11 @@ async function getUserQuestionnairesInformationHandler (
     const { userId } = request.user as { userId: string }
     /// ELIMINAR DESDE AQUI
     const { dev } = request.query
-    console.log(dev)
     if (typeof dev !== 'undefined') {
       const resultDEV = await findQuestionnaireMany('all', [])
       return await reply.send(resultDEV)
     }
-    // HASTA AQUI
+    // HASTA AQUI Y ELIMINAR EL QUERYSTRING DE GETQUESTINONAIRESINFORMATIONSCHEMA
     const { questionnairesToDo } = await findUserUnique('id', userId) as User
     const questionnaires = await findQuestionnaireMany('id', questionnairesToDo)
     return await reply.send(questionnaires)

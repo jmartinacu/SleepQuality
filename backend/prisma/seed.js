@@ -2,6 +2,8 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 const questionnaires = [
+  // TODO SPLIT CONSENSUS SLEEP DIARY IN MORNING AND NIGHT DIARY
+  // TODO ADD INFORMATION TO ALL DIARIES
   {
     name: 'Consensus Sleep Diary',
     questions: {
@@ -125,7 +127,7 @@ const questionnaires = [
       },
       {
         questions: [16],
-        descriptions: '',
+        description: '',
         enum: ['No problem at all', 'Only a very slight problem', 'Somewhat of a problem', 'A very big problem'],
         relation: {
           'No problem at all': 0,
@@ -146,12 +148,12 @@ const questionnaires = [
       },
       {
         questions: [18],
-        descriptions: '',
+        description: '',
         enum: ['Not bed partner or room mate', 'Partner/room mate in other room', 'Partner in same room but not same bed', 'partner in same bed']
       },
       {
         questions: [19, 20, 21, 22],
-        descriptions: 'If you have a room mate or bed partner, ask him/her how often in the past month you have had:',
+        description: 'If you have a room mate or bed partner, ask him/her how often in the past month you have had:',
         enum: ['Not during the past month', 'Less than once a week', 'Once or twice a week', 'Three or more times a week']
       }
     ]
@@ -413,6 +415,8 @@ const questionnaires = [
 async function main () {
   await prisma.answer.deleteMany()
   await prisma.user.deleteMany()
+  await prisma.doctor.deleteMany()
+  await prisma.session.deleteMany()
   await prisma.questionnaire.deleteMany()
   await prisma.questionnaireAlgorithm.deleteMany()
   // TODO: HASH ADMIN PASSWORD

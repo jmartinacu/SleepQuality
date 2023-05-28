@@ -112,12 +112,14 @@ const createQuestionnaireResponseSchema = Type.Object({
   additionalInformation
 })
 
-const createAnswerResponseSchema = Type.Object({
+const answerResponseSchema = Type.Object({
   id,
   questionnaireId: id,
   name,
   answers
 })
+
+const answersResponseSchema = Type.Array(answerResponseSchema)
 
 const getIdParamsSchema = Type.Object({
   id
@@ -197,7 +199,7 @@ const GetQuestionnairesInformationSchema = {
 const CreateAnswerSchema = {
   body: createAnswerSchema,
   response: {
-    201: createAnswerResponseSchema,
+    201: answerResponseSchema,
     400: errorResponseSchema,
     500: Type.Any()
   }
@@ -243,6 +245,10 @@ type InsomniaSeverityIndexWarning = Static<typeof insomniaSeverityIndexWarning>
 type DefaultAlgorithmInformation = Static<typeof getDefaultAlgorithmInformationResponseSchema>
 
 export {
+  getAlgorithmResponseSchema,
+  getAlgorithmsResponseSchema,
+  answerResponseSchema,
+  answersResponseSchema,
   CreateQuestionnaireSchema,
   CreateAnswerSchema,
   GetQuestionnaireSchema,

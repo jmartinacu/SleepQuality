@@ -61,6 +61,10 @@ const userAttributes = {
     minimum: 10000,
     maximum: 99999
   }),
+  doctorCode: Type.Integer({
+    minimum: 10000,
+    maximum: 99999
+  }),
   profilePictureString: Type.String(),
   doctorId: Type.RegEx(regexObjectId),
   profilePicturePNG: Type.String({
@@ -98,8 +102,17 @@ const {
   verified,
   questionnairesToDo,
   ids,
-  doctorId
+  doctorId,
+  doctorCode
 } = userAttributes
+
+const acceptDoctor = Type.Union([
+  Type.Object({
+    code: doctorCode,
+    id: doctorId
+  }),
+  Type.Null()
+])
 
 const { BMI, birth, ...userCoreExceptBMIAndBirth } = userCore
 
@@ -193,6 +206,10 @@ const resetPasswordBodySchema = Type.Object({
   email
 })
 
+const acceptDoctorParamsSchema = Type.Object({
+  doctorCode
+})
+
 const updateUserServiceSchema = Type.Object({
   gender: Type.Optional(gender),
   role: Type.Optional(role),
@@ -208,7 +225,8 @@ const updateUserServiceSchema = Type.Object({
   password: Type.Optional(password),
   profilePicture: Type.Optional(profilePictureString),
   doctorId: Type.Optional(doctorId),
-  questionnairesToDo: Type.Optional(questionnairesToDo)
+  questionnairesToDo: Type.Optional(questionnairesToDo),
+  acceptDoctor: Type.Optional(acceptDoctor)
 })
 
 const updateUserSchema = Type.Omit(updateUserServiceSchema, [
@@ -219,7 +237,8 @@ const updateUserSchema = Type.Omit(updateUserServiceSchema, [
   'profilePicture',
   'questionnairesToDo',
   'doctorId',
-  'role'
+  'role',
+  'acceptDoctor'
 ])
 
 const verifyAccountResponseSchema = Type.Object({
@@ -249,6 +268,14 @@ const idsUserSchema = Type.Object({
   ids
 })
 
+const getUser = Type.Object({
+  email,
+  id
+})
+
+const getUsers = Type.Array(getUser)
+
+// TODO CHECK RESPONSES PREHANDLERS
 const CreateUserSchema = {
   body: createUserSchema,
   response: {
@@ -330,6 +357,15 @@ const ResetPasswordSchema = {
   }
 }
 
+const AcceptDoctorSchema = {
+  params: acceptDoctorParamsSchema,
+  response: {
+    200: verifyAccountResponseSchema,
+    403: errorResponseSchema,
+    500: Type.Unknown()
+  }
+}
+
 const AddProfilePictureSchema = {
   response: {
     200: verifyAccountResponseSchema,
@@ -359,10 +395,13 @@ type VerifyAccountResponse = Static<typeof verifyAccountResponseSchema>
 type IdsUserInput = Static<typeof idsUserSchema>
 type UpdateSessionInput = Static<typeof updateSessionSchema>
 type RefreshTokenResponse = Static<typeof refreshTokenResponseSchema>
+type AcceptDoctor = Static<typeof acceptDoctor>
 type Gender = Static<typeof gender>
 type Role = Static<typeof role>
 
 export {
+  getUsers,
+  createUserResponseSchema,
   type Gender,
   type Role,
   CreateUserSchema,
@@ -373,6 +412,7 @@ export {
   UpdateUserAuthenticatedSchema,
   VerifyUserSchema,
   ForgotPasswordSchema,
+  AcceptDoctorSchema,
   ResetPasswordSchema,
   AddProfilePictureSchema,
   GetProfilePictureSchema,
@@ -388,5 +428,6 @@ export {
   type UpdateUserStrictSchema,
   type UpdateSessionInput,
   type RefreshTokenResponse,
-  type IdsUserInput
+  type IdsUserInput,
+  type AcceptDoctor
 }

@@ -72,7 +72,8 @@ async function updateUser (
     chronicDisorders: rest.chronicDisorders,
     role: rest.role,
     doctorId: rest.doctorId,
-    questionnairesToDo: rest.questionnairesToDo
+    questionnairesToDo: rest.questionnairesToDo,
+    acceptDoctor: rest.acceptDoctor
   }
   if (typeof dataToUpdate.height !== 'undefined' || typeof dataToUpdate.weight !== 'undefined') {
     const { height, weight } = await findUserUnique('id', userId) as User

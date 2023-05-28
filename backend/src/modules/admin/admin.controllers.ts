@@ -6,8 +6,8 @@ import {
 } from './admin.schemas'
 import { errorCodeAndMessage } from '../../utils/error'
 import { createDoctor, createManyDoctors } from '../doctor/doctor.services'
-import { Doctor } from '../../utils/database'
-import { CreateDoctorSchema, CreateManyDoctorsSchema } from '../doctor/doctor.schemas'
+import { CreateDoctorSchema, CreateManyDoctorsSchema, DoctorResponse } from '../doctor/doctor.schemas'
+import { parseDateToString } from '../../utils/helpers'
 
 async function createAdminHandler (
   request: FastifyRequestTypebox<typeof CreateAdminSchema>,
@@ -37,7 +37,7 @@ async function createAdminHandler (
 async function createDoctorHandler (
   request: FastifyRequestTypebox<typeof CreateDoctorSchema>,
   reply: FastifyReplyTypebox<typeof CreateDoctorSchema>
-): Promise<Doctor> {
+): Promise<DoctorResponse> {
   try {
     const { id } = request.params
     const user = await findUserUnique('id', id)
@@ -45,7 +45,8 @@ async function createDoctorHandler (
       return await reply.code(404).send({ message: 'User not found' })
     }
     const doctor = await createDoctor(id)
-    return await reply.code(201).send(doctor)
+    const { birth, ...rest } = doctor
+    return await reply.code(201).send({ birth: parseDateToString(birth), ...rest })
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
     let code = 500
