@@ -268,6 +268,13 @@ const idsUserSchema = Type.Object({
   ids
 })
 
+const getUser = Type.Object({
+  email,
+  id
+})
+
+const getUsers = Type.Array(getUser)
+
 // TODO CHECK RESPONSES PREHANDLERS
 const CreateUserSchema = {
   body: createUserSchema,
@@ -393,6 +400,8 @@ type Gender = Static<typeof gender>
 type Role = Static<typeof role>
 
 export {
+  getUsers,
+  createUserResponseSchema,
   type Gender,
   type Role,
   CreateUserSchema,

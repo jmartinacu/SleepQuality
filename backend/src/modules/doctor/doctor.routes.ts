@@ -6,14 +6,21 @@ import {
   addQuestionnaireToUserHandler,
   logInDoctorHandler,
   refreshAccessTokenHandler,
-  getDoctorAuthenticatedHandler
+  getDoctorAuthenticatedHandler,
+  getQuestionnairesHandler,
+  getQuestionnaireHandler,
+  getUsersHandler,
+  getUserHandler
 } from './doctor.controllers'
 import {
   AddDoctorToUserSchema,
   AddQuestionnairesToUserSchema,
   GetDoctorAuthenticatedSchema,
-  GetUserInformationSchema
+  GetUserInformationSchema,
+  GetUserSchema,
+  GetUsersSchema
 } from './doctor.schemas'
+import { GetQuestionnaireSchema, GetQuestionnairesInformationSchema } from '../questionnaire/questionnaire.schemas'
 
 async function doctorRoutes (server: FastifyInstance): Promise<void> {
   server.get('/',
@@ -44,6 +51,24 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
     refreshAccessTokenHandler
   )
 
+  server.get('/users',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkDoctorVerification]),
+      schema: GetUsersSchema
+    },
+    getUsersHandler
+  )
+
+  server.get('/users/:id',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkDoctorVerification]),
+      schema: GetUserSchema
+    },
+    getUserHandler
+  )
+
   server.post('/users/questionnaires/:id',
     {
       onRequest: server.auth([server.authenticate]),
@@ -61,7 +86,7 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
     },
     addDoctorToUserHandler
   )
-  // TODO: SEND INFORMATION OF THE USER TO THE DOCTOR
+
   server.get('/users/:userId/:questionnaireId',
     {
       onRequest: server.auth([server.authenticate]),
@@ -69,6 +94,24 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
       schema: GetUserInformationSchema
     },
     getUserInformationHandler
+  )
+
+  server.get('/questionnaires',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkDoctorVerification]),
+      schema: GetQuestionnairesInformationSchema
+    },
+    getQuestionnairesHandler
+  )
+
+  server.get('/questionnaires/:id',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkDoctorVerification]),
+      schema: GetQuestionnaireSchema
+    },
+    getQuestionnaireHandler
   )
 }
 

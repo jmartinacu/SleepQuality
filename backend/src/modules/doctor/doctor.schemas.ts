@@ -1,5 +1,5 @@
 import { Type, Static } from '@fastify/type-provider-typebox'
-import { regexDate, regexPassword, regexObjectId } from '../user/user.schemas'
+import { regexDate, regexPassword, regexObjectId, getUsers, createUserResponseSchema } from '../user/user.schemas'
 import {
   answerResponseSchema,
   answersResponseSchema,
@@ -178,6 +178,22 @@ const GetUserAlgorithmsSchema = {
   }
 }
 
+const GetUsersSchema = {
+  response: {
+    200: getUsers,
+    500: Type.Unknown()
+  }
+}
+
+const GetUserSchema = {
+  params: createDoctorParamsSchema,
+  response: {
+    200: createUserResponseSchema,
+    404: errorResponseSchema,
+    500: Type.Unknown()
+  }
+}
+
 type MessageResponse = Static<typeof messageResponseSchema>
 type DoctorResponse = Static<typeof createDoctorResponseSchema>
 
@@ -190,6 +206,8 @@ export {
   GetUserAnswerSchema,
   GetUserAlgorithmsSchema,
   GetUserInformationSchema,
+  GetUsersSchema,
+  GetUserSchema,
   type MessageResponse,
   type DoctorResponse
 }

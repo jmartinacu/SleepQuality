@@ -10,7 +10,9 @@ import {
   Answer,
   Session,
   QuestionnaireAlgorithm,
-  Doctor
+  Doctor,
+  Questionnaire,
+  User
 } from '../../utils/database'
 import {
   createDoctorSession,
@@ -33,11 +35,14 @@ import {
   GetUserAlgorithmsSchema,
   GetUserAnswerSchema,
   GetUserInformationSchema,
+  GetUserSchema,
+  GetUsersSchema,
   MessageResponse
 } from './doctor.schemas'
-import { findAnswers, findLastAnswer, findLastQuestionnaireAlgorithms, findQuestionnaireAlgorithmsOrderByCreatedAt, findQuestionnaireMany } from '../questionnaire/questionnaire.services'
+import { findAnswers, findLastAnswer, findLastQuestionnaireAlgorithms, findQuestionnaireAlgorithmsOrderByCreatedAt, findQuestionnaireMany, findQuestionnaireUnique } from '../questionnaire/questionnaire.services'
 import sendEmail from '../../utils/mailer'
 import { findDoctorUnique, findUsersDoctor } from './doctor.services'
+import { GetQuestionnaireSchema, GetQuestionnairesInformationSchema } from '../questionnaire/questionnaire.schemas'
 
 async function logInDoctorHandler (
   request: FastifyRequestTypebox<typeof LogInSchema>,
@@ -339,6 +344,97 @@ async function getUserInformationHandler (
   }
 }
 
+async function getQuestionnairesHandler (
+  _request: FastifyRequestTypebox<typeof GetQuestionnairesInformationSchema>,
+  reply: FastifyReplyTypebox<typeof GetQuestionnairesInformationSchema>
+): Promise<Questionnaire[]> {
+  try {
+    const questionnaires = await findQuestionnaireMany('all', [])
+    return await reply.send(questionnaires)
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
+async function getQuestionnaireHandler (
+  request: FastifyRequestTypebox<typeof GetQuestionnaireSchema>,
+  reply: FastifyReplyTypebox<typeof GetQuestionnaireSchema>
+): Promise<Questionnaire> {
+  try {
+    const { id } = request.params
+    const questionnaire = await findQuestionnaireUnique('id', id)
+    if (questionnaire === null) {
+      return await reply.code(404).send({ message: 'Questionnaire not found' })
+    }
+    return await reply.send(questionnaire)
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
+async function getUsersHandler (
+  request: FastifyRequestTypebox<typeof GetUsersSchema>,
+  reply: FastifyReplyTypebox<typeof GetUsersSchema>
+): Promise<User[]> {
+  try {
+    const { doctorId } = request.user as { doctorId: string }
+    const users = await findUsersDoctor('id', doctorId)
+    return await reply.send(users)
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
+async function getUserHandler (
+  request: FastifyRequestTypebox<typeof GetUserSchema>,
+  reply: FastifyReplyTypebox<typeof GetUserSchema>
+): Promise<User> {
+  try {
+    const { doctorId } = request.user as { doctorId: string }
+    const { id } = request.params
+    const users = await findUsersDoctor('id', doctorId)
+    const user = users.find(user => user.id === id)
+    if (typeof user === 'undefined') {
+      return await reply.code(404).send({ message: 'User not found' })
+    }
+    return await reply.send(user)
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
 export {
   logInDoctorHandler,
   refreshAccessTokenHandler,
@@ -347,5 +443,9 @@ export {
   GetUserAnswersHandler,
   GetUserAlgorithmsHandler,
   getUserInformationHandler,
-  getDoctorAuthenticatedHandler
+  getDoctorAuthenticatedHandler,
+  getQuestionnairesHandler,
+  getQuestionnaireHandler,
+  getUsersHandler,
+  getUserHandler
 }
