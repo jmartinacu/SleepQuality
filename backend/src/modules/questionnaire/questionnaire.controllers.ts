@@ -53,11 +53,13 @@ async function getQuestionnaireHandler (
   reply: FastifyReplyTypebox<typeof GetQuestionnaireSchema>
 ): Promise<Questionnaire> {
   try {
+    console.log('He llegaod a este handler getQuestionnaireHanlder')
     const { id } = request.params
     const questionnaire = await findQuestionnaireUnique('id', id)
     if (questionnaire === null) {
       return await reply.code(404).send({ message: 'Not found' })
     }
+    console.log(questionnaire.additionalInformation)
     return await reply.send(questionnaire)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)

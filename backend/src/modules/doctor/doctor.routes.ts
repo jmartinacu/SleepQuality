@@ -20,7 +20,10 @@ import {
   GetUserSchema,
   GetUsersSchema
 } from './doctor.schemas'
-import { GetQuestionnaireSchema, GetQuestionnairesInformationSchema } from '../questionnaire/questionnaire.schemas'
+import {
+  GetQuestionnaireSchema,
+  GetQuestionnairesInformationSchema
+} from '../questionnaire/questionnaire.schemas'
 
 async function doctorRoutes (server: FastifyInstance): Promise<void> {
   server.get('/',

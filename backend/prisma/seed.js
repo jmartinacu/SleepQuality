@@ -127,7 +127,7 @@ const questionnaires = [
       },
       {
         questions: [16],
-        descriptions: '',
+        description: '',
         enum: ['No problem at all', 'Only a very slight problem', 'Somewhat of a problem', 'A very big problem'],
         relation: {
           'No problem at all': 0,
@@ -148,12 +148,12 @@ const questionnaires = [
       },
       {
         questions: [18],
-        descriptions: '',
+        description: '',
         enum: ['Not bed partner or room mate', 'Partner/room mate in other room', 'Partner in same room but not same bed', 'partner in same bed']
       },
       {
         questions: [19, 20, 21, 22],
-        descriptions: 'If you have a room mate or bed partner, ask him/her how often in the past month you have had:',
+        description: 'If you have a room mate or bed partner, ask him/her how often in the past month you have had:',
         enum: ['Not during the past month', 'Less than once a week', 'Once or twice a week', 'Three or more times a week']
       }
     ]
