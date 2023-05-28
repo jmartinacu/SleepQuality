@@ -1,10 +1,12 @@
-import { FlatList, KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useEffect, useState } from 'react'
 import { Picker } from '@react-native-picker/picker'
 import { createAswer } from '../../api/ApiQuestionnaries'
 import { ScrollView } from 'react-native-gesture-handler'
 
 const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additionalInfo }) => {
+  const [modalVisible, setModalVisible] = useState(false)
+
   const result = Object.entries(questions)
     .reduce((accumulator, current) => {
       const obj = {
@@ -22,9 +24,7 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
   const EnumForEachQuestion = new Map()
 
   const [answers, setAnswers] = useState(new Array(22).fill(''))
-  const [isError, setIsError] = useState(new Array(22).fill(false))
-
-  const [status, setStatus] = useState('')
+  const [error, setError] = useState(false)
 
   for (const obj of result) {
     if (obj.type.split('_')[0] === 'SECONDARY') {
@@ -63,37 +63,50 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
   }
 
   const handleSubmitAnswer = () => {
-    const submit = []
+    const isOnlyNumbers = /^\d+$/
+    let submit = []
+    let err = false
     let i = 0
     for (const obj of result) {
-      if (isBoolean[i] && answers[i] === '') {
-        const listInList = [obj.question, true]
-        submit.push(listInList)
-      } else if (keys.includes(i)) {
-        const listInList = [obj.question, EnumForEachQuestion.get(i)[0]]
-        submit.push(listInList)
+      if (isNumber[i] && !isOnlyNumbers.test(answers[i])) {
+        console.log('HOLa')
+        setError('Some questions can only be filled with numbers: **')
+        err = true
+        submit = []
+        break
+      } else if ((!isSecondary[i] || isBoolean[i] || keys.includes(i)) && answers[i] === '') {
+        console.log('ADIOS')
+        setError('You need to fill all the mandatory questions: *')
+        err = true
+        submit = []
+        break
       } else {
-        const listInList = [obj.question, answers[i]]
-        submit.push(listInList)
+        if (isSecondary[i] && answers[i] === '') {
+          const listInList = [obj.question, null]
+          submit.push(listInList)
+        } else {
+          const listInList = [obj.question, answers[i].trim()]
+          submit.push(listInList)
+        }
       }
       i++
     }
-    createAswer(accessToken, {
-      name,
-      answers: Object.fromEntries(submit)
-    })
-      .then(result => {
-        if (result.status === 201) {
-          setStatus('')
-          navigation.replace('TextAndButton', { text: 'Answers Successfully Submitted', button: 'Go Home', direction: 'Home' })
-        } else {
-          console.log(result)
-          setStatus(result.message)
-        }
+    if (!err) {
+      createAswer(accessToken, {
+        name,
+        answers: Object.fromEntries(submit)
       })
-      .catch(err => {
-        console.error(err)
-      })
+        .then(result => {
+          if (result.status === 201) {
+            navigation.replace('TextAndButton', { text: 'Answers Successfully Submitted', button: 'Go Home', direction: 'Home' })
+          } else {
+            console.log(result)
+          }
+        })
+        .catch(err => {
+          console.error(err)
+        })
+    }
 
     return submit
   }
@@ -106,7 +119,22 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
 
     return (
       <View>
-        <Text>{item.question}</Text>
+        {isSecondary[index]
+          ? (
+            <Text>{item.question}</Text>
+            )
+          : (
+            <View>
+              {isNumber[index]
+                ? (
+                  <Text>{item.question} **</Text>
+                  )
+                : (
+                  <Text>{item.question} *</Text>
+                  )}
+            </View>
+            )}
+
         {isEnum
           ? (
             <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
@@ -116,6 +144,10 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
                 prompt='Answer'
                 mode='dropdown'
               >
+                <Picker.Item
+                  label='Select an answer...'
+                  value=''
+                />
                 {EnumForEachQuestion.get(index).map((value, index) => {
                   return (
                     <Picker.Item
@@ -163,6 +195,10 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
                     mode='dropdown'
                   >
                     <Picker.Item
+                      label='Select an answer...'
+                      value=''
+                    />
+                    <Picker.Item
                       label='Yes'
                       value='true'
                     />
@@ -179,26 +215,16 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
 
     )
   }
-  const prueba = false
 
   const renderSubmitButton = () => {
     return (
       <View>
-        {prueba
-          ? (
-            <TouchableOpacity
-              disabled
-              style={styles.buttonDisable}
-              onPress={handleSubmitAnswer}
-            >
-              <Text style={styles.text}>Submit</Text>
-            </TouchableOpacity>
-            )
-          : (
-            <TouchableOpacity style={styles.button} onPress={handleSubmitAnswer}>
-              <Text style={styles.text}>Submit</Text>
-            </TouchableOpacity>
-            )}
+        <Text>*: Mandatory question</Text>
+        <Text>**: Mandatory question. You can only answer with numbers</Text>
+        <TouchableOpacity style={styles.button} onPress={handleSubmitAnswer}>
+          <Text style={styles.text}>Submit</Text>
+        </TouchableOpacity>
+        <Text style={styles.textFailed}>{error}</Text>
       </View>
     )
   }
@@ -208,7 +234,36 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.container}
     >
-      <Text>{name}</Text>
+      <Modal
+        animationType='slide'
+        transparent
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible)
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>iNSTRUCTIONS</Text>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <Text style={styles.textStyle}>Hide Instructions</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      <View style={styles.row}>
+        <Text>{name}</Text>
+        <Pressable
+          style={styles.button}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text>See Instructions</Text>
+        </Pressable>
+      </View>
+
       <FlatList
         data={result}
         renderItem={renderQuestion}
@@ -301,6 +356,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10
+  },
+  row: {
+    flexDirection: 'row'
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center'
   }
 })
 

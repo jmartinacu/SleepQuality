@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { View, StyleSheet, Image, TouchableOpacity, Text } from 'react-native'
-import { getQuestionnaires, getQuestionnarieById } from '../api/ApiQuestionnaries'
-import ConsensusSleepDiary from '../components/typesQuestionnaries/ConsensusSleepDiary'
+import { getQuestionnaires } from '../api/ApiQuestionnaries'
 import { getItemFromStorage } from '../utils/Utils'
 import { FlatList } from 'react-native-gesture-handler'
 import PreviewQuestionnaire from '../components/questionnaries/PreviewQuestionnarie'
+import { AIS, CSD, ESS, IRLS, ISI, PSQ, PSQI, SB } from '../assests/questionnarieLogo'
 
 const Home = ({ navigation }) => {
   const [questionnaires, setQuestionnaires] = useState([])
@@ -20,7 +20,6 @@ const Home = ({ navigation }) => {
         .then(result => {
           if (result.status === 200) {
             setError(false)
-            console.log(result)
             setQuestionnaires(result.data)
           } else {
             setError(true)
@@ -35,8 +34,36 @@ const Home = ({ navigation }) => {
   }, [accessToken])
 
   const renderQuestionnaires = ({ index, item }) => {
+    let logo = null
+    switch (item.name) {
+      case 'Consensus Sleep Diary':
+        logo = CSD
+        break
+      case 'STOP-BANG':
+        logo = SB
+        break
+      case 'Epworth Sleepiness Scale':
+        logo = ESS
+        break
+      case 'Pittsburgh Sleep Quality Index':
+        logo = PSQI
+        break
+      case 'Perceived Stress Questionnaire':
+        logo = PSQ
+        break
+      case 'Athens Insomnia Scale':
+        logo = AIS
+        break
+      case 'International Restless Legs Scale':
+        logo = IRLS
+        break
+      case 'Insomnia Severity Index':
+        logo = ISI
+        break
+    }
+
     return (
-      <PreviewQuestionnaire navigation={navigation} id={item.id} name={item.name} />
+      <PreviewQuestionnaire logo={logo} navigation={navigation} id={item.id} name={item.name} />
     )
   }
 

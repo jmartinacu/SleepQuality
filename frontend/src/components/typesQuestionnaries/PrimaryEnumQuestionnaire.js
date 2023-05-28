@@ -3,8 +3,9 @@ import { createAswer } from '../../api/ApiQuestionnaries'
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Picker } from '@react-native-picker/picker'
 
-const InsomniaSeverityIndex = ({ accessToken, navigation, name, questions, additionalInfo }) => {
-  const [answers, setAnswers] = useState(new Array(7).fill(''))
+const PrimaryEnumQuestionnaire = ({ n, accessToken, navigation, name, questions, additionalInfo }) => {
+  const [answers, setAnswers] = useState(new Array(n).fill(''))
+  const [error, setError] = useState('')
 
   const result = Object.entries(questions)
     .reduce((accumulator, current) => {
@@ -24,6 +25,7 @@ const InsomniaSeverityIndex = ({ accessToken, navigation, name, questions, addit
       }
     }
   }
+  const keys = [...EnumForEachQuestion.keys()]
 
   const handleAddAnswer = (answer, index) => {
     const copyAnswers = [...answers]
@@ -32,59 +34,75 @@ const InsomniaSeverityIndex = ({ accessToken, navigation, name, questions, addit
   }
 
   const handleSubmitAnswer = () => {
-    const submit = []
+    let submit = []
+    let err = false
     let i = 0
     for (const obj of result) {
       if (answers[i] === '') {
-        const listInList = [obj.question, EnumForEachQuestion.get(i)[0]]
-        submit.push(listInList)
+        setError('You need to fill all the mandatory questions: *')
+        err = true
+        submit = []
+        break
       } else {
         const listInList = [obj.question, answers[i]]
         submit.push(listInList)
       }
       i++
     }
-
-    createAswer(accessToken, {
-      name,
-      answers: Object.fromEntries(submit)
-    })
-      .then(result => {
-        if (result.status === 201) {
-          navigation.replace('TextAndButton', { text: 'Answers Successfully Submitted', button: 'Go Home', direction: 'Home' })
-        } else {
-          console.log(result)
-        }
+    if (!err) {
+      createAswer(accessToken, {
+        name,
+        answers: Object.fromEntries(submit)
       })
-      .catch(err => {
-        console.error(err)
-      })
+        .then(result => {
+          if (result.status === 201) {
+            navigation.replace('TextAndButton', { text: 'Answers Successfully Submitted', button: 'Go Home', direction: 'Home' })
+          } else {
+            console.log(result)
+          }
+        })
+        .catch(err => {
+          console.error(err)
+        })
 
-    return submit
+      return submit
+    }
   }
 
   const renderQuestion = ({ index, item }) => {
+    let isEnum = false
+    if (keys.includes(index)) {
+      isEnum = true
+    }
     return (
       <View>
-        <Text>{item.question}</Text>
-        <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
-          <Picker
-            selectedValue={answers[index]}
-            onValueChange={(itemValue, itemIndex) => handleAddAnswer(itemValue, index)}
-            prompt='Answer'
-            mode='dropdown'
-          >
-            {EnumForEachQuestion.get(index).map((value, index) => {
-              return (
+        {isEnum &&
+          <View>
+            <Text>{item.question} *</Text>
+            <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
+              <Picker
+                selectedValue={answers[index]}
+                onValueChange={(itemValue, itemIndex) => handleAddAnswer(itemValue, index)}
+                prompt='Answer'
+                mode='dropdown'
+              >
                 <Picker.Item
-                  key={index}
-                  label={value}
-                  value={value}
+                  label='Select an answer...'
+                  value=''
                 />
-              )
-            })}
-          </Picker>
-        </View>
+                {EnumForEachQuestion.get(index).map((value, index) => {
+                  return (
+                    <Picker.Item
+                      key={index}
+                      label={value}
+                      value={value}
+                    />
+                  )
+                })}
+              </Picker>
+            </View>
+          </View>}
+
       </View>
 
     )
@@ -93,10 +111,11 @@ const InsomniaSeverityIndex = ({ accessToken, navigation, name, questions, addit
   const renderSubmitButton = () => {
     return (
       <View>
+        <Text>*: Mandatory question</Text>
         <TouchableOpacity style={styles.button} onPress={handleSubmitAnswer}>
           <Text style={styles.text}>Submit</Text>
         </TouchableOpacity>
-
+        <Text style={styles.textFailed}>{error}</Text>
       </View>
     )
   }
@@ -150,4 +169,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default InsomniaSeverityIndex
+export default PrimaryEnumQuestionnaire

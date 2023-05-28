@@ -1,7 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity } from 'react-native'
-import { Eye } from '../../assests/eyes'
 
-const PreviewQuestionnaire = ({ navigation, id, name }) => {
+const PreviewQuestionnaire = ({ navigation, id, name, logo }) => {
   return (
     <TouchableOpacity
       style={styles.container}
@@ -9,7 +8,7 @@ const PreviewQuestionnaire = ({ navigation, id, name }) => {
       activeOpacity={0.5}
     >
       <Image
-        source={Eye}
+        source={logo}
         resizeMode='contain'
         style={styles.image}
       />

@@ -176,13 +176,13 @@ const RegisterForm = ({ navigation }) => {
     const checkPassowrd = checkPasswordValidity(password)
     if (!checkPassowrd) {
       userRegister({
-        email: email.toLocaleLowerCase(),
-        name,
+        email: email.toLocaleLowerCase().trim(),
+        name: name.trim(),
         gender,
         height,
         weight,
         birth: parseDateToString(birthDate),
-        chronicDisorders: chronicDisorders === '' ? null : chronicDisorders,
+        chronicDisorders: chronicDisorders === '' ? null : chronicDisorders.trim(),
         password
       })
         .then(result => {
@@ -502,16 +502,16 @@ const RegisterForm = ({ navigation }) => {
               mode='dropdown'
             >
               <Picker.Item
+                label='Other'
+                value='NEUTER'
+              />
+              <Picker.Item
                 label='Male'
                 value='MASCULINE'
               />
               <Picker.Item
                 label='Female'
                 value='FEMININE'
-              />
-              <Picker.Item
-                label='Other'
-                value='NEUTER'
               />
             </Picker>
           </View>

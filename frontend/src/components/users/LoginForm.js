@@ -75,12 +75,11 @@ const LoginForm = ({ navigation }) => {
     const checkPassword = checkPasswordValidity(password)
     if (!checkPassword) {
       userLogin({
-        email: email.toLocaleLowerCase(),
+        email: email.toLocaleLowerCase().trim(),
         password
       })
         .then(result => {
           if (result.status === 200) {
-            console.log(result)
             setStatus('')
             AsyncStorage.setItem('accessToken', result.data.accessToken)
             AsyncStorage.setItem('refreshToken', result.data.refreshToken)

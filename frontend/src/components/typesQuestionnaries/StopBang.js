@@ -1,11 +1,30 @@
 import { Picker } from '@react-native-picker/picker'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { createAswer } from '../../api/ApiQuestionnaries'
+import { createAswer, getDefaultInfo } from '../../api/ApiQuestionnaries'
 
 const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo }) => {
-  const [answers, setAnswers] = useState(new Array(22).fill(''))
-  const [status, setStatus] = useState('')
+  const [answers, setAnswers] = useState(new Array(8).fill(''))
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    getDefaultInfo(accessToken, id)
+      .then(result => {
+        if (result.status === 200) {
+          console.log(result.data)
+          if (result.data !== []) {
+            const copy = [...answers]
+            for (const obj of result.data) {
+              copy.splice(obj.index, 0, obj.answer)
+            }
+            console.log(copy)
+            setAnswers(copy)
+          }
+        } else {
+          console.log(result.data.message)
+        }
+      })
+  }, [])
 
   const result = Object.entries(questions)
     .reduce((accumulator, current) => {
@@ -24,12 +43,15 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
   }
 
   const handleSubmitAnswer = () => {
-    const submit = []
+    let submit = []
+    let err = false
     let i = 0
     for (const obj of result) {
       if (answers[i] === '') {
-        const listInList = [obj.question, true]
-        submit.push(listInList)
+        setError('You need to fill all the mandatory questions: *')
+        err = true
+        submit = []
+        break
       } else {
         const listInList = [obj.question, answers[i]]
         submit.push(listInList)
@@ -37,30 +59,30 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
       i++
     }
 
-    createAswer(accessToken, {
-      name,
-      answers: Object.fromEntries(submit)
-    })
-      .then(result => {
-        if (result.status === 201) {
-          setStatus('')
-          navigation.replace('TextAndButton', { text: 'Answers Successfully Submitted', button: 'Go Home', direction: 'Home' })
-        } else {
-          console.log(result)
-          setStatus(result.message)
-        }
+    if (!err) {
+      createAswer(accessToken, {
+        name,
+        answers: Object.fromEntries(submit)
       })
-      .catch(err => {
-        console.error(err)
-      })
+        .then(result => {
+          if (result.status === 201) {
+            navigation.replace('TextAndButton', { text: 'Answers Successfully Submitted', button: 'Go Home', direction: 'Home' })
+          } else {
+            console.log(result)
+          }
+        })
+        .catch(err => {
+          console.error(err)
+        })
 
-    return submit
+      return submit
+    }
   }
 
   const renderQuestion = ({ index, item }) => {
     return (
       <View>
-        <Text>{item.question}</Text>
+        <Text>{item.question} *</Text>
         <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
           <Picker
             selectedValue={answers[index]}
@@ -68,6 +90,10 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
             prompt='Answer'
             mode='dropdown'
           >
+            <Picker.Item
+              label='Select an answer...'
+              value=''
+            />
             <Picker.Item
               label='Yes'
               value='true'
@@ -86,10 +112,11 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
   const renderSubmitButton = () => {
     return (
       <View>
+        <Text>*: Mandatory question</Text>
         <TouchableOpacity style={styles.button} onPress={handleSubmitAnswer}>
           <Text style={styles.text}>Submit</Text>
         </TouchableOpacity>
-
+        <Text style={styles.textFailed}>{error}</Text>
       </View>
     )
   }

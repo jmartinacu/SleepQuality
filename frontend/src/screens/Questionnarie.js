@@ -6,10 +6,9 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { getItemFromStorage } from '../utils/Utils'
 import ConsensusSleepDiary from '../components/typesQuestionnaries/ConsensusSleepDiary'
 import StopBang from '../components/typesQuestionnaries/StopBang'
-import EpworthSleepinessScale from '../components/typesQuestionnaries/EpworthSleepinessScale'
-import PerceivedStress from '../components/typesQuestionnaries/PerceivedStress'
-import AthensInsomniaScale from '../components/typesQuestionnaries/AthensInsomniaScale'
-import InternationalRestlessLegsScale from '../components/typesQuestionnaries/InternationalRestlessLegsScale'
+
+import PrimaryEnumQuestionnaire from '../components/typesQuestionnaries/PrimaryEnumQuestionnaire'
+import PittsburghSleepQualityIndex from '../components/typesQuestionnaries/PittsburghSleepQualityIndex'
 
 const Questionnarie = ({ navigation, route }) => {
   const [name, setName] = useState('')
@@ -53,12 +52,12 @@ const Questionnarie = ({ navigation, route }) => {
           <View>
             {name === 'Consensus Sleep Diary' && <ConsensusSleepDiary accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
             {name === 'STOP-BANG' && <StopBang id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
-            {name === 'Epworth Sleepiness Scale' && <EpworthSleepinessScale id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
-
-            {name === 'Perceived Stress Questionnaire' && <PerceivedStress id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
-            {name === 'Athens Insomnia Scale' && <AthensInsomniaScale id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
-            {name === 'International Restless Legs Scale' && <InternationalRestlessLegsScale id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
-            {name === 'Insomnia Severity Index' && <InternationalRestlessLegsScale id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'Epworth Sleepiness Scale' && <PrimaryEnumQuestionnaire n={8} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'Pittsburgh Sleep Quality Index' && <PittsburghSleepQualityIndex accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'Perceived Stress Questionnaire' && <PrimaryEnumQuestionnaire n={20} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'Athens Insomnia Scale' && <PrimaryEnumQuestionnaire n={8} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'International Restless Legs Scale' && <PrimaryEnumQuestionnaire n={10} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'Insomnia Severity Index' && <PrimaryEnumQuestionnaire n={7} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
           </View>
           )}
     </SafeAreaView>
