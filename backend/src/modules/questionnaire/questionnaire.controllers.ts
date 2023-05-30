@@ -58,7 +58,6 @@ async function getQuestionnaireHandler (
     if (questionnaire === null) {
       return await reply.code(404).send({ message: 'Not found' })
     }
-    console.log(questionnaire.additionalInformation)
     return await reply.send(questionnaire)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)

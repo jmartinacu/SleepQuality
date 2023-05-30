@@ -93,7 +93,7 @@ const questionnaireCore = {
   instructions: Type.String()
 }
 
-const { name, questions, additionalInformation } = questionnaireCore
+const { name, questions, additionalInformation, instructions } = questionnaireCore
 
 const createQuestionnaireSchema = Type.Object({
   name,
@@ -130,7 +130,8 @@ const getQuestionnaireResponseSchema = Type.Object({
   id,
   name,
   questions,
-  additionalInformation
+  additionalInformation,
+  instructions
 })
 
 const getQuestionnairesInformationResponseSchema = Type.Array(
@@ -176,7 +177,7 @@ const CreateQuestionnaireSchema = {
   body: createQuestionnaireSchema,
   response: {
     201: createQuestionnaireResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -185,7 +186,7 @@ const GetQuestionnaireSchema = {
   response: {
     200: getQuestionnaireResponseSchema,
     404: errorResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -193,7 +194,7 @@ const GetQuestionnairesInformationSchema = {
   querystring: Type.Object({ dev: Type.Optional(Type.Boolean()) }),
   response: {
     200: getQuestionnairesInformationResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -202,7 +203,7 @@ const CreateAnswerSchema = {
   response: {
     201: answerResponseSchema,
     400: errorResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -211,7 +212,7 @@ const GetLastAlgorithmSchema = {
   response: {
     200: getAlgorithmResponseSchema,
     404: errorResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -219,7 +220,7 @@ const GetAlgorithmSchema = {
   params: getIdParamsSchema,
   response: {
     200: getAlgorithmsResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
 
@@ -228,10 +229,9 @@ const GetDefaultAlgorithmInformationSchema = {
   response: {
     200: getDefaultAlgorithmInformationResponseSchema,
     404: errorResponseSchema,
-    500: Type.Any()
+    500: Type.Unknown()
   }
 }
-
 type CreateQuestionnaireInput = Static<typeof createQuestionnaireSchema>
 type Questions = Static<typeof questions>
 type QuestionType = Static<typeof questionType>
