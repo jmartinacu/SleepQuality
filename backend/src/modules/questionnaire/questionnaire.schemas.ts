@@ -89,7 +89,8 @@ const questionnaireCore = {
       relation: Type.Optional(Type.Record(Type.String(), Type.Number())),
       default: Type.Optional(Type.Boolean())
     })
-  )
+  ),
+  instructions: Type.String()
 }
 
 const { name, questions, additionalInformation } = questionnaireCore

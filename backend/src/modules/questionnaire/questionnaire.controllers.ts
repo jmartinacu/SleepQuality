@@ -53,7 +53,6 @@ async function getQuestionnaireHandler (
   reply: FastifyReplyTypebox<typeof GetQuestionnaireSchema>
 ): Promise<Questionnaire> {
   try {
-    console.log('He llegaod a este handler getQuestionnaireHanlder')
     const { id } = request.params
     const questionnaire = await findQuestionnaireUnique('id', id)
     if (questionnaire === null) {

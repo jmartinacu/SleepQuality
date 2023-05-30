@@ -2,10 +2,9 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 const questionnaires = [
-  // TODO SPLIT CONSENSUS SLEEP DIARY IN MORNING AND NIGHT DIARY
-  // TODO ADD INFORMATION TO ALL DIARIES
+  // TODO ADD INSTRUCTIONS TO ALL QUESTIONNAIRES
   {
-    name: 'Consensus Sleep Diary',
+    name: 'Consensus Sleep Diary Morning',
     questions: {
       'What time did you get into bed?': 'PRIMARY_TEXT',
       'What did you you try to go to sleep?': 'PRIMARY_TEXT',
@@ -19,16 +18,7 @@ const questionnaires = [
       'What time did you get out of bed for the day?': 'PRIMARY_TEXT',
       'In total, how long did you sleep?': 'PRIMARY_TEXT',
       'How would you rate the quality of your sleep?': 'PRIMARY_TEXT',
-      'How rested or refreshed did you feel when you woke-up for the day?': 'PRIMARY_TEXT',
-      'How many times did you nap or doze': 'PRIMARY_NUMBER',
-      'In total, how long did you nap or doze?': 'SECONDARY_TEXT',
-      'How many drinks containing alcohol did you have?': 'PRIMARY_NUMBER',
-      'What time was your last alcohol drink?': 'SECONDARY_TEXT',
-      'How many caffeinated drinks (coffee, tea, soda, energy drinks) did you have?': 'PRIMARY_NUMBER',
-      'What time was your last caffeinated drink?': 'SECONDARY_TEXT',
-      'Did you take any over-the-counter or prescription medication(s) to help you sleep?': 'PRIMARY_BOOL',
-      'If so, list medication(s), dose, and time taken': 'SECONDARY_TEXT',
-      Comments: 'SECONDARY_TEXT'
+      'How rested or refreshed did you feel when you woke-up for the day?': 'PRIMARY_TEXT'
     },
     additionalInformation: [
       {
@@ -39,7 +29,24 @@ const questionnaires = [
         questions: [12],
         enum: ['Not at all rested', 'Slightly rested', 'Somewhat rested', 'Well-rested', 'Very well-rested']
       }
-    ]
+    ],
+    instructions: 'General Instructions:\n\nWhat is a Sleep Diary? A sleep diary is designed to gather information about your daily sleep pattern.\nHow often and when do I fill out the sleep diary? It is necessary for you to complete your sleep diary every day. If possible, the sleep diary should be completed within one hour of getting out of bed in the morning. The Nighttime Sleep Diary can be completed before you go to bed at night.\nWhat should I do if I miss a day? If you forget to fill in the diary or are unable to finish it, leave the diary blank for that day.\nWhat if something unusual affects my sleep or how I feel in the daytime? If your sleep or daytime functioning is affected by some unusual event (such as an illness, or an emergency) you may make brief notes on your diary.\nWhat do the words "bed" and "day" mean on the diary? This diary can be used for people who are awake or asleep at unusual times. In the sleep diary, the word "day" is the time when you choose or are required to be awake. The term "bed" means the place where you usually sleep.\nWill answering these questions about my sleep keep me awake? This is not usually a problem. You should not worry about giving exact times, and you should not watch the clock. Just give your best estimate.\n\nMorning Sleep Diary Item Instructions:\n\nUse the guide below to clarify what is being asked for each item of the Sleep Diary.\n\n1. What time did you get into bed? Write the time that you got into bed. This may not be the time you began "trying" to fall asleep.\n2. What time did you try to go to sleep? Record the time that you began "trying" to fall asleep.\n3. How long did it take you to fall asleep? Beginning at the time you wrote in question 2, how long did it take you to fall asleep.\n4. How many times did you wake up, not counting your final awakening? How many times did you wake up between the time you first fell asleep and your final awakening?\n5. In total, how long did these awakenings last? What was the total time you were awake between the time you first fell asleep and your final awakening. For example, if you woke 3 times for 20 minutes, 35 minutes, and 15 minutes, add them all up (20+35+15= 70 min or 1 hr and 10 min).\n6a. What time was your final awakening? Record the last time you woke up in the morning.\n6b. After your final awakening, how long did you spend in bed trying to sleep? After the last time you woke-up (Item #6a), how many minutes did you spend in bed trying to sleep? For example, if you woke up at 8 am but continued to try and sleep until 9 am, record 1 hour.\n6c. Did you wake up earlier than you planned? If you woke up or were awakened earlier than you planned, check yes. If you woke up at your planned time, check no.\n6d. If yes, how much earlier? If you answered "yes" to question 6c, write the number of minutes you woke up earlier than you had planned on waking up. For example, if you woke up 15 minutes before the alarm went off, record 15 minutes here.\n7. What time did you get out of bed for the day? What time did you get out of bed with no further attempt at sleeping? This may be different from your final awakening time (e.g. you may have wok at 6:35 a.m. but did not get out of bed to start your day until 7:20 a.m.)\n8. In total, how long did you sleep? This should just be your best estimate, based on when you went to bed and woke up, how long it took you to fall asleep, and how long you were awake. You do not need to calculate this by adding and subtracting; just give your best estimate.\n9. How would you rate the quality of your sleep? "Sleep Quality" is your sense of whether your sleep was good or poor.\n10. How restful or refreshed did you feel when you woke up for the day? This refers to how you felt after you were done sleeping for the night, during the first few minutes that you were awake.'
+  },
+  {
+    name: 'Consensus Sleep Diary Night',
+    questions: {
+      'How many times did you nap or doze': 'PRIMARY_NUMBER',
+      'In total, how long did you nap or doze?': 'SECONDARY_TEXT',
+      'How many drinks containing alcohol did you have?': 'PRIMARY_NUMBER',
+      'What time was your last alcohol drink?': 'SECONDARY_TEXT',
+      'How many caffeinated drinks (coffee, tea, soda, energy drinks) did you have?': 'PRIMARY_NUMBER',
+      'What time was your last caffeinated drink?': 'SECONDARY_TEXT',
+      'Did you take any over-the-counter or prescription medication(s) to help you sleep?': 'PRIMARY_BOOL',
+      'If so, list medication(s), dose, and time taken': 'SECONDARY_TEXT',
+      Comments: 'SECONDARY_TEXT'
+    },
+    additionalInformation: [],
+    instructions: 'General Instructions:\n\nWhat is a Sleep Diary? A sleep diary is designed to gather information about your daily sleep pattern.\nHow often and when do I fill out the sleep diary? It is necessary for you to complete your sleep diary every day. If possible, the sleep diary should be completed within one hour of getting out of bed in the morning. The Nighttime Sleep Diary can be completed before you go to bed at night.\nWhat should I do if I miss a day? If you forget to fill in the diary or are unable to finish it, leave the diary blank for that day.\nWhat if something unusual affects my sleep or how I feel in the daytime? If your sleep or daytime functioning is affected by some unusual event (such as an illness, or an emergency) you may make brief notes on your diary.\nWhat do the words "bed" and "day" mean on the diary? This diary can be used for people who are awake or asleep at unusual times. In the sleep diary, the word "day" is the time when you choose or are required to be awake. The term "bed" means the place where you usually sleep.\nWill answering these questions about my sleep keep me awake? This is not usually a problem. You should not worry about giving exact times, and you should not watch the clock. Just give your best estimate.\n\nNighttime Sleep Diary Item Instructions:\n\nPlease complete the following items before you go to bed.\n\n11a. How many times did you nap or doze? A nap is a time you decided to sleep during the day, whether in bed or not in bed. "Dozing" is a time you may have nodded off for a few minutes, without meaning to, such as while watching TV. Count all the times you napped or dozed at any time from when you first got out of bed in the morning until you got into bed again at night.\n11b. In total, how long did you nap or doze? Estimate the total amount of time you spent napping or dozing, in hours and minutes. For instance, if you napped twice, once for 30 minutes and once for 60 minutes, and dozed for 10 minutes, you would answer "1 hour 40 minutes." If you did not nap or doze, write "N/A" (not applicable).\n12a. How many drinks containing alcohol did you have? Enter the number of alcoholic drinks you had where 1 drink is defined as one 12 oz beer (can), 5 oz wine, or 1.5 oz liquor (one shot).\n12b. What time was your last drink? If you had an alcoholic drink yesterday, enter the time of day in hours and minutes of your last drink. If you did not have a drink, write "N/A" (not applicable).\n13a. How many caffeinated drinks (coffee, tea, soda, energy drinks) did you have? Enter the number of caffeinated drinks (coffee, tea, soda, energy drinks) you had where for coffee and tea, one drink = 6-8 oz; while for caffeinated soda one drink = 12 oz.\n13b. What time was your last drink? If you had a caffeinated drink, enter the time of day in hours and minutes of your last drink. If you did n have a caffeinated drink, "N/A" (not applicable).\n14. Did you take any over-the-counter or prescription medication(s) to help you sleep? If so, list medication(s), dose, and time taken: List the medication name, how much and when you took EACH different medication you took tonight to help you sleep. Include medication available over the counter, prescription medications, and herbals (example: "Sleepwell 50 mg 11 pm"). If every night is the same, write "same" after the first day.\n15. Comments If you have anything that you would like to say that is relevant to your sleep feel free to write it here.'
   },
   {
     name: 'STOP-BANG',
@@ -50,7 +57,7 @@ const questionnaires = [
       'Pressure? Do you have or are being treated for High Blood Pressure?': 'PRIMARY_BOOL',
       'Body Mass Index more than 35 kg/m^2?': 'PRIMARY_BOOL',
       'Age older than 50?': 'PRIMARY_BOOL',
-      'Neck size large? (Measured around Adams Apple) is your shirt collar 16 inches / 40 cm larger?': 'PRIMARY_BOOL',
+      'Neck size large? (Measured around Adams Apple) is your shirt collar 40 cm larger?': 'PRIMARY_BOOL',
       'Gender = Male?': 'PRIMARY_BOOL'
     },
     additionalInformation: [
@@ -58,7 +65,8 @@ const questionnaires = [
         questions: [4, 5, 7],
         default: true
       }
-    ]
+    ],
+    instructions: 'Obstructive sleep apnea (OSA) is the most prevalent sleep-breathing disturbance, affecting 24% of men and 9% of women in the general population.\n\nAn estimated 82% of men and 92% of women with moderate-to severe OSA have not been diagnosed.\n\nSleep Apnea Events:\n\nAs a complete cessation of breathing (apnea) or a marked reduction in airflow (hypopnea) during sleep, and are considered clinically relevant if they last more than 10 s. The episodes of apneas and hypopneas may persist for 30-60s in some individuals.\n\nObstructive Sleep Apnea: \n\n- Repetitive obstruction of the upper airway often resulting in oxygen desaturation and arousals from sleep\n- excessive daytime sleepiness\n- unrefreshing sleep\n- poor concentration\n- fatigue\n\nStop-Bang Item Instruction:\n\n4. Body Mass Index more than 35 kg/m^2? The Body Mass Index is weight in kilograms divided by height in meters squared. '
   },
   {
     name: 'Epworth Sleepiness Scale',
@@ -83,7 +91,8 @@ const questionnaires = [
           'High chance of falling asleep': 3
         }
       }
-    ]
+    ],
+    instructions: 'General Instructions:\n\nHow likely are you to doze off or fall asleep in the following situations, in contrast to feeling just tired?\nThis refers to your usual way of life in recent times.\nEven if you haven\'t done some of these things recently try to work out how they would have affected you.'
   },
   {
     name: 'Pittsburgh Sleep Quality Index',
@@ -156,7 +165,8 @@ const questionnaires = [
         description: 'If you have a room mate or bed partner, ask him/her how often in the past month you have had:',
         enum: ['Not during the past month', 'Less than once a week', 'Once or twice a week', 'Three or more times a week']
       }
-    ]
+    ],
+    instructions: 'General Instructions:\n\nThe following questions relate to your usual sleep habits during the past month only. Your answers should indicate the most accurate reply for the majority of days and nights in the past month. Please answer all questions.'
   },
   {
     name: 'Perceived Stress Questionnaire',
@@ -193,7 +203,8 @@ const questionnaires = [
           Usually: 3
         }
       }
-    ]
+    ],
+    instructions: 'General Instructions:\n\nBelow you will find a series of findings. Please read each one and select from the four responses the one that indicates how often the statement applies to your life in the past 2 weeks. For each observation, please check the box under the answer you have chosen. There are no right or wrong answers. Think please do not think twice and do not leave out any question.'
   },
   {
     name: 'Athens Insomnia Scale',
@@ -278,7 +289,8 @@ const questionnaires = [
           Intense: 3
         }
       }
-    ]
+    ],
+    instructions: 'General Instructions:\n\nThis scale is intended to record your own assessment of any sleep difficulty you might have experienced. Please, check (by circling the appropriate number) the items below to indicate your estimate of any difficulty, provided that it occurred at least three times per week during the last month.'
   },
   {
     name: 'International Restless Legs Scale',
@@ -339,7 +351,8 @@ const questionnaires = [
           None: 0
         }
       }
-    ]
+    ],
+    instructions: 'General instructions:\n\nThe IRLS is composed of 10 items. It gives a global score for all 10 items that is most commonly used as an overall severity score. 9 of the 10 items investigate two dimensions of the RLS severity.'
   },
   {
     name: 'Insomnia Severity Index',
@@ -408,7 +421,8 @@ const questionnaires = [
           'Very Much Interfering': 4
         }
       }
-    ]
+    ],
+    instructions: 'General instructions:\n\nThe Insomnia Severity Index has seven questions. The seven answers are added up to get a total score.For each question, please CIRCLE the number that best describes your answer.Please rate the CURRENT (i.e. LAST 2 WEEKS) SEVERITY of your insomnia problem(s).'
   }
 ]
 
@@ -419,31 +433,9 @@ async function main () {
   await prisma.session.deleteMany()
   await prisma.questionnaire.deleteMany()
   await prisma.questionnaireAlgorithm.deleteMany()
-  // TODO: HASH ADMIN PASSWORD
-  // IDEA ELIMINAR LA CREACION DEL ADMIN DE AQUI Y LUEGO CREAR EL ADMIN USANDO LA
-  // UTILIDAD FASTIFY.INJECT
-  const admin = await prisma.user.create({
-    data: {
-      email: 'admin@admin.com',
-      name: 'Admin',
-      birth: new Date(),
-      role: 'ADMIN',
-      gender: 'NEUTER',
-      height: 3,
-      weight: 100,
-      password: 'f^4p#XS71BtqLQrvtT&',
-      BMI: 100,
-      verified: true,
-      chronicDisorders: ''
-    }
-  })
-
-  console.log({ admin })
-
-  const questionnaireDB = await prisma.questionnaire.createMany({
+  await prisma.questionnaire.createMany({
     data: questionnaires
   })
-  console.log(questionnaireDB)
 }
 
 main()
