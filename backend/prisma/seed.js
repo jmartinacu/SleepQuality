@@ -173,34 +173,34 @@ const questionnaires = [
     questions: {
       'You feel rested': 'PRIMARY_TEXT',
       'You feel that too many demands are being made on you': 'PRIMARY_TEXT',
-      'You have too many things to do': 'PRIMARY_TEXT',
-      "You feel you're doing things you really like": 'PRIMARY_TEXT',
-      'You fear you may not manage to attain your goals': 'PRIMARY_TEXT',
+      'You have too much to do': 'PRIMARY_TEXT',
+      "You feel you're doing things that you really like": 'PRIMARY_TEXT',
+      'You fear that you will not be able to achieve your goals': 'PRIMARY_TEXT',
       'You feel calm': 'PRIMARY_TEXT',
       'You feel frustrated': 'PRIMARY_TEXT',
       'You are full of energy': 'PRIMARY_TEXT',
       'You feel tense': 'PRIMARY_TEXT',
       'Your problems seem to be pilling up': 'PRIMARY_TEXT',
-      "You feel you're in a hurry": 'PRIMARY_TEXT',
-      'You feel safe and protected': 'PRIMARY_TEXT',
+      'You feel rushed': 'PRIMARY_TEXT',
+      'You feel safe and secure': 'PRIMARY_TEXT',
       'You have many worries': 'PRIMARY_TEXT',
-      'You enjoy yourself': 'PRIMARY_TEXT',
-      'You are afraid for the future': 'PRIMARY_TEXT',
-      'You are lighthearted': 'PRIMARY_TEXT',
-      'You feel mentally relaxing': 'PRIMARY_TEXT',
+      'You have fun': 'PRIMARY_TEXT',
+      'You are afraid of the future': 'PRIMARY_TEXT',
+      'You are light hearted': 'PRIMARY_TEXT',
+      'You feel mentally exhausted': 'PRIMARY_TEXT',
       'You have trouble relaxing': 'PRIMARY_TEXT',
-      'Yoy have enough time for yourself': 'PRIMARY_TEXT',
+      'You have enough time for yourself': 'PRIMARY_TEXT',
       'You feel under pressure from deadlines': 'PRIMARY_TEXT'
     },
     additionalInformation: [
       {
         questions: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
-        enum: ['Almost never', 'Some-times', 'Often', 'Usually'],
+        enum: ['Almost never', 'Sometimes', 'Frequent', 'Mostly'],
         relation: {
-          'Almost never': 0,
-          'Some-times': 1,
-          Often: 2,
-          Usually: 3
+          'Almost never': 1,
+          Sometimes: 2,
+          Frequent: 3,
+          Mostly: 4
         }
       }
     ],

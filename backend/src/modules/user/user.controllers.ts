@@ -8,6 +8,7 @@ import type {
   CreateUserSchema,
   DeleteUserAuthenticatedSchema,
   ForgotPasswordSchema,
+  GetCSVDataSchema,
   GetProfilePictureSchema,
   GetUserAuthenticatedSchema,
   LogInSchema,
@@ -41,6 +42,7 @@ import {
 } from '../../utils/helpers'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 import { errorCodeAndMessage } from '../../utils/error'
+import { saveCSV } from '../../utils/csv'
 
 // TODO: CHECK EMAIL IS NOT UNIQUE IN DB
 async function createUserHandler (
@@ -426,6 +428,35 @@ async function getProfilePictureHandler (
   }
 }
 
+async function getCSVDataHandler (
+  request: FastifyRequestTypebox<typeof GetCSVDataSchema>,
+  reply: FastifyReplyTypebox<typeof GetCSVDataSchema>
+): Promise<ReadStream> {
+  try {
+    const { userId } = request.user as { userId: string }
+    const fileName = `${userId}.csv`
+    await saveCSV(userId, fileName, 'all')
+    const fileStream = fs.createReadStream(fileName)
+    return await reply.type('text/csv').send(fileStream)
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  } finally {
+    const { userId } = request.user as { userId: string }
+    const fileName = `${userId}.csv`
+    if (fs.existsSync(fileName)) {
+      fs.unlink(fileName, () => {})
+    }
+  }
+}
+
 export {
   createUserHandler,
   deleteUserHandler,
@@ -438,5 +469,6 @@ export {
   resetPasswordHandler,
   addProfilePictureHandler,
   getProfilePictureHandler,
-  acceptDoctorHandler
+  acceptDoctorHandler,
+  getCSVDataHandler
 }

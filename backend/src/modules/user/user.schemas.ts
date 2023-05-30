@@ -79,6 +79,10 @@ const userAttributes = {
     contentEncoding: 'base64',
     contentMediaType: 'image/webp'
   }),
+  csvData: Type.String({
+    contentEncoding: 'base64',
+    contentMediaType: 'text/csv'
+  }),
   message: Type.String()
 }
 
@@ -99,6 +103,7 @@ const {
   profilePictureJPG,
   profilePicturePNG,
   profilePictureWEBP,
+  csvData,
   verified,
   questionnairesToDo,
   ids,
@@ -382,6 +387,13 @@ const GetProfilePictureSchema = {
   }
 }
 
+const GetCSVDataSchema = {
+  response: {
+    200: csvData,
+    500: Type.Unknown()
+  }
+}
+
 type CreateUserInput = Static<typeof createUserSchema>
 type CreateUserResponse = Static<typeof createUserResponseSchema>
 type CreateUserServiceInput = Static<typeof createUserServiceSchema>
@@ -416,6 +428,7 @@ export {
   ResetPasswordSchema,
   AddProfilePictureSchema,
   GetProfilePictureSchema,
+  GetCSVDataSchema,
   type CreateUserResponse,
   type CreateUserInput,
   type CreateUserServiceInput,

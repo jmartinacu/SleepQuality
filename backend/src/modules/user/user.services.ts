@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import prisma, { type User, type Session } from '../../utils/database'
+import prisma, { type User, type Session, Answer, QuestionnaireAlgorithm } from '../../utils/database'
 import { calculateBMI, parseStringToDate } from '../../utils/helpers'
 import {
   CreateUserHandlerResponse,
@@ -317,6 +317,24 @@ async function updateSession (
   return session
 }
 
+async function findUserAnswers (userId: string): Promise<Answer[]> {
+  const answer = await prisma.answer.findMany({
+    where: {
+      userId
+    }
+  })
+  return answer
+}
+
+async function findUserAlgorithms (userId: string): Promise<QuestionnaireAlgorithm[]> {
+  const algorithms = await prisma.questionnaireAlgorithm.findMany({
+    where: {
+      userId
+    }
+  })
+  return algorithms
+}
+
 export {
   createUser,
   createUserSession,
@@ -330,5 +348,7 @@ export {
   findUserMany,
   findSessionUnique,
   updateSession,
-  findSessionAndUserUnique
+  findSessionAndUserUnique,
+  findUserAnswers,
+  findUserAlgorithms
 }

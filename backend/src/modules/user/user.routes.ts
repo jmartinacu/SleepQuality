@@ -11,7 +11,8 @@ import {
   getProfilePictureHandler,
   deleteUserHandler,
   updateUserHandler,
-  acceptDoctorHandler
+  acceptDoctorHandler,
+  getCSVDataHandler
 } from './user.controllers'
 import {
   CreateUserSchema,
@@ -25,7 +26,8 @@ import {
   ResetPasswordSchema,
   AddProfilePictureSchema,
   GetProfilePictureSchema,
-  AcceptDoctorSchema
+  AcceptDoctorSchema,
+  GetCSVDataSchema
 } from './user.schemas'
 import { upload } from '../../server'
 
@@ -106,7 +108,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     resetPasswordHandler
   )
 
-  // TODO: USER NEED TO KNOW THE ID OF THE DOCTOR WHO HAS SENDED THE EMAIL TO HIM
+  // TODO TESTING HAPPY PATH
   server.post('/doctors/:doctorCode',
     {
       onRequest: server.auth([server.authenticate]),
@@ -138,7 +140,15 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     },
     getProfilePictureHandler
   )
-  // TODO: CSV DATA ENDPOINT
+
+  server.get('/data',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkUserVerification]),
+      schema: GetCSVDataSchema
+    },
+    getCSVDataHandler
+  )
 }
 
 export default userRoutes

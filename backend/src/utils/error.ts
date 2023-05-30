@@ -34,6 +34,13 @@ class ValidationError extends Error {
   }
 }
 
+class CSVError extends Error {
+  constructor (message: string) {
+    super(message)
+    this.message = message
+  }
+}
+
 function errorCodeAndMessage (error: unknown): [number, { message: string }] | unknown {
   console.error(error)
   console.log('--------------------------------------------')
@@ -46,6 +53,9 @@ function errorCodeAndMessage (error: unknown): [number, { message: string }] | u
     console.info(`Validation ${error.failedValidation} failed`)
     console.info(`Cause: ${error.reason}`)
     return [error.code, { message: error.message }]
+  } else if (error instanceof CSVError) {
+    console.info('Create CSV file failed')
+    return [500, { message: error.message }]
   } else {
     return error
   }
@@ -55,5 +65,6 @@ export {
   errorCodeAndMessage,
   DateFormatError,
   QuestionnaireAlgorithmError,
-  ValidationError
+  ValidationError,
+  CSVError
 }
