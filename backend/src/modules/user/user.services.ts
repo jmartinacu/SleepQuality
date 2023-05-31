@@ -1,13 +1,16 @@
-import fs from 'node:fs/promises'
+import fs, { appendFile } from 'node:fs/promises'
 import path from 'node:path'
-import prisma, { type User, type Session, Answer, QuestionnaireAlgorithm } from '../../utils/database'
-import { calculateBMI, parseStringToDate } from '../../utils/helpers'
+import prisma, { type User, type Session, Answer, QuestionnaireAlgorithm, Questionnaire } from '../../utils/database'
+import { calculateBMI, parseDateToString, parseStringToDate } from '../../utils/helpers'
 import {
   CreateUserHandlerResponse,
   UpdateSessionInput,
   UpdateUserServiceInput,
   CreateUserServiceInput
 } from './user.schemas'
+import { CSVError } from '../../utils/error'
+import { findQuestionnaireUnique } from '../questionnaire/questionnaire.services'
+import { AnswerUser } from '../questionnaire/questionnaire.schemas'
 
 async function createUser (
   userInput: CreateUserServiceInput
@@ -335,6 +338,146 @@ async function findUserAlgorithms (userId: string): Promise<QuestionnaireAlgorit
   return algorithms
 }
 
+async function saveCSV (
+  userId: string,
+  fileName: string,
+  mode: 'all' | 'answers' | 'algorithms'
+): Promise<void> {
+  try {
+    let answers: Answer[]
+    let algorithms: QuestionnaireAlgorithm[]
+    switch (mode) {
+      case 'answers':
+        answers = await findUserAnswers(userId)
+        await saveAnswersCSV(answers, fileName)
+        break
+      case 'algorithms':
+        algorithms = await findUserAlgorithms(userId)
+        await saveAlgorithmsCSV(algorithms, fileName)
+        break
+      default:
+        answers = await findUserAnswers(userId)
+        algorithms = await findUserAlgorithms(userId)
+        await saveAllCSV(answers, algorithms, fileName)
+    }
+  } catch (error) {
+    throw new CSVError('Store user data in CSV file failed')
+  }
+}
+
+async function saveAllCSV (
+  answers: Answer[],
+  algorithms: QuestionnaireAlgorithm[],
+  fileName: string
+): Promise<void> {
+  await saveAnswersCSV(answers, fileName)
+  await saveAlgorithmsCSV(algorithms, fileName)
+}
+
+async function saveAnswersCSV (answers: Answer[], fileName: string): Promise<void> {
+  const csvMap = await transformAnswersToCSVData(answers)
+
+  for (const [header, csvData] of csvMap.entries()) {
+    await appendFile(fileName, header)
+    await Promise.all(csvData.map(async (line) => {
+      await appendFile(fileName, line)
+    }))
+  }
+}
+
+async function transformAnswersToCSVData (
+  answers: Answer[]
+): Promise<Map<string, string[]>> {
+  return await answers.reduce(
+    async (accumulator, current) => {
+      const { name } = await findQuestionnaireUnique(
+        'id',
+        current.questionnaireId
+      ) as Questionnaire
+      const answerWithoutCommas = removeCommasFromAnswer(current)
+      const headerAux = answerWithoutCommas.map(data => data.question)
+      headerAux.unshift(name)
+      headerAux.push('date')
+      const newHeader = headerAux.join(',')
+      const awaitedAccumulator = await accumulator
+      if (!awaitedAccumulator.has(newHeader)) {
+        const date = parseDateToString(current.createdAt)
+        const responses = answerWithoutCommas.map(data => data.response).join(',')
+        awaitedAccumulator.set(newHeader, [`${name},${responses},${date}`])
+      } else {
+        const date = parseDateToString(current.createdAt)
+        const responses = answerWithoutCommas.map(data => data.response).join(',')
+        awaitedAccumulator.get(newHeader)?.push(`${name},${responses},${date}`)
+      }
+      return awaitedAccumulator
+    }, Promise.resolve(new Map<string, string[]>()))
+}
+
+function removeCommasFromAnswer (current: Answer): Array<
+{
+  question: string
+  response: string
+} | {
+  question: string
+  response: boolean | number | null
+}
+> {
+  return Object.entries(current.answers as AnswerUser)
+    .map(entry => {
+      let newResponse
+      const commaGlobalRegex = /,/g
+      if (typeof entry[1] === 'string') {
+        newResponse = entry[1].replace(commaGlobalRegex, '')
+        return {
+          question: entry[0].replace(commaGlobalRegex, ''),
+          response: newResponse
+        }
+      } else {
+        return {
+          question: entry[0].replace(commaGlobalRegex, ''),
+          response: entry[1]
+        }
+      }
+    })
+}
+
+async function saveAlgorithmsCSV (
+  algorithms: QuestionnaireAlgorithm[],
+  fileName: string
+): Promise<void> {
+  const { header, algorithmsCSVData } = transformAlgorithmsToCSVData(algorithms)
+  await appendFile(fileName, header)
+  await Promise.all(algorithmsCSVData.map(async (line) => {
+    await appendFile(fileName, line)
+  }))
+}
+
+function transformAlgorithmsToCSVData (
+  algorithms: QuestionnaireAlgorithm[]
+): {
+    header: string
+    algorithmsCSVData: string[]
+  } {
+  const algorithmsCSVData = algorithms.map(algorithm => {
+    return [
+      algorithm.athensInsomniaScale,
+      algorithm.epworthSleepinessScaleRisk,
+      algorithm.epworthSleepinessScaleWarning,
+      algorithm.insomniaSeverityIndexRisk,
+      algorithm.insomniaSeverityIndexWarning,
+      algorithm.internationalRestlessLegsScale,
+      algorithm.perceivedStressQuestionnaire,
+      algorithm.pittsburghSleepQualityIndex,
+      algorithm.stopBangRisk,
+      algorithm.stopBangWarning,
+      parseDateToString(algorithm.createdAt)
+    ].join(',')
+  })
+
+  const header = 'athensInsomniaScale,epworthSleepinessScaleRisk,epworthSleepinessScaleWarning,insomniaSeverityIndexRisk,insomniaSeverityIndexWarning,internationalRestlessLegsScale,perceivedStressQuestionnaire,pittsburghSleepQualityIndex,stopBangRisk,stopBangWarning,date'
+  return { header, algorithmsCSVData }
+}
+
 export {
   createUser,
   createUserSession,
@@ -350,5 +493,6 @@ export {
   updateSession,
   findSessionAndUserUnique,
   findUserAnswers,
-  findUserAlgorithms
+  findUserAlgorithms,
+  saveCSV
 }

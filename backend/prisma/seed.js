@@ -2,7 +2,6 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 const questionnaires = [
-  // TODO ADD INSTRUCTIONS TO ALL QUESTIONNAIRES
   {
     name: 'Consensus Sleep Diary Morning',
     questions: {

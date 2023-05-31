@@ -280,6 +280,14 @@ const getUser = Type.Object({
 
 const getUsers = Type.Array(getUser)
 
+const getCSVDataQueryStringSchema = Type.Object({
+  data: Type.Optional(Type.Union([
+    Type.Literal('answers'),
+    Type.Literal('algorithms'),
+    Type.Literal('all')
+  ]))
+})
+
 // TODO CHECK RESPONSES PREHANDLERS
 const CreateUserSchema = {
   body: createUserSchema,
@@ -388,6 +396,7 @@ const GetProfilePictureSchema = {
 }
 
 const GetCSVDataSchema = {
+  querystring: getCSVDataQueryStringSchema,
   response: {
     200: csvData,
     500: Type.Unknown()

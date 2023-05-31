@@ -26,6 +26,7 @@ import {
   deleteUser,
   findSessionUnique,
   findUserUnique,
+  saveCSV,
   updateSession,
   updateUser
 } from './user.services'
@@ -42,9 +43,7 @@ import {
 } from '../../utils/helpers'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 import { errorCodeAndMessage } from '../../utils/error'
-import { saveCSV } from '../../utils/csv'
 
-// TODO: CHECK EMAIL IS NOT UNIQUE IN DB
 async function createUserHandler (
   request: FastifyRequestTypebox<typeof CreateUserSchema>,
   reply: FastifyReplyTypebox<typeof CreateUserSchema>
@@ -62,10 +61,11 @@ async function createUserHandler (
       weight: rest.weight
     }
 
-    const checkEmailIsUnique = await findUserUnique('email', rest.email)
+    const checkEmailUserIsUnique = await findUserUnique('email', rest.email)
+    const checkEmailDoctorIsUnique = await findUserUnique('email', rest.email)
 
-    if (checkEmailIsUnique !== null) {
-      return await reply.code(400).send({ message: `Email ${rest.email} is used by other user` })
+    if (checkEmailUserIsUnique !== null || checkEmailDoctorIsUnique !== null) {
+      return await reply.code(400).send({ message: `Email ${rest.email} is already used` })
     }
 
     const passwordHash = await request.bcryptHash(password)
@@ -432,10 +432,18 @@ async function getCSVDataHandler (
   request: FastifyRequestTypebox<typeof GetCSVDataSchema>,
   reply: FastifyReplyTypebox<typeof GetCSVDataSchema>
 ): Promise<ReadStream> {
+  const { userId } = request.user as { userId: string }
+  const fileName = `${userId}.csv`
   try {
-    const { userId } = request.user as { userId: string }
-    const fileName = `${userId}.csv`
-    await saveCSV(userId, fileName, 'all')
+    const { data } = request.query
+    console.log(data)
+    if (typeof data === 'undefined' || data === 'all') {
+      await saveCSV(userId, fileName, 'all')
+    } else if (data === 'algorithms') {
+      await saveCSV(userId, fileName, 'algorithms')
+    } else {
+      await saveCSV(userId, fileName, 'answers')
+    }
     const fileStream = fs.createReadStream(fileName)
     return await reply.type('text/csv').send(fileStream)
   } catch (error) {
@@ -449,8 +457,6 @@ async function getCSVDataHandler (
     }
     return await reply.code(code).send(message)
   } finally {
-    const { userId } = request.user as { userId: string }
-    const fileName = `${userId}.csv`
     if (fs.existsSync(fileName)) {
       fs.unlink(fileName, () => {})
     }
