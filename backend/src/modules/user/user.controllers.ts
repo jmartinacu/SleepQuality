@@ -436,7 +436,6 @@ async function getCSVDataHandler (
   const fileName = `${userId}.csv`
   try {
     const { data } = request.query
-    console.log(data)
     if (typeof data === 'undefined' || data === 'all') {
       await saveCSV(userId, fileName, 'all')
     } else if (data === 'algorithms') {

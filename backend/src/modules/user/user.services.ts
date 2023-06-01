@@ -1,6 +1,12 @@
 import fs, { appendFile } from 'node:fs/promises'
 import path from 'node:path'
-import prisma, { type User, type Session, Answer, QuestionnaireAlgorithm, Questionnaire } from '../../utils/database'
+import prisma, {
+  type User,
+  type Session,
+  type Answer,
+  type QuestionnaireAlgorithm,
+  type Questionnaire
+} from '../../utils/database'
 import { calculateBMI, parseDateToString, parseStringToDate } from '../../utils/helpers'
 import {
   CreateUserHandlerResponse,
@@ -10,7 +16,7 @@ import {
 } from './user.schemas'
 import { CSVError } from '../../utils/error'
 import { findQuestionnaireUnique } from '../questionnaire/questionnaire.services'
-import { AnswerUser } from '../questionnaire/questionnaire.schemas'
+import { AnswerUser, PerceivedStressQuestionnaireEmotions } from '../questionnaire/questionnaire.schemas'
 
 async function createUser (
   userInput: CreateUserServiceInput
@@ -361,7 +367,11 @@ async function saveCSV (
         await saveAllCSV(answers, algorithms, fileName)
     }
   } catch (error) {
-    throw new CSVError('Store user data in CSV file failed')
+    let reason = 'Unknown'
+    if (error instanceof Error) {
+      reason = error.message
+    }
+    throw new CSVError('Store user data in CSV file failed', reason)
   }
 }
 
@@ -376,7 +386,6 @@ async function saveAllCSV (
 
 async function saveAnswersCSV (answers: Answer[], fileName: string): Promise<void> {
   const csvMap = await transformAnswersToCSVData(answers)
-
   for (const [header, csvData] of csvMap.entries()) {
     await appendFile(fileName, header)
     await Promise.all(csvData.map(async (line) => {
@@ -398,16 +407,16 @@ async function transformAnswersToCSVData (
       const headerAux = answerWithoutCommas.map(data => data.question)
       headerAux.unshift(name)
       headerAux.push('date')
-      const newHeader = headerAux.join(',')
+      const newHeader = headerAux.join(',') + '\n'
       const awaitedAccumulator = await accumulator
       if (!awaitedAccumulator.has(newHeader)) {
         const date = parseDateToString(current.createdAt)
         const responses = answerWithoutCommas.map(data => data.response).join(',')
-        awaitedAccumulator.set(newHeader, [`${name},${responses},${date}`])
+        awaitedAccumulator.set(newHeader, [`${name},${responses},${date}\n`])
       } else {
         const date = parseDateToString(current.createdAt)
         const responses = answerWithoutCommas.map(data => data.response).join(',')
-        awaitedAccumulator.get(newHeader)?.push(`${name},${responses},${date}`)
+        awaitedAccumulator.get(newHeader)?.push(`${name},${responses},${date}\n`)
       }
       return awaitedAccumulator
     }, Promise.resolve(new Map<string, string[]>()))
@@ -424,20 +433,20 @@ function removeCommasFromAnswer (current: Answer): Array<
 > {
   return Object.entries(current.answers as AnswerUser)
     .map(entry => {
-      let newResponse
+      let result
       const commaGlobalRegex = /,/g
       if (typeof entry[1] === 'string') {
-        newResponse = entry[1].replace(commaGlobalRegex, '')
-        return {
+        result = {
           question: entry[0].replace(commaGlobalRegex, ''),
-          response: newResponse
+          response: entry[1].replace(commaGlobalRegex, '')
         }
       } else {
-        return {
+        result = {
           question: entry[0].replace(commaGlobalRegex, ''),
           response: entry[1]
         }
       }
+      return result
     })
 }
 
@@ -459,22 +468,38 @@ function transformAlgorithmsToCSVData (
     algorithmsCSVData: string[]
   } {
   const algorithmsCSVData = algorithms.map(algorithm => {
-    return [
+    const emotions = (algorithm.perceivedStressQuestionnaireEmotions as PerceivedStressQuestionnaireEmotions | null)
+    const worries = emotions !== null && typeof emotions.worries !== 'undefined' ? emotions.worries : null
+    const tension = emotions !== null && typeof emotions.tension !== 'undefined' ? emotions.tension : null
+    const joy = emotions !== null && typeof emotions.joy !== 'undefined' ? emotions.joy : null
+    const requirements = emotions !== null && typeof emotions.requirements !== 'undefined' ? emotions.requirements : null
+    const result = [
       algorithm.athensInsomniaScale,
       algorithm.epworthSleepinessScaleRisk,
       algorithm.epworthSleepinessScaleWarning,
       algorithm.insomniaSeverityIndexRisk,
       algorithm.insomniaSeverityIndexWarning,
       algorithm.internationalRestlessLegsScale,
-      algorithm.perceivedStressQuestionnaire,
+      algorithm.perceivedStressQuestionnaireRisk,
+      worries,
+      tension,
+      joy,
+      requirements,
       algorithm.pittsburghSleepQualityIndex,
       algorithm.stopBangRisk,
       algorithm.stopBangWarning,
       parseDateToString(algorithm.createdAt)
     ].join(',')
+    return result + '\n'
   })
 
-  const header = 'athensInsomniaScale,epworthSleepinessScaleRisk,epworthSleepinessScaleWarning,insomniaSeverityIndexRisk,insomniaSeverityIndexWarning,internationalRestlessLegsScale,perceivedStressQuestionnaire,pittsburghSleepQualityIndex,stopBangRisk,stopBangWarning,date'
+  const perceivedStressQuestionnaireEmotions = [
+    'perceivedStressQuestionnaireWorries',
+    'perceivedStressQuestionnaireTension',
+    'perceivedStressQuestionnaireJoy',
+    'perceivedStressQuestionnaireRequirements'
+  ].join('')
+  const header = `athensInsomniaScale,epworthSleepinessScaleRisk,epworthSleepinessScaleWarning,insomniaSeverityIndexRisk,insomniaSeverityIndexWarning,internationalRestlessLegsScale,perceivedStressQuestionnaireRisk,${perceivedStressQuestionnaireEmotions},pittsburghSleepQualityIndex,stopBangRisk,stopBangWarning,date\n`
   return { header, algorithmsCSVData }
 }
 

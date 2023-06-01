@@ -71,7 +71,8 @@ function fakeUser ({
     questionnairesToDo,
     createdAt,
     updatedAt,
-    doctorId: null
+    doctorId: null,
+    acceptDoctor: null
   }
 }
 
@@ -148,7 +149,7 @@ const correctAnswers = [
       'Pressure? Do you have or are being treated for High Blood Pressure?': false,
       'Body Mass Index more than 35 kg/m^2?': true,
       'Age older than 50?': false,
-      'Neck size large? (Measured around Adams Apple) is your shirt collar 16 inches / 40 cm larger?': true,
+      'Neck size large? (Measured around Adams Apple) is your shirt collar 40 cm larger?': true,
       'Gender = Male?': true
     }
   },

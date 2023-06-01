@@ -35,9 +35,11 @@ class ValidationError extends Error {
 }
 
 class CSVError extends Error {
-  constructor (message: string) {
+  reason: string
+  constructor (message: string, reason: string) {
     super(message)
     this.message = message
+    this.reason = reason
   }
 }
 
@@ -55,6 +57,7 @@ function errorCodeAndMessage (error: unknown): [number, { message: string }] | u
     return [error.code, { message: error.message }]
   } else if (error instanceof CSVError) {
     console.info('Create CSV file failed')
+    console.info(error.reason)
     return [500, { message: error.message }]
   } else {
     return error

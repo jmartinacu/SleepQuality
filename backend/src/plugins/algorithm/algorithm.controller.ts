@@ -7,6 +7,7 @@ import type {
   AnswerUser,
   EpworthSleepinessScaleWarning,
   InsomniaSeverityIndexWarning,
+  PerceivedStressQuestionnaireAnswer,
   StopBangWarning
 } from '../../modules/questionnaire/questionnaire.schemas'
 import {
@@ -201,10 +202,57 @@ async function PittsburghSleepQualityIndexAlgorithm (
 }
 
 async function PerceivedStressQuestionnaireAlgorithm (
-  _answer: AnswerUser,
-  _questionnaireId: string,
-  _userId: string
+  answer: PerceivedStressQuestionnaireAnswer,
+  questionnaireId: string,
+  userId: string
 ): Promise<void> {
+  const { additionalInformation } = await findQuestionnaireUnique('id', questionnaireId) as Questionnaire
+  const scores = (additionalInformation as AdditionalInformation).at(0)?.relation as Record<string, number>
+  const responsesScores = Object.values(answer).map(response => scores[response])
+
+  const totalScore = ((
+    (
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      (responsesScores.at(9)! + responsesScores.at(12)! + responsesScores.at(14)! + responsesScores.at(4)! + responsesScores.at(6)! + responsesScores.at(8)! + (5 - responsesScores.at(0)!) + responsesScores.at(16)! + responsesScores.at(17)! + (5 - responsesScores.at(5)!) + (5 - responsesScores.at(3)!) + (5 - responsesScores.at(13)!) + (5 - responsesScores.at(15)!) + (5 - responsesScores.at(7)!) + (5 - responsesScores.at(11)!) + responsesScores.at(2)! + (5 - responsesScores.at(18)!) + responsesScores.at(19)! + responsesScores.at(10)! + responsesScores.at(1)!
+      ) / 20
+    ) - 1
+  ) / 3) * 100
+
+  const worries = ((
+    (
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      (responsesScores.at(9)! + responsesScores.at(12)! + responsesScores.at(14)! + responsesScores.at(4)! + responsesScores.at(6)!) / 5
+    ) - 1
+  ) / 3) * 100
+
+  const tension = ((
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    ((responsesScores.at(8)! + (5 - responsesScores.at(0)!) + responsesScores.at(16)! + responsesScores.at(17)! + (5 - responsesScores.at(5)!)) / 5) - 1
+  ) / 3) * 100
+
+  const joy = ((
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    ((responsesScores.at(3)! + responsesScores.at(13)! + responsesScores.at(15)! + responsesScores.at(7)! + responsesScores.at(11)!) / 5) - 1
+  ) / 3) * 100
+
+  const requirements = ((
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    ((responsesScores.at(2)! + (5 - responsesScores.at(18)!) + responsesScores.at(19)! + responsesScores.at(10)! + responsesScores.at(1)!) / 5) - 1
+  ) / 3) * 100
+
+  await createAlgorithmData(
+    {
+      perceivedStressQuestionnaireRisk: totalScore,
+      perceivedStressQuestionnaireEmotions: {
+        worries,
+        joy,
+        tension,
+        requirements
+      }
+    },
+    userId,
+    questionnaireId
+  )
 }
 
 async function AthensInsomniaScaleAlgorithm (
@@ -273,7 +321,8 @@ async function InsomniaSeverityIndexAlgorithm (
 }
 
 const questionnairesAlgorithms = {
-  'Consensus Sleep Diary': () => {},
+  'Consensus Sleep Diary Morning': () => {},
+  'Consensus Sleep Diary Night': () => {},
   'STOP-BANG': StopBangAlgorithm,
   'Epworth Sleepiness Scale': EpworthSleepinessScaleAlgorithm,
   'Pittsburgh Sleep Quality Index': PittsburghSleepQualityIndexAlgorithm,

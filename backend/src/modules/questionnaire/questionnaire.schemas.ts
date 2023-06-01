@@ -22,7 +22,8 @@ const questionnaireAttributes = {
     ])
   ),
   stopBangAnswer: Type.Record(Type.String(), Type.Boolean()),
-  epworthSleepinessScaleAnswer: Type.Record(Type.String(), Type.Integer())
+  epworthSleepinessScaleAnswer: Type.Record(Type.String(), Type.Integer()),
+  perceivedStressQuestionnaireAnswer: Type.Record(Type.String(), Type.String())
 }
 
 const algorithmAttributes = {
@@ -41,7 +42,13 @@ const algorithmAttributes = {
   ]),
   epworthSleepinessScaleRisk: Type.Integer({ minimum: 0, maximum: 24 }),
   pittsburghSleepQualityIndex: Type.Integer({ minimum: 0, maximum: 21 }),
-  perceivedStressQuestionnaire: Type.Integer(),
+  perceivedStressQuestionnaireRisk: Type.Number(),
+  perceivedStressQuestionnaireEmotions: Type.Object({
+    worries: Type.Number(),
+    tension: Type.Number(),
+    joy: Type.Number(),
+    requirements: Type.Number()
+  }),
   athensInsomniaScale: Type.Integer({ minimum: 0, maximum: 24 }),
   internationalRestlessLegsScale: Type.Integer({ minimum: 0, maximum: 40 }),
   insomniaSeverityIndexWarning: Type.Union([
@@ -59,7 +66,8 @@ const {
   questionType,
   answers,
   stopBangAnswer,
-  epworthSleepinessScaleAnswer
+  epworthSleepinessScaleAnswer,
+  perceivedStressQuestionnaireAnswer
 } = questionnaireAttributes
 
 const {
@@ -70,7 +78,8 @@ const {
   epworthSleepinessScaleRisk,
   insomniaSeverityIndexRisk,
   internationalRestlessLegsScale,
-  perceivedStressQuestionnaire,
+  perceivedStressQuestionnaireRisk,
+  perceivedStressQuestionnaireEmotions,
   pittsburghSleepQualityIndex,
   stopBangRisk
 } = algorithmAttributes
@@ -98,7 +107,8 @@ const { name, questions, additionalInformation, instructions } = questionnaireCo
 const createQuestionnaireSchema = Type.Object({
   name,
   questions,
-  additionalInformation: Type.Optional(additionalInformation)
+  additionalInformation: Type.Optional(additionalInformation),
+  instructions
 })
 
 const createAnswerSchema = Type.Object({
@@ -153,7 +163,8 @@ const getAlgorithmResponseSchema = Type.Object({
   epworthSleepinessScaleRisk: Type.Optional(epworthSleepinessScaleRisk),
   insomniaSeverityIndexRisk: Type.Optional(insomniaSeverityIndexRisk),
   internationalRestlessLegsScale: Type.Optional(internationalRestlessLegsScale),
-  perceivedStressQuestionnaire: Type.Optional(perceivedStressQuestionnaire),
+  perceivedStressQuestionnaireRisk: Type.Optional(perceivedStressQuestionnaireRisk),
+  perceivedStressQuestionnaireEmotions: Type.Optional(perceivedStressQuestionnaireEmotions),
   pittsburghSleepQualityIndex: Type.Optional(pittsburghSleepQualityIndex),
   stopBangRisk: Type.Optional(stopBangRisk)
 })
@@ -238,12 +249,14 @@ type QuestionType = Static<typeof questionType>
 type AnswerUser = Static<typeof answers>
 type AnswerStopBang = Static<typeof stopBangAnswer>
 type AnswerEpworthSleepinessScale = Static<typeof epworthSleepinessScaleAnswer>
+type PerceivedStressQuestionnaireAnswer = Static<typeof perceivedStressQuestionnaireAnswer>
 type AdditionalInformation = Static<typeof additionalInformation>
 type CreateAlgorithmInput = Partial<Static<typeof createAlgorithmSchema>>
 type StopBangWarning = Static<typeof stopBangWarning>
 type EpworthSleepinessScaleWarning = Static<typeof epworthSleepinessScaleWarning>
 type InsomniaSeverityIndexWarning = Static<typeof insomniaSeverityIndexWarning>
 type DefaultAlgorithmInformation = Static<typeof getDefaultAlgorithmInformationResponseSchema>
+type PerceivedStressQuestionnaireEmotions = Partial<Static<typeof perceivedStressQuestionnaireEmotions>>
 
 export {
   getAlgorithmResponseSchema,
@@ -268,5 +281,7 @@ export {
   type StopBangWarning,
   type EpworthSleepinessScaleWarning,
   type InsomniaSeverityIndexWarning,
-  type DefaultAlgorithmInformation
+  type DefaultAlgorithmInformation,
+  type PerceivedStressQuestionnaireEmotions,
+  type PerceivedStressQuestionnaireAnswer
 }

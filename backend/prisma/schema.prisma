@@ -74,23 +74,24 @@ model Questionnaire {
 }
 
 model QuestionnaireAlgorithm {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  stopBangWarning                String?
-  stopBangRisk                   Int?
-  epworthSleepinessScaleRisk     Int?
-  epworthSleepinessScaleWarning  String?
-  pittsburghSleepQualityIndex    Int?
-  perceivedStressQuestionnaire   Int?
-  athensInsomniaScale            Int?  
-  internationalRestlessLegsScale Int?
-  insomniaSeverityIndexWarning   String?
-  insomniaSeverityIndexRisk      Int?
-  createdAt                      DateTime @default(now())
-  updatedAt                      DateTime @updatedAt
-  questionnaireId                String  @db.ObjectId
-  quesionnaire                   Questionnaire @relation(fields: [questionnaireId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  userId                         String @db.ObjectId
-  user                           User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  id String @id @default(auto())       @map("_id") @db.ObjectId
+  stopBangWarning                      String?
+  stopBangRisk                         Int?
+  epworthSleepinessScaleRisk           Int?
+  epworthSleepinessScaleWarning        String?
+  pittsburghSleepQualityIndex          Int?
+  perceivedStressQuestionnaireRisk     Float?
+  perceivedStressQuestionnaireEmotions Json?
+  athensInsomniaScale                  Int?  
+  internationalRestlessLegsScale       Int?
+  insomniaSeverityIndexWarning         String?
+  insomniaSeverityIndexRisk            Int?
+  createdAt                            DateTime @default(now())
+  updatedAt                            DateTime @updatedAt
+  questionnaireId                      String  @db.ObjectId
+  quesionnaire                         Questionnaire @relation(fields: [questionnaireId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId                               String @db.ObjectId
+  user                                 User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model Answer {
