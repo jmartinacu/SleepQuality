@@ -211,9 +211,9 @@ const RegisterForm = ({ navigation }) => {
           ? (
             <View>
               <View style={styles.wrapperInputWrong}>
+                <Text style={styles.floatingLabel}>Name</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Name Lastname'
                   value={name}
                   onChangeText={text => handleCheckName(text)}
                   returnKeyType='done'
@@ -226,9 +226,9 @@ const RegisterForm = ({ navigation }) => {
           : (
             <View>
               <View style={styles.wrapperInput}>
+                <Text style={styles.floatingLabel}>Name</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Name'
                   value={name}
                   onChangeText={text => handleCheckName(text)}
                   returnKeyType='done'
@@ -244,9 +244,9 @@ const RegisterForm = ({ navigation }) => {
           ? (
             <View>
               <View style={styles.wrapperInputWrong}>
+                <Text style={styles.floatingLabel}>Email</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Email'
                   inputMode='email'
                   keyboardType='email-address'
                   value={email}
@@ -262,9 +262,9 @@ const RegisterForm = ({ navigation }) => {
           : (
             <View>
               <View style={styles.wrapperInput}>
+                <Text style={styles.floatingLabel}>Email</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Email'
                   inputMode='email'
                   keyboardType='email-address'
                   value={email}
@@ -283,9 +283,9 @@ const RegisterForm = ({ navigation }) => {
           ? (
             <View>
               <View style={styles.wrapperInputWrong}>
+                <Text style={styles.floatingLabel}>Password</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Password'
                   value={password}
                   secureTextEntry={seePassword}
                   onChangeText={text => handleCheckPasswordValidity(text)}
@@ -305,9 +305,9 @@ const RegisterForm = ({ navigation }) => {
           : (
             <View>
               <View style={styles.wrapperInput}>
+                <Text style={styles.floatingLabel}>Password</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Password'
                   value={password}
                   secureTextEntry={seePassword}
                   onChangeText={text => handleCheckPasswordValidity(text)}
@@ -329,9 +329,9 @@ const RegisterForm = ({ navigation }) => {
           ? (
             <View>
               <View style={styles.wrapperInputWrong}>
+                <Text style={styles.floatingLabel}>Confirm Password</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Confirm Password'
                   value={confirmedPassword}
                   secureTextEntry={seeConfirmedPassword}
                   onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
@@ -351,9 +351,9 @@ const RegisterForm = ({ navigation }) => {
           : (
             <View>
               <View style={styles.wrapperInput}>
+                <Text style={styles.floatingLabel}>Confirm Password</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Confirm Password'
                   value={confirmedPassword}
                   secureTextEntry={seeConfirmedPassword}
                   onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
@@ -374,7 +374,7 @@ const RegisterForm = ({ navigation }) => {
         <View
           style={{
             marginTop: 20,
-            borderBottomColor: 'black',
+            borderBottomColor: 'white',
             borderBottomWidth: StyleSheet.hairlineWidth
           }}
         />
@@ -385,11 +385,11 @@ const RegisterForm = ({ navigation }) => {
           {checkValidHeight
             ? (
               <View style={styles.wrapperInputWrong}>
+                <Text style={styles.floatingLabel}>Height</Text>
                 <TextInput
                   style={styles.input}
                   inputMode='numeric'
                   keyboardType='numeric'
-                  placeholder='Height'
                   value={height}
                   onChangeText={text => handleCheckHeightValidity(text)}
                   returnKeyType='done'
@@ -399,11 +399,11 @@ const RegisterForm = ({ navigation }) => {
               )
             : (
               <View style={styles.wrapperInput}>
+                <Text style={styles.floatingLabel}>Height</Text>
                 <TextInput
                   style={styles.input}
                   inputMode='numeric'
                   keyboardType='numeric'
-                  placeholder='Height'
                   value={height}
                   onChangeText={text => handleCheckHeightValidity(text)}
                   returnKeyType='done'
@@ -416,11 +416,11 @@ const RegisterForm = ({ navigation }) => {
           {checkValidWeight
             ? (
               <View style={styles.wrapperInputWrong}>
+                <Text style={styles.floatingLabel}>Weight</Text>
                 <TextInput
                   style={styles.input}
                   inputMode='numeric'
                   keyboardType='numeric'
-                  placeholder='Weight'
                   value={weight}
                   onChangeText={text => handleCheckWeightValidity(text)}
                   returnKeyType='done'
@@ -430,11 +430,11 @@ const RegisterForm = ({ navigation }) => {
               )
             : (
               <View style={styles.wrapperInput}>
+                <Text style={styles.floatingLabel}>Weight</Text>
                 <TextInput
                   style={styles.input}
                   inputMode='numeric'
                   keyboardType='numeric'
-                  placeholder='Weight'
                   value={weight}
                   onChangeText={text => handleCheckWeightValidity(text)}
                   returnKeyType='done'
@@ -486,7 +486,7 @@ const RegisterForm = ({ navigation }) => {
         <View
           style={{
             marginTop: 20,
-            borderBottomColor: 'black',
+            borderBottomColor: 'white',
             borderBottomWidth: StyleSheet.hairlineWidth
           }}
         />
@@ -518,8 +518,8 @@ const RegisterForm = ({ navigation }) => {
 
           {/* INPUT CHRONICAL DISORDER */}
           <View>
-            <Text style={styles.input}>Any chronical disorder?</Text>
             <View style={styles.wrapperInput}>
+              <Text style={styles.floatingLabel}>Any chronical disorder?</Text>
               <TextInput
                 style={styles.input}
                 multiline
@@ -593,6 +593,17 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     height: 50
   },
+
+  floatingLabel: {
+    position: 'absolute',
+    top: -10,
+    left: 10,
+    paddingHorizontal: 5,
+    backgroundColor: '#191970',
+    color: 'white',
+    fontSize: 12
+  },
+
   wrapperIcon: {
     position: 'absolute',
     right: 0,

@@ -58,7 +58,7 @@ const LoginForm = ({ navigation }) => {
     }
 
     const isContainsSymbol =
-       /^(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹]).*$/
+      /^(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹]).*$/
     if (!isContainsSymbol.test(value)) {
       return 'Password must contain at least one Special Symbol.'
     }
@@ -108,26 +108,19 @@ const LoginForm = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-
-      <View style={styles.wrapperInput}>
+      <View style={[styles.wrapperInput, email === '' || checkValidEmail ? styles.invalidInput : null]}>
+        <Text style={styles.floatingLabel}>Email</Text>
         <TextInput
           style={styles.input}
-          placeholder='Email'
           value={email}
           onChangeText={text => handleCheckEmail(text)}
         />
       </View>
-      {checkValidEmail
-        ? (
-          <Text style={styles.textFailed}>Wrong format email</Text>
-          )
-        : (
-          <Text style={styles.textFailed}> </Text>
-          )}
-      <View style={styles.wrapperInput}>
+      {checkValidEmail ? <Text style={styles.textFailed}>Wrong format email</Text> : null}
+      <View style={[styles.wrapperInput, password === '' ? styles.invalidInput : null]}>
+        <Text style={styles.floatingLabel}>Password</Text>
         <TextInput
           style={styles.input}
-          placeholder='Password'
           value={password}
           secureTextEntry={seePassword}
           onChangeText={text => setPassword(text)}
@@ -145,7 +138,7 @@ const LoginForm = ({ navigation }) => {
       >
         <Text style={styles.underline}>Forgot password?</Text>
       </TouchableOpacity>
-      {email === '' || password === '' || checkValidEmail === true
+      {(email === '' || password === '' || checkValidEmail)
         ? (
           <TouchableOpacity
             disabled
@@ -160,19 +153,17 @@ const LoginForm = ({ navigation }) => {
             <Text style={styles.textLogin}>Login</Text>
           </TouchableOpacity>
           )}
-      {status !== '' &&
-        <Text style={styles.textFailed}>{status}</Text>}
-
+      {status !== '' && <Text style={styles.textFailed}>{status}</Text>}
       <TouchableOpacity
         style={styles.forgotPass}
         onPress={handleRegister}
       >
         <Text style={styles.underline}>Don't have an account?</Text>
       </TouchableOpacity>
-
     </View>
   )
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -183,31 +174,49 @@ const styles = StyleSheet.create({
   wrapperInput: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'white',
     marginTop: 10,
     flexDirection: 'row',
     alignItems: 'center'
   },
+
+  invalidInput: {
+    borderColor: 'white'
+  },
+
   input: {
     padding: 10,
-    width: '100%',
+    flex: 1,
     color: 'white',
     fontWeight: '400'
   },
+
+  floatingLabel: {
+    position: 'absolute',
+    top: -10,
+    left: 10,
+    paddingHorizontal: 5,
+    backgroundColor: '#191970',
+    color: 'white',
+    fontSize: 12
+  },
+
   wrapperIcon: {
     position: 'absolute',
     right: 0,
     padding: 10
   },
+
   icon: {
     width: 30,
     height: 24
   },
+
   forgotPass: {
     alignSelf: 'flex-end',
     padding: 10,
     flexDirection: 'row'
   },
+
   button: {
     padding: 10,
     alignItems: 'center',
@@ -216,6 +225,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 25
   },
+
   buttonDisable: {
     padding: 10,
     alignItems: 'center',
