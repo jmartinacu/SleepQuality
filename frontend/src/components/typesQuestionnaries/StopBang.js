@@ -1,9 +1,11 @@
 import { Picker } from '@react-native-picker/picker'
 import { useEffect, useState } from 'react'
-import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { createAswer, getDefaultInfo } from '../../api/ApiQuestionnaries'
 
-const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo }) => {
+const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo, instructions }) => {
+  const [modalVisible, setModalVisible] = useState(false)
+
   const [answers, setAnswers] = useState(new Array(8).fill(''))
   const [error, setError] = useState('')
 
@@ -126,7 +128,39 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.container}
     >
-      <Text>{name}</Text>
+      <Modal
+        propagateSwipe
+        animationType='slide'
+        transparent
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible)
+        }}
+      >
+        <ScrollView>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>{instructions}</Text>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setModalVisible(!modalVisible)}
+              >
+                <Text style={styles.textStyle}>Hide Instructions</Text>
+              </Pressable>
+            </View>
+          </View>
+        </ScrollView>
+      </Modal>
+
+      <View style={styles.row}>
+        <Text>{name}</Text>
+        <Pressable
+          style={styles.button}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text>See Instructions</Text>
+        </Pressable>
+      </View>
       <FlatList
         data={result}
         renderItem={renderQuestion}
@@ -167,6 +201,39 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: 'grey',
     marginTop: 10
+  },
+  row: {
+    flexDirection: 'row'
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center'
   }
 })
 

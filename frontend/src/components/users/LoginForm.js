@@ -113,6 +113,7 @@ const LoginForm = ({ navigation }) => {
         <TextInput
           style={styles.input}
           value={email}
+          keyboardType='email-address'
           onChangeText={text => handleCheckEmail(text)}
         />
       </View>

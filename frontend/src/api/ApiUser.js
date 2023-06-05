@@ -67,3 +67,39 @@ export const userChangePass = async (data, code) => {
     return err.response
   }
 }
+
+export const userGetProffilePic = async (token) => {
+  try {
+    const result = await ApiManager('/users/images', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        Authorization: 'Bearer ' + token
+      }
+    })
+    return result
+  } catch (err) {
+    console.log(err.response)
+    return err.response
+  }
+}
+
+export const userAddProffilePic = async (data, token) => {
+  try {
+    console.log(data)
+    const result = await ApiManager('/users/images', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        Authorization: 'Bearer ' + token
+      },
+      data
+    })
+    return result
+  } catch (err) {
+    console.log(err.response)
+    return err.response
+  }
+}

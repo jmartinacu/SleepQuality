@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { getQuestionnarieById } from '../api/ApiQuestionnaries'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { getItemFromStorage } from '../utils/Utils'
 import ConsensusSleepDiary from '../components/typesQuestionnaries/ConsensusSleepDiary'
@@ -14,6 +13,9 @@ const Questionnarie = ({ navigation, route }) => {
   const [name, setName] = useState('')
   const [questions, setQuestions] = useState({})
   const [additionalInfo, setAdditionalInfo] = useState([])
+  const [instructions, setInstructions] = useState('')
+  const [desc1, setDesc1] = useState('')
+  const [desc2, setDesc2] = useState('')
 
   const [error, setError] = useState(false)
 
@@ -29,6 +31,11 @@ const Questionnarie = ({ navigation, route }) => {
             setName(result.data.name)
             setQuestions(result.data.questions)
             setAdditionalInfo(result.data.additionalInformation)
+            setInstructions(result.data.instructions)
+            if (result.data.name === 'Pittsburgh Sleep Quality Index') {
+              setDesc1(result.data.additionalInformation[0].description)
+              setDesc2(result.data.additionalInformation[4].description)
+            }
           } else {
             setError(true)
             console.log(result.data.message)
@@ -50,14 +57,15 @@ const Questionnarie = ({ navigation, route }) => {
           )
         : (
           <View>
-            {name === 'Consensus Sleep Diary' && <ConsensusSleepDiary accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
-            {name === 'STOP-BANG' && <StopBang id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
-            {name === 'Epworth Sleepiness Scale' && <PrimaryEnumQuestionnaire n={8} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
-            {name === 'Pittsburgh Sleep Quality Index' && <PittsburghSleepQualityIndex accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
-            {name === 'Perceived Stress Questionnaire' && <PrimaryEnumQuestionnaire n={20} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
-            {name === 'Athens Insomnia Scale' && <PrimaryEnumQuestionnaire n={8} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
-            {name === 'International Restless Legs Scale' && <PrimaryEnumQuestionnaire n={10} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
-            {name === 'Insomnia Severity Index' && <PrimaryEnumQuestionnaire n={7} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} />}
+            {name === 'Consensus Sleep Diary Night' && <ConsensusSleepDiary accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} instructions={instructions} />}
+            {name === 'Consensus Sleep Diary Morning' && <ConsensusSleepDiary accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} instructions={instructions} />}
+            {name === 'STOP-BANG' && <StopBang id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} instructions={instructions} />}
+            {name === 'Epworth Sleepiness Scale' && <PrimaryEnumQuestionnaire n={8} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} instructions={instructions} />}
+            {name === 'Pittsburgh Sleep Quality Index' && <PittsburghSleepQualityIndex accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} instructions={instructions} desc1={desc1} desc2={desc2} />}
+            {name === 'Perceived Stress Questionnaire' && <PrimaryEnumQuestionnaire n={20} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} instructions={instructions} />}
+            {name === 'Athens Insomnia Scale' && <PrimaryEnumQuestionnaire n={8} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} instructions={instructions} />}
+            {name === 'International Restless Legs Scale' && <PrimaryEnumQuestionnaire n={10} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} instructions={instructions} />}
+            {name === 'Insomnia Severity Index' && <PrimaryEnumQuestionnaire n={7} id={route.params.id} accessToken={accessToken} navigation={navigation} name={name} questions={questions} additionalInfo={additionalInfo} instructions={instructions} />}
           </View>
           )}
     </SafeAreaView>

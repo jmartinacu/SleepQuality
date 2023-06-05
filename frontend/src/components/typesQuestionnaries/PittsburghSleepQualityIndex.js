@@ -1,10 +1,11 @@
-import { FlatList, KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import { useEffect, useState } from 'react'
+import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { useState } from 'react'
 import { Picker } from '@react-native-picker/picker'
 import { createAswer } from '../../api/ApiQuestionnaries'
-import { ScrollView } from 'react-native-gesture-handler'
 
-const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions, additionalInfo }) => {
+const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions, additionalInfo, instructions, desc1, desc2 }) => {
+  const [modalVisible, setModalVisible] = useState(false)
+
   const result = Object.entries(questions)
     .reduce((accumulator, current) => {
       const obj = {
@@ -114,16 +115,13 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
     if (keys.includes(index)) {
       isEnum = true
     }
-    console.log(additionalInfo)
-    console.log(additionalInfo[4])
-    console.log(additionalInfo[4].descriptions)
 
     return (
       <View>
         {((index >= 4 && index <= 12) || (index >= 19 && index <= 22)) &&
           <View style={styles.hasDesc}>
-            {index === 4 && <Text>{additionalInfo[0].description}</Text>}
-            {index === 19 && <Text>{additionalInfo[4].description}</Text>}
+            {index === 4 && <Text>{desc1}</Text>}
+            {index === 19 && <Text>{desc2}</Text>}
             {isSecondary[index]
               ? (
                 <Text>{item.question}</Text>
@@ -337,7 +335,39 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.container}
     >
-      <Text>{name}</Text>
+      <Modal
+        propagateSwipe
+        animationType='slide'
+        transparent
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible)
+        }}
+      >
+        <ScrollView>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>{instructions}</Text>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setModalVisible(!modalVisible)}
+              >
+                <Text style={styles.textStyle}>Hide Instructions</Text>
+              </Pressable>
+            </View>
+          </View>
+        </ScrollView>
+      </Modal>
+
+      <View style={styles.row}>
+        <Text>{name}</Text>
+        <Pressable
+          style={styles.button}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text>See Instructions</Text>
+        </Pressable>
+      </View>
       <FlatList
         data={result}
         renderItem={renderQuestion}
@@ -435,6 +465,39 @@ const styles = StyleSheet.create({
     marginLeft: 30,
     borderLeftWidth: 10,
     borderColor: 'black'
+  },
+  row: {
+    flexDirection: 'row'
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center'
   }
 })
 
