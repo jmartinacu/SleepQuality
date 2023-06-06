@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { View, StyleSheet, Button, TouchableOpacity, Image } from 'react-native'
-import { getItemFromStorage } from '../utils/Utils'
+import { DataURIToBlob, getItemFromStorage } from '../utils/Utils'
 import { userAddProffilePic, userGetProffilePic } from '../api/ApiUser'
-import { launchImageLibrary } from 'react-native-image-picker'
+import { EmptyProffile } from '../assests/perfil'
+import * as ImagePicker from 'expo-image-picker'
 
 const Proffile = ({ navigation }) => {
   const [accessToken, setAccessToken] = useState(null)
-  const [image, setImage] = useState('../public/PERFIL-VACIO.png')
+  const [image, setImage] = useState(EmptyProffile)
 
   useEffect(() => {
     getItemFromStorage('accessToken', setAccessToken).then()
@@ -20,32 +21,29 @@ const Proffile = ({ navigation }) => {
     }
   }, [])
 
-  const handdleAddPic = () => {
-    launchImageLibrary({
-      selectionLimit: 1,
-      mediaType: 'photo',
-      includeBase64: false
+  const handleAddPic = async () => {
+    // No permissions request is necessary for launching the image library
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1
     })
-      .then(result => {
-        console.log(result)
-        if (!result.didCancel && result.assets !== []) {
-          const url = result.assets[0].uri
-          console.log(url)
-          const formData = new FormData()
-          formData.append('profilePicture', url)
-          userAddProffilePic({ formData }, accessToken)
-            .then(res => {
-              console.log(result)
-              if (res.status === 200) {
-                setImage(result.assets)
-              } else if (res.status === 401) {
-                // Token Expired
-              } else if (res.status === 400) {
-                // Bad Image
-              }
-            })
-        }
-      })
+
+    console.log(result)
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri)
+      const imgBase64 = result.assets[0].uri
+      const file = DataURIToBlob(imgBase64)
+      const formData = new FormData()
+      formData.append('profilePicture', file)
+
+      userAddProffilePic(formData, accessToken)
+        .then(res => {
+          console.log(res)
+        })
+    }
   }
 
   return (
@@ -53,11 +51,11 @@ const Proffile = ({ navigation }) => {
     <View style={styles.container}>
 
       <TouchableOpacity
-        onPress={handdleAddPic}
+        onPress={handleAddPic}
         activeOpacity={0.5}
       >
         <Image
-          source={require('../public/PERFIL-VACIO.png')}
+          source={image}
           style={styles.proffileImage}
         />
       </TouchableOpacity>

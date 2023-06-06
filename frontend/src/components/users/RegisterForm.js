@@ -61,11 +61,11 @@ const RegisterForm = ({ navigation }) => {
 
   const checkPasswordValidity = value => {
     const isNonWhiteSpace = /^\S*$/
-    const isContainsUppercase = /^(?=.*[A-Z]).*$/
-    const isContainsLowercase = /^(?=.*[a-z]).*$/
-    const isContainsNumber = /^(?=.*[0-9]).*$/
+    const isContainsUppercase = /^(?=.[A-Z]).$/
+    const isContainsLowercase = /^(?=.[a-z]).$/
+    const isContainsNumber = /^(?=.[0-9]).$/
     const isValidLength = /^.{8,15}$/
-    const isContainsSymbol = /^(?=.*[~`!@#$%^&*€()--+={}[\]|\\:;"'<>,.?/_₹]).*$/
+    const isContainsSymbol = /^(?=.[~`!@#$%^&€()--+={}[\]|\\:;"'<>,.?/_₹]).*$/
     const isContainsComma = /,/
 
     if (isContainsComma.test(value)) {
@@ -102,11 +102,11 @@ const RegisterForm = ({ navigation }) => {
   const handleCheckPasswordValidity = value => {
     setPassword(value)
     const isNonWhiteSpace = /^\S*$/
-    const isContainsUppercase = /^(?=.*[A-Z]).*$/
-    const isContainsLowercase = /^(?=.*[a-z]).*$/
-    const isContainsNumber = /^(?=.*[0-9]).*$/
+    const isContainsUppercase = /^(?=.[A-Z]).$/
+    const isContainsLowercase = /^(?=.[a-z]).$/
+    const isContainsNumber = /^(?=.[0-9]).$/
     const isValidLength = /^.{8,15}$/
-    const isContainsSymbol = /^(?=.*[~`!@#$%^&*€()--+={}[\]|\\:;"'<>,.?/_₹]).*$/
+    const isContainsSymbol = /^(?=.[~`!@#$%^&€()--+={}[\]|\\:;"'<>,.?/_₹]).*$/
     const isContainsComma = /,/
 
     if (!isNonWhiteSpace.test(value) || !isContainsUppercase.test(value) || !isContainsLowercase.test(value) ||
@@ -375,7 +375,8 @@ const RegisterForm = ({ navigation }) => {
           style={{
             marginTop: 20,
             borderBottomColor: 'white',
-            borderBottomWidth: StyleSheet.hairlineWidth
+            // borderBottomWidth: StyleSheet.hairlineWidth
+            borderBottomWidth: 5
           }}
         />
 
@@ -385,7 +386,7 @@ const RegisterForm = ({ navigation }) => {
           {checkValidHeight
             ? (
               <View style={styles.wrapperInputWrong}>
-                <Text style={styles.floatingLabel}>Height</Text>
+                <Text style={styles.floatingLabel}>Height (cm)</Text>
                 <TextInput
                   style={styles.input}
                   inputMode='numeric'
@@ -396,10 +397,11 @@ const RegisterForm = ({ navigation }) => {
                   maxLength={3}
                 />
               </View>
+
               )
             : (
               <View style={styles.wrapperInput}>
-                <Text style={styles.floatingLabel}>Height</Text>
+                <Text style={styles.floatingLabel}>Height (cm)</Text>
                 <TextInput
                   style={styles.input}
                   inputMode='numeric'
@@ -416,7 +418,7 @@ const RegisterForm = ({ navigation }) => {
           {checkValidWeight
             ? (
               <View style={styles.wrapperInputWrong}>
-                <Text style={styles.floatingLabel}>Weight</Text>
+                <Text style={styles.floatingLabel}>Weight (kg)</Text>
                 <TextInput
                   style={styles.input}
                   inputMode='numeric'
@@ -430,7 +432,7 @@ const RegisterForm = ({ navigation }) => {
               )
             : (
               <View style={styles.wrapperInput}>
-                <Text style={styles.floatingLabel}>Weight</Text>
+                <Text style={styles.floatingLabel}>Weight (kg)</Text>
                 <TextInput
                   style={styles.input}
                   inputMode='numeric'
@@ -442,58 +444,59 @@ const RegisterForm = ({ navigation }) => {
                 />
               </View>
               )}
-
-          {/* INPUT BIRTHDATE */}
-          <View style={styles.birthdate}>
-            <Text style={styles.input}>Introduce your birhdate:</Text>
-            {!(Platform.OS === 'ios') &&
-              <Button
-                onPress={showDatepicker}
-                title={birthDate.toLocaleDateString()}
-              />}
-            {show && !(Platform.OS === 'ios') &&
-              <DateTimePicker
-                testID='dateTimePicker'
-                value={birthDate}
-                mode='date'
-                is24Hour
-                onChange={onChange}
-                maximumDate={new Date(Date.now())}
-              />}
-            {Platform.OS === 'ios' &&
-              <DateTimePicker
-                testID='dateTimePicker'
-                value={birthDate}
-                mode='date'
-                is24Hour
-                onChange={(event, selectedDate) => handleCheckBirthdateValidity(selectedDate)}
-                maximumDate={new Date(Date.now())}
-              />}
-          </View>
+          {/* ERROR MESSAGES HEIGHT AND WEIGHT VALIDATION */}
         </View>
-
-        {/* ERROR MESSAGES HEIGHT AND WEIGHT VALIDATION */}
         {checkValidWeight &&
   (
-    <Text style={styles.textFailed}>Weight must be bigger than 0 and less than 600kg</Text>
+    <Text style={styles.textFailed}>Weight must be bigger than 0 kg and less than 600 kg</Text>
   )}
         {checkValidHeight &&
   (
-    <Text style={styles.textFailed}>Height must be bigger than 0 and less than 300cm</Text>
+    <Text style={styles.textFailed}>Height must be bigger than 0 cm and less than 300 cm</Text>
   )}
+        <View />
+
+        {/* INPUT BIRTHDATE */}
+        <View style={styles.birthdate}>
+          <Text style={styles.input}>Introduce your birthdate:</Text>
+          {!(Platform.OS === 'ios') &&
+            <Button
+              onPress={showDatepicker}
+              title={birthDate.toLocaleDateString()}
+            />}
+          {show && !(Platform.OS === 'ios') &&
+            <DateTimePicker
+              testID='dateTimePicker'
+              value={birthDate}
+              mode='date'
+              is24Hour
+              onChange={onChange}
+              maximumDate={new Date(Date.now())}
+            />}
+          {Platform.OS === 'ios' &&
+            <DateTimePicker
+              testID='dateTimePicker'
+              value={birthDate}
+              mode='date'
+              is24Hour
+              onChange={(event, selectedDate) => handleCheckBirthdateValidity(selectedDate)}
+              maximumDate={new Date(Date.now())}
+            />}
+        </View>
 
         {/* HORIZONTAL LINE */}
         <View
           style={{
             marginTop: 20,
             borderBottomColor: 'white',
-            borderBottomWidth: StyleSheet.hairlineWidth
+            // borderBottomWidth: StyleSheet.hairlineWidth
+            borderBottomWidth: 5
           }}
         />
 
         {/* INPUT GENDER */}
         <View>
-          <Text style={styles.input}>Introduce your gender:</Text>
+          <Text style={styles.inputGender}>Introduce your gender:</Text>
           <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
             <Picker
               selectedValue={gender}
@@ -565,6 +568,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 50
   },
+
   wrapperInput: {
     borderWidth: 0.5,
     borderRadius: 5,
@@ -573,6 +577,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 50
   },
+
   wrapperInputWrong: {
     borderWidth: 0.5,
     borderRadius: 5,
@@ -581,17 +586,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 50
   },
+
   wrapperInputRow: {
     flexDirection: 'row',
     marginTop: 10,
     justifyContent: 'space-around'
   },
+
   input: {
     padding: 10,
     width: '100%',
     color: 'white',
     fontWeight: '400',
     height: 50
+  },
+
+  inputGender: {
+    padding: 10,
+    width: '100%',
+    color: 'white',
+    fontWeight: '400',
+    height: 50,
+    marginTop: '0'
   },
 
   floatingLabel: {

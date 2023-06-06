@@ -37,17 +37,17 @@ const LoginForm = ({ navigation }) => {
       return 'Password must not contain Whitespaces.'
     }
 
-    const isContainsUppercase = /^(?=.*[A-Z]).*$/
+    const isContainsUppercase = /^(?=.[A-Z]).$/
     if (!isContainsUppercase.test(value)) {
       return 'Password must have at least one Uppercase Character.'
     }
 
-    const isContainsLowercase = /^(?=.*[a-z]).*$/
+    const isContainsLowercase = /^(?=.[a-z]).$/
     if (!isContainsLowercase.test(value)) {
       return 'Password must have at least one Lowercase Character.'
     }
 
-    const isContainsNumber = /^(?=.*[0-9]).*$/
+    const isContainsNumber = /^(?=.[0-9]).$/
     if (!isContainsNumber.test(value)) {
       return 'Password must contain at least one Digit.'
     }
@@ -58,7 +58,7 @@ const LoginForm = ({ navigation }) => {
     }
 
     const isContainsSymbol =
-      /^(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹]).*$/
+      /^(?=.[~`!@#$%^&()--+={}[\]|\\:;"'<>.?/_₹]).*$/
     if (!isContainsSymbol.test(value)) {
       return 'Password must contain at least one Special Symbol.'
     }
@@ -108,16 +108,41 @@ const LoginForm = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.wrapperInput, email === '' || checkValidEmail ? styles.invalidInput : null]}>
-        <Text style={styles.floatingLabel}>Email</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          keyboardType='email-address'
-          onChangeText={text => handleCheckEmail(text)}
-        />
-      </View>
-      {checkValidEmail ? <Text style={styles.textFailed}>Wrong format email</Text> : null}
+      {checkValidEmail
+        ? (
+          <View>
+            <View style={styles.wrapperInputWrong}>
+              <Text style={styles.floatingLabel}>Email</Text>
+              <TextInput
+                style={styles.input}
+                inputMode='email'
+                keyboardType='email-address'
+                value={email}
+                onChangeText={text => handleCheckEmail(text)}
+                returnKeyType='done'
+                maxLength={40}
+              />
+            </View>
+            <Text style={styles.textFailed}>Wrong format email</Text>
+          </View>
+          )
+        : (
+          <View>
+            <View style={styles.wrapperInput}>
+              <Text style={styles.floatingLabel}>Email</Text>
+              <TextInput
+                style={styles.input}
+                inputMode='email'
+                keyboardType='email-address'
+                value={email}
+                onChangeText={text => handleCheckEmail(text)}
+                returnKeyType='done'
+                maxLength={40}
+              />
+            </View>
+            <Text style={styles.textFailed}> </Text>
+          </View>
+          )}
       <View style={[styles.wrapperInput, password === '' ? styles.invalidInput : null]}>
         <Text style={styles.floatingLabel}>Password</Text>
         <TextInput
@@ -176,8 +201,16 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderRadius: 5,
     marginTop: 10,
+    borderColor: 'white',
     flexDirection: 'row',
     alignItems: 'center'
+  },
+
+  wrapperInputWrong: {
+    borderWidth: 0.5,
+    borderRadius: 5,
+    borderColor: '#FF7F50',
+    marginTop: 10
   },
 
   invalidInput: {

@@ -12,6 +12,7 @@ import SignUp from '../screens/SignUp'
 import EmailVerification from '../screens/EmailVerification'
 import TextAndButton from '../components/users/TextAndButton'
 import Questionnarie from '../screens/Questionnarie'
+import { EmptyProffile } from '../assests/perfil'
 
 const Stack = createStackNavigator()
 
@@ -54,7 +55,7 @@ const MyStack = () => {
               activeOpacity={0.5}
             >
               <Image
-                source={require('../public/PERFIL-VACIO.png')}
+                source={EmptyProffile}
                 style={styles.proffileImage}
               />
             </TouchableOpacity>
