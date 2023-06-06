@@ -8,19 +8,21 @@ import { Input } from 'react-native-elements'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { parseDateToString } from '../../utils/Utils'
 
-const RegisterForm = ({ navigation }) => {
+const RegisterForm = ({ navigation, update, nameU, emailU, heightU, weightU, genderU, birthDateU, chronicDisordersU }) => {
   const [status, setStatus] = useState('')
 
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  console.log(nameU)
+
+  const [name, setName] = useState(nameU)
+  const [email, setEmail] = useState(emailU)
   const [password, setPassword] = useState('')
   const [confirmedPassword, setConfirmedPassword] = useState('')
 
   const [birthDate, setBirthDate] = useState(new Date(1598051730000))
-  const [gender, setGender] = useState('NEUTER')
-  const [height, setHeight] = useState('')
-  const [weight, setWeight] = useState('')
-  const [chronicDisorders, setChronicDisorders] = useState('')
+  const [gender, setGender] = useState(genderU)
+  const [height, setHeight] = useState(heightU)
+  const [weight, setWeight] = useState(weightU)
+  const [chronicDisorders, setChronicDisorders] = useState(chronicDisordersU)
 
   const [seePassword, setSeePassword] = useState(true)
   const [seeConfirmedPassword, setSeeConfirmedPassword] = useState(true)

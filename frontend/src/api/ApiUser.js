@@ -103,3 +103,20 @@ export const userAddProffilePic = async (data, token) => {
     return err.response
   }
 }
+
+export const userGetUserData = async (token) => {
+  try {
+    const result = await ApiManager('/users', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        Authorization: 'Bearer ' + token
+      }
+    })
+    return result
+  } catch (err) {
+    console.log(err.response)
+    return err.response
+  }
+}

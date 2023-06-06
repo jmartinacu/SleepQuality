@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Blob } from 'buffer'
 
 export const parseDateToString = (date) => {
   const dateStringBackend = date.toLocaleDateString('es-ES', {
@@ -35,5 +34,5 @@ export const DataURIToBlob = (dataURI) => {
   const ia = new Uint8Array(byteString.length)
   for (let i = 0; i < byteString.length; i++) { ia[i] = byteString.charCodeAt(i) }
 
-  return [ia]
+  return new Blob([ia], { type: mimeString })
 }
