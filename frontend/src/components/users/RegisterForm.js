@@ -61,11 +61,11 @@ const RegisterForm = ({ navigation }) => {
 
   const checkPasswordValidity = value => {
     const isNonWhiteSpace = /^\S*$/
-    const isContainsUppercase = /^(?=.[A-Z]).$/
-    const isContainsLowercase = /^(?=.[a-z]).$/
-    const isContainsNumber = /^(?=.[0-9]).$/
+    const isContainsUppercase = /^(?=.*[A-Z]).*$/
+    const isContainsLowercase = /^(?=.*[a-z]).*$/
+    const isContainsNumber = /^(?=.*[0-9]).*$/
     const isValidLength = /^.{8,15}$/
-    const isContainsSymbol = /^(?=.[~`!@#$%^&€()--+={}[\]|\\:;"'<>,.?/_₹]).*$/
+    const isContainsSymbol = /^(?=.*[~`!@#$%^&*€()--+={}[\]|\\:;"'<>,.?/_₹]).*$/
     const isContainsComma = /,/
 
     if (isContainsComma.test(value)) {
@@ -102,11 +102,11 @@ const RegisterForm = ({ navigation }) => {
   const handleCheckPasswordValidity = value => {
     setPassword(value)
     const isNonWhiteSpace = /^\S*$/
-    const isContainsUppercase = /^(?=.[A-Z]).$/
-    const isContainsLowercase = /^(?=.[a-z]).$/
-    const isContainsNumber = /^(?=.[0-9]).$/
+    const isContainsUppercase = /^(?=.*[A-Z]).*$/
+    const isContainsLowercase = /^(?=.*[a-z]).*$/
+    const isContainsNumber = /^(?=.*[0-9]).*$/
     const isValidLength = /^.{8,15}$/
-    const isContainsSymbol = /^(?=.[~`!@#$%^&€()--+={}[\]|\\:;"'<>,.?/_₹]).*$/
+    const isContainsSymbol = /^(?=.*[~`!@#$%^&*€()--+={}[\]|\\:;"'<>,.?/_₹]).*$/
     const isContainsComma = /,/
 
     if (!isNonWhiteSpace.test(value) || !isContainsUppercase.test(value) || !isContainsLowercase.test(value) ||
