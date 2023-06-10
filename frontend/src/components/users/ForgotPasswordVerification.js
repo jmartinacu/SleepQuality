@@ -113,7 +113,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: 20,
     marginBottom: 50
-
   },
 
   wrapperInput: {
@@ -128,7 +127,7 @@ const styles = StyleSheet.create({
   wrapperInputWrong: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'white',
+    borderColor: '#FF7F50',
     marginTop: 10,
     alignItems: 'center'
   },
@@ -171,8 +170,8 @@ const styles = StyleSheet.create({
   text: {
     color: 'white',
     fontWeight: '600'
-
   },
+
   textFailed: {
     alignSelf: 'flex-end',
     color: '#FF7F50'

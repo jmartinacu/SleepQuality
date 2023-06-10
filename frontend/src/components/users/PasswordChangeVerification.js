@@ -124,7 +124,7 @@ const PasswordChangeVerification = ({ navigation, email }) => {
 
   return (
     <View style={styles.container}>
-      <Text>
+      <Text style={styles.text}>
         Introduce the 5 Digits Code that you received:
       </Text>
       {checkValidCode
@@ -162,15 +162,17 @@ const PasswordChangeVerification = ({ navigation, email }) => {
             <Text style={styles.textFailed}> </Text>
           </View>
           )}
-      <Text>Introduce your new Password</Text>
+      <Text style={styles.text}>
+        Introduce your new Password
+      </Text>
       {/* INPUT PASSWORD */}
       {checkValidPassword
         ? (
           <View>
             <View style={styles.wrapperInputWrong}>
+              <Text style={styles.floatingLabel}>Password</Text>
               <TextInput
                 style={styles.input}
-                placeholder='Password'
                 value={password}
                 secureTextEntry={seePassword}
                 onChangeText={text => handleCheckPasswordValidity(text)}
@@ -190,9 +192,9 @@ const PasswordChangeVerification = ({ navigation, email }) => {
         : (
           <View>
             <View style={styles.wrapperInput}>
+              <Text style={styles.floatingLabel}>Password</Text>
               <TextInput
                 style={styles.input}
-                placeholder='Password'
                 value={password}
                 secureTextEntry={seePassword}
                 onChangeText={text => handleCheckPasswordValidity(text)}
@@ -214,9 +216,9 @@ const PasswordChangeVerification = ({ navigation, email }) => {
         ? (
           <View>
             <View style={styles.wrapperInputWrong}>
+              <Text style={styles.floatingLabel}>Confirm Password</Text>
               <TextInput
                 style={styles.input}
-                placeholder='Confirm Password'
                 value={confirmedPassword}
                 secureTextEntry={seeConfirmedPassword}
                 onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
@@ -236,9 +238,9 @@ const PasswordChangeVerification = ({ navigation, email }) => {
         : (
           <View>
             <View style={styles.wrapperInput}>
+              <Text style={styles.floatingLabel}>Confirm Password</Text>
               <TextInput
                 style={styles.input}
-                placeholder='Confirm Password'
                 value={confirmedPassword}
                 secureTextEntry={seeConfirmedPassword}
                 onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
@@ -261,12 +263,12 @@ const PasswordChangeVerification = ({ navigation, email }) => {
             style={styles.buttonDisable}
             onPress={handleVerification}
           >
-            <Text style={styles.text}>Change Password</Text>
+            <Text style={styles.textSend}>Change Password</Text>
           </TouchableOpacity>
           )
         : (
           <TouchableOpacity style={styles.button} onPress={handleVerification}>
-            <Text style={styles.text}>Change Password</Text>
+            <Text style={styles.textSend}>Change Password</Text>
           </TouchableOpacity>
           )}
       {status !== '' &&
@@ -282,58 +284,83 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 50
   },
+
   wrapperInput: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'grey',
     marginTop: 10,
-    alignItems: 'center',
-    height: 50
+    borderColor: 'white',
+    flexDirection: 'row',
+    alignItems: 'center'
   },
+
   wrapperInputWrong: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'red',
+    borderColor: '#FF7F50',
     marginTop: 10,
-    alignItems: 'center',
-    height: 50
+    alignItems: 'center'
   },
+
   input: {
     padding: 10,
-    width: '100%'
+    width: '100%',
+    color: 'white',
+    fontWeight: '400'
   },
+
   wrapperIcon: {
     position: 'absolute',
     right: 0,
     padding: 10
   },
+
   icon: {
     width: 30,
     height: 24
   },
+
+  floatingLabel: {
+    position: 'absolute',
+    top: -10,
+    left: 10,
+    paddingHorizontal: 5,
+    backgroundColor: '#191970',
+    color: 'white',
+    fontSize: 12
+  },
+
   button: {
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'orange',
+    backgroundColor: '#FF7F50',
     borderRadius: 5,
     marginTop: 25
   },
+
   buttonDisable: {
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'grey',
+    backgroundColor: 'white',
     borderRadius: 5,
     marginTop: 25
   },
+
   text: {
     color: 'white',
-    fontWeight: '700'
+    fontWeight: '600'
   },
+
   textFailed: {
     alignSelf: 'flex-end',
-    color: 'red'
+    color: '#FF7F50'
+  },
+
+  textSend: {
+    color: '#191970',
+    fontWeight: '700'
   }
 })
 
