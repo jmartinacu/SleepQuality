@@ -4,7 +4,7 @@ import { Picker } from '@react-native-picker/picker'
 import { createAswer } from '../../api/ApiQuestionnaries'
 import { ScrollView } from 'react-native-gesture-handler'
 
-const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additionalInfo }) => {
+const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additionalInfo, instructions }) => {
   const [modalVisible, setModalVisible] = useState(false)
 
   const result = Object.entries(questions)
@@ -69,13 +69,11 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
     let i = 0
     for (const obj of result) {
       if (isNumber[i] && !isOnlyNumbers.test(answers[i])) {
-        console.log('HOLa')
         setError('Some questions can only be filled with numbers: **')
         err = true
         submit = []
         break
       } else if ((!isSecondary[i] || isBoolean[i] || keys.includes(i)) && answers[i] === '') {
-        console.log('ADIOS')
         setError('You need to fill all the mandatory questions: *')
         err = true
         submit = []
@@ -219,8 +217,8 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
   const renderSubmitButton = () => {
     return (
       <View>
-        <Text>*: Mandatory question</Text>
-        <Text>**: Mandatory question. You can only answer with numbers</Text>
+        <Text>* Mandatory question</Text>
+        <Text>** Mandatory question. You can only answer with numbers</Text>
         <TouchableOpacity style={styles.button} onPress={handleSubmitAnswer}>
           <Text style={styles.text}>Submit</Text>
         </TouchableOpacity>
@@ -235,6 +233,7 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
       style={styles.container}
     >
       <Modal
+        propagateSwipe
         animationType='slide'
         transparent
         visible={modalVisible}
@@ -242,25 +241,28 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
           setModalVisible(!modalVisible)
         }}
       >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>iNSTRUCTIONS</Text>
-            <Pressable
-              style={[styles.button, styles.buttonClose]}
-              onPress={() => setModalVisible(!modalVisible)}
-            >
-              <Text style={styles.textStyle}>Hide Instructions</Text>
-            </Pressable>
+        <ScrollView>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>{instructions}</Text>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setModalVisible(!modalVisible)}
+              >
+                <Text style={styles.textStyle}>Hide Instructions</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
+        </ScrollView>
       </Modal>
+
       <View style={styles.row}>
         <Text>{name}</Text>
         <Pressable
           style={styles.button}
           onPress={() => setModalVisible(true)}
         >
-          <Text>See Instructions</Text>
+          <Text style={styles.text}>See Instructions</Text>
         </Pressable>
       </View>
 
@@ -287,7 +289,7 @@ const styles = StyleSheet.create({
   wrapperInput: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'grey',
+    borderColor: 'white',
     marginTop: 10,
     alignItems: 'center',
     height: 50,
@@ -323,7 +325,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'orange',
+    backgroundColor: '#FF7F50',
     borderRadius: 5,
     marginTop: 25
   },
@@ -331,7 +333,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'grey',
+    backgroundColor: 'white',
     borderRadius: 5,
     marginTop: 25
   },
@@ -349,7 +351,7 @@ const styles = StyleSheet.create({
   picker: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'grey',
+    borderColor: 'white',
     marginTop: 10
   },
   birthdate: {

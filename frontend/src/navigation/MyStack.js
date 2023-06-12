@@ -12,6 +12,7 @@ import SignUp from '../screens/SignUp'
 import EmailVerification from '../screens/EmailVerification'
 import TextAndButton from '../components/users/TextAndButton'
 import Questionnarie from '../screens/Questionnarie'
+import { EmptyProffile } from '../assests/perfil'
 
 const Stack = createStackNavigator()
 
@@ -20,7 +21,7 @@ const MyStack = () => {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: 'yellow'
+          backgroundColor: '#FF7F50'
         }
       }}
     >
@@ -45,16 +46,17 @@ const MyStack = () => {
         name='Home'
         component={Home}
         options={({ navigation }) => ({
-          backgroundColor: 'yellow',
+          backgroundColor: '#FF7F50',
           title: 'Sleep Sheep',
           headerTitleAlign: 'center',
+          headerTitleStyle: { color: '#191970', fontWeight: 'bold' },
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => navigation.push('Proffile')}
               activeOpacity={0.5}
             >
               <Image
-                source={require('../public/PERFIL-VACIO.png')}
+                source={EmptyProffile}
                 style={styles.proffileImage}
               />
             </TouchableOpacity>
@@ -79,7 +81,7 @@ const MyStack = () => {
         name='Proffile'
         component={Proffile}
         options={{
-          backgroundColor: 'yellow',
+          backgroundColor: '#FF7F50',
           title: '',
           headerTitleAlign: 'center'
         }}
@@ -89,7 +91,7 @@ const MyStack = () => {
         name='CalendarPage'
         component={CalendarPage}
         options={{
-          backgroundColor: 'yellow',
+          backgroundColor: '#FF7F50',
           title: '',
           headerTitleAlign: 'center'
         }}

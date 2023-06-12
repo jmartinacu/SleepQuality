@@ -53,9 +53,9 @@ const ForgotPasswordVerification = ({ navigation }) => {
         ? (
           <View>
             <View style={styles.wrapperInputWrong}>
+              <Text style={styles.floatingLabel}>Email</Text>
               <TextInput
                 style={styles.input}
-                placeholder='Email'
                 inputMode='email'
                 keyboardType='email-address'
                 value={email}
@@ -70,9 +70,9 @@ const ForgotPasswordVerification = ({ navigation }) => {
         : (
           <View>
             <View style={styles.wrapperInput}>
+              <Text style={styles.floatingLabel}>Email</Text>
               <TextInput
                 style={styles.input}
-                placeholder='Email'
                 inputMode='email'
                 keyboardType='email-address'
                 value={email}
@@ -113,16 +113,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: 20,
     marginBottom: 50
-
   },
 
   wrapperInput: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'white',
     marginTop: 10,
+    flexDirection: 'row',
     alignItems: 'center',
-    height: 50
+    borderColor: 'white'
   },
 
   wrapperInputWrong: {
@@ -130,8 +129,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: '#FF7F50',
     marginTop: 10,
-    alignItems: 'center',
-    height: 50
+    alignItems: 'center'
   },
 
   input: {
@@ -139,6 +137,16 @@ const styles = StyleSheet.create({
     width: '100%',
     color: 'white',
     fontWeight: '400'
+  },
+
+  floatingLabel: {
+    position: 'absolute',
+    top: -10,
+    left: 10,
+    paddingHorizontal: 5,
+    backgroundColor: '#191970',
+    color: 'white',
+    fontSize: 12
   },
 
   button: {
@@ -161,9 +169,9 @@ const styles = StyleSheet.create({
 
   text: {
     color: 'white',
-    fontWeight: '300'
-
+    fontWeight: '600'
   },
+
   textFailed: {
     alignSelf: 'flex-end',
     color: '#FF7F50'

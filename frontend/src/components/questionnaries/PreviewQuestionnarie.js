@@ -12,7 +12,7 @@ const PreviewQuestionnaire = ({ navigation, id, name, logo }) => {
         resizeMode='contain'
         style={styles.image}
       />
-      <Text>{name}</Text>
+      <Text style={styles.quesText}>{name}</Text>
     </TouchableOpacity>
   )
 }
@@ -22,9 +22,14 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row'
   },
+
   image: {
     height: 40,
     width: 40
+  },
+
+  quesText: {
+    color: 'white'
   }
 })
 

@@ -18,12 +18,13 @@ const TextAndButton = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+
   },
   button: {
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'orange',
+    backgroundColor: '#FF7F50',
     borderRadius: 5,
     marginTop: 25
   }

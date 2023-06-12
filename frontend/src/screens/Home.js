@@ -4,7 +4,7 @@ import { getQuestionnaires } from '../api/ApiQuestionnaries'
 import { getItemFromStorage } from '../utils/Utils'
 import { FlatList } from 'react-native-gesture-handler'
 import PreviewQuestionnaire from '../components/questionnaries/PreviewQuestionnarie'
-import { AIS, CSD, ESS, IRLS, ISI, PSQ, PSQI, SB } from '../assests/questionnarieLogo'
+import { CSDN, CSDM, AIS, ESS, IRLS, ISI, PSQ, PSQI, SB } from '../assests/questionnarieLogo'
 
 const Home = ({ navigation }) => {
   const [questionnaires, setQuestionnaires] = useState([])
@@ -36,8 +36,11 @@ const Home = ({ navigation }) => {
   const renderQuestionnaires = ({ index, item }) => {
     let logo = null
     switch (item.name) {
-      case 'Consensus Sleep Diary':
-        logo = CSD
+      case 'Consensus Sleep Diary Morning':
+        logo = CSDM
+        break
+      case 'Consensus Sleep Diary Night':
+        logo = CSDN
         break
       case 'STOP-BANG':
         logo = SB
@@ -88,8 +91,10 @@ const Home = ({ navigation }) => {
 const styles = StyleSheet.create({
   tabBarStyle: {
     flex: 1,
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: '#191970'
   },
+
   proffileImage: {
     height: 40,
     width: 40

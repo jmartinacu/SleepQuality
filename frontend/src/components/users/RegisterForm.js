@@ -8,19 +8,21 @@ import { Input } from 'react-native-elements'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { parseDateToString } from '../../utils/Utils'
 
-const RegisterForm = ({ navigation }) => {
+const RegisterForm = ({ navigation, update, nameU, emailU, heightU, weightU, genderU, birthDateU, chronicDisordersU }) => {
   const [status, setStatus] = useState('')
 
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  console.log(nameU)
+
+  const [name, setName] = useState(nameU)
+  const [email, setEmail] = useState(emailU)
   const [password, setPassword] = useState('')
   const [confirmedPassword, setConfirmedPassword] = useState('')
 
   const [birthDate, setBirthDate] = useState(new Date(1598051730000))
-  const [gender, setGender] = useState('NEUTER')
-  const [height, setHeight] = useState('')
-  const [weight, setWeight] = useState('')
-  const [chronicDisorders, setChronicDisorders] = useState('')
+  const [gender, setGender] = useState(genderU)
+  const [height, setHeight] = useState(heightU)
+  const [weight, setWeight] = useState(weightU)
+  const [chronicDisorders, setChronicDisorders] = useState(chronicDisordersU)
 
   const [seePassword, setSeePassword] = useState(true)
   const [seeConfirmedPassword, setSeeConfirmedPassword] = useState(true)
@@ -211,9 +213,9 @@ const RegisterForm = ({ navigation }) => {
           ? (
             <View>
               <View style={styles.wrapperInputWrong}>
+                <Text style={styles.floatingLabel}>Name</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Name Lastname'
                   value={name}
                   onChangeText={text => handleCheckName(text)}
                   returnKeyType='done'
@@ -226,9 +228,9 @@ const RegisterForm = ({ navigation }) => {
           : (
             <View>
               <View style={styles.wrapperInput}>
+                <Text style={styles.floatingLabel}>Name</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Name'
                   value={name}
                   onChangeText={text => handleCheckName(text)}
                   returnKeyType='done'
@@ -244,9 +246,9 @@ const RegisterForm = ({ navigation }) => {
           ? (
             <View>
               <View style={styles.wrapperInputWrong}>
+                <Text style={styles.floatingLabel}>Email</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Email'
                   inputMode='email'
                   keyboardType='email-address'
                   value={email}
@@ -262,9 +264,9 @@ const RegisterForm = ({ navigation }) => {
           : (
             <View>
               <View style={styles.wrapperInput}>
+                <Text style={styles.floatingLabel}>Email</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Email'
                   inputMode='email'
                   keyboardType='email-address'
                   value={email}
@@ -283,9 +285,9 @@ const RegisterForm = ({ navigation }) => {
           ? (
             <View>
               <View style={styles.wrapperInputWrong}>
+                <Text style={styles.floatingLabel}>Password</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Password'
                   value={password}
                   secureTextEntry={seePassword}
                   onChangeText={text => handleCheckPasswordValidity(text)}
@@ -305,9 +307,9 @@ const RegisterForm = ({ navigation }) => {
           : (
             <View>
               <View style={styles.wrapperInput}>
+                <Text style={styles.floatingLabel}>Password</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Password'
                   value={password}
                   secureTextEntry={seePassword}
                   onChangeText={text => handleCheckPasswordValidity(text)}
@@ -329,9 +331,9 @@ const RegisterForm = ({ navigation }) => {
           ? (
             <View>
               <View style={styles.wrapperInputWrong}>
+                <Text style={styles.floatingLabel}>Confirm Password</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Confirm Password'
                   value={confirmedPassword}
                   secureTextEntry={seeConfirmedPassword}
                   onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
@@ -351,9 +353,9 @@ const RegisterForm = ({ navigation }) => {
           : (
             <View>
               <View style={styles.wrapperInput}>
+                <Text style={styles.floatingLabel}>Confirm Password</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder='Confirm Password'
                   value={confirmedPassword}
                   secureTextEntry={seeConfirmedPassword}
                   onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
@@ -374,8 +376,9 @@ const RegisterForm = ({ navigation }) => {
         <View
           style={{
             marginTop: 20,
-            borderBottomColor: 'black',
-            borderBottomWidth: StyleSheet.hairlineWidth
+            borderBottomColor: 'white',
+            // borderBottomWidth: StyleSheet.hairlineWidth
+            borderBottomWidth: 5
           }}
         />
 
@@ -385,25 +388,26 @@ const RegisterForm = ({ navigation }) => {
           {checkValidHeight
             ? (
               <View style={styles.wrapperInputWrong}>
+                <Text style={styles.floatingLabel}>Height (cm)</Text>
                 <TextInput
                   style={styles.input}
                   inputMode='numeric'
                   keyboardType='numeric'
-                  placeholder='Height'
                   value={height}
                   onChangeText={text => handleCheckHeightValidity(text)}
                   returnKeyType='done'
                   maxLength={3}
                 />
               </View>
+
               )
             : (
               <View style={styles.wrapperInput}>
+                <Text style={styles.floatingLabel}>Height (cm)</Text>
                 <TextInput
                   style={styles.input}
                   inputMode='numeric'
                   keyboardType='numeric'
-                  placeholder='Height'
                   value={height}
                   onChangeText={text => handleCheckHeightValidity(text)}
                   returnKeyType='done'
@@ -416,11 +420,11 @@ const RegisterForm = ({ navigation }) => {
           {checkValidWeight
             ? (
               <View style={styles.wrapperInputWrong}>
+                <Text style={styles.floatingLabel}>Weight (kg)</Text>
                 <TextInput
                   style={styles.input}
                   inputMode='numeric'
                   keyboardType='numeric'
-                  placeholder='Weight'
                   value={weight}
                   onChangeText={text => handleCheckWeightValidity(text)}
                   returnKeyType='done'
@@ -430,11 +434,11 @@ const RegisterForm = ({ navigation }) => {
               )
             : (
               <View style={styles.wrapperInput}>
+                <Text style={styles.floatingLabel}>Weight (kg)</Text>
                 <TextInput
                   style={styles.input}
                   inputMode='numeric'
                   keyboardType='numeric'
-                  placeholder='Weight'
                   value={weight}
                   onChangeText={text => handleCheckWeightValidity(text)}
                   returnKeyType='done'
@@ -442,58 +446,59 @@ const RegisterForm = ({ navigation }) => {
                 />
               </View>
               )}
-
-          {/* INPUT BIRTHDATE */}
-          <View style={styles.birthdate}>
-            <Text style={styles.input}>Introduce your birhdate:</Text>
-            {!(Platform.OS === 'ios') &&
-              <Button
-                onPress={showDatepicker}
-                title={birthDate.toLocaleDateString()}
-              />}
-            {show && !(Platform.OS === 'ios') &&
-              <DateTimePicker
-                testID='dateTimePicker'
-                value={birthDate}
-                mode='date'
-                is24Hour
-                onChange={onChange}
-                maximumDate={new Date(Date.now())}
-              />}
-            {Platform.OS === 'ios' &&
-              <DateTimePicker
-                testID='dateTimePicker'
-                value={birthDate}
-                mode='date'
-                is24Hour
-                onChange={(event, selectedDate) => handleCheckBirthdateValidity(selectedDate)}
-                maximumDate={new Date(Date.now())}
-              />}
-          </View>
+          {/* ERROR MESSAGES HEIGHT AND WEIGHT VALIDATION */}
         </View>
-
-        {/* ERROR MESSAGES HEIGHT AND WEIGHT VALIDATION */}
         {checkValidWeight &&
   (
-    <Text style={styles.textFailed}>Weight must be bigger than 0 and less than 600kg</Text>
+    <Text style={styles.textFailed}>Weight must be bigger than 0 kg and less than 600 kg</Text>
   )}
         {checkValidHeight &&
   (
-    <Text style={styles.textFailed}>Height must be bigger than 0 and less than 300cm</Text>
+    <Text style={styles.textFailed}>Height must be bigger than 0 cm and less than 300 cm</Text>
   )}
+        <View />
+
+        {/* INPUT BIRTHDATE */}
+        <View style={styles.birthdate}>
+          <Text style={styles.input}>Introduce your birthdate:</Text>
+          {!(Platform.OS === 'ios') &&
+            <Button
+              onPress={showDatepicker}
+              title={birthDate.toLocaleDateString()}
+            />}
+          {show && !(Platform.OS === 'ios') &&
+            <DateTimePicker
+              testID='dateTimePicker'
+              value={birthDate}
+              mode='date'
+              is24Hour
+              onChange={onChange}
+              maximumDate={new Date(Date.now())}
+            />}
+          {Platform.OS === 'ios' &&
+            <DateTimePicker
+              testID='dateTimePicker'
+              value={birthDate}
+              mode='date'
+              is24Hour
+              onChange={(event, selectedDate) => handleCheckBirthdateValidity(selectedDate)}
+              maximumDate={new Date(Date.now())}
+            />}
+        </View>
 
         {/* HORIZONTAL LINE */}
         <View
           style={{
             marginTop: 20,
-            borderBottomColor: 'black',
-            borderBottomWidth: StyleSheet.hairlineWidth
+            borderBottomColor: 'white',
+            // borderBottomWidth: StyleSheet.hairlineWidth
+            borderBottomWidth: 5
           }}
         />
 
         {/* INPUT GENDER */}
         <View>
-          <Text style={styles.input}>Introduce your gender:</Text>
+          <Text style={styles.inputGender}>Introduce your gender:</Text>
           <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
             <Picker
               selectedValue={gender}
@@ -518,8 +523,8 @@ const RegisterForm = ({ navigation }) => {
 
           {/* INPUT CHRONICAL DISORDER */}
           <View>
-            <Text style={styles.input}>Any chronical disorder?</Text>
             <View style={styles.wrapperInput}>
+              <Text style={styles.floatingLabel}>Any chronical disorder?</Text>
               <TextInput
                 style={styles.input}
                 multiline
@@ -565,6 +570,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 50
   },
+
   wrapperInput: {
     borderWidth: 0.5,
     borderRadius: 5,
@@ -573,6 +579,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 50
   },
+
   wrapperInputWrong: {
     borderWidth: 0.5,
     borderRadius: 5,
@@ -581,11 +588,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 50
   },
+
   wrapperInputRow: {
     flexDirection: 'row',
     marginTop: 10,
     justifyContent: 'space-around'
   },
+
   input: {
     padding: 10,
     width: '100%',
@@ -593,6 +602,26 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     height: 50
   },
+
+  inputGender: {
+    padding: 10,
+    width: '100%',
+    color: 'white',
+    fontWeight: '400',
+    height: 50,
+    marginTop: '0'
+  },
+
+  floatingLabel: {
+    position: 'absolute',
+    top: -10,
+    left: 10,
+    paddingHorizontal: 5,
+    backgroundColor: '#191970',
+    color: 'white',
+    fontSize: 12
+  },
+
   wrapperIcon: {
     position: 'absolute',
     right: 0,
