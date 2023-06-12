@@ -84,7 +84,7 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
   const renderQuestion = ({ index, item }) => {
     return (
       <View>
-        <Text>{item.question} *</Text>
+        <Text style={styles.textQuiz}>{item.question} *</Text>
         <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
           <Picker
             selectedValue={answers[index]}
@@ -114,7 +114,7 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
   const renderSubmitButton = () => {
     return (
       <View>
-        <Text>*: Mandatory question</Text>
+        <Text style={styles.textQuiz}>* Mandatory question</Text>
         <TouchableOpacity style={styles.button} onPress={handleSubmitAnswer}>
           <Text style={styles.text}>Submit</Text>
         </TouchableOpacity>
@@ -153,12 +153,12 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
       </Modal>
 
       <View style={styles.row}>
-        <Text>{name}</Text>
+        <Text style={styles.textTitle}>{name}</Text>
         <Pressable
           style={styles.button}
           onPress={() => setModalVisible(true)}
         >
-          <Text>See Instructions</Text>
+          <Text style={styles.textStyle}>See Instructions</Text>
         </Pressable>
       </View>
       <FlatList
@@ -180,37 +180,50 @@ const styles = StyleSheet.create({
     marginBottom: 50,
     marginHorizontal: 20
   },
+
   button: {
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'orange',
+    backgroundColor: '#FF5F50',
     borderRadius: 5,
     marginTop: 25
   },
+
   text: {
     color: 'white',
     fontWeight: '700'
   },
+
+  textTitle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+
   textFailed: {
     alignSelf: 'flex-end',
     color: 'red'
   },
+
   picker: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'grey',
+    borderColor: 'white',
     marginTop: 10
   },
+
   row: {
     flexDirection: 'row'
   },
+
   centeredView: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 22
   },
+
   modalView: {
     margin: 20,
     backgroundColor: 'white',
@@ -222,15 +235,23 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2
     },
+
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5
   },
+
   textStyle: {
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center'
   },
+
+  textQuiz: {
+    color: 'white',
+    textAlign: 'center'
+  },
+
   modalText: {
     marginBottom: 15,
     textAlign: 'center'

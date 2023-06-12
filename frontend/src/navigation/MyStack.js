@@ -21,7 +21,7 @@ const MyStack = () => {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: 'yellow'
+          backgroundColor: '#FF7F50'
         }
       }}
     >
@@ -46,9 +46,10 @@ const MyStack = () => {
         name='Home'
         component={Home}
         options={({ navigation }) => ({
-          backgroundColor: 'yellow',
+          backgroundColor: '#FF7F50',
           title: 'Sleep Sheep',
           headerTitleAlign: 'center',
+          headerTitleStyle: { color: '#191970', fontWeight: 'bold' },
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => navigation.push('Proffile')}
@@ -80,7 +81,7 @@ const MyStack = () => {
         name='Proffile'
         component={Proffile}
         options={{
-          backgroundColor: 'yellow',
+          backgroundColor: '#FF7F50',
           title: '',
           headerTitleAlign: 'center'
         }}
@@ -90,7 +91,7 @@ const MyStack = () => {
         name='CalendarPage'
         component={CalendarPage}
         options={{
-          backgroundColor: 'yellow',
+          backgroundColor: '#FF7F50',
           title: '',
           headerTitleAlign: 'center'
         }}

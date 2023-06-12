@@ -36,10 +36,10 @@ const Home = ({ navigation }) => {
   const renderQuestionnaires = ({ index, item }) => {
     let logo = null
     switch (item.name) {
-      case 'MORNING Consensus Sleep Diary':
+      case 'Consensus Sleep Diary Morning':
         logo = CSDM
         break
-      case 'NIGHT Consensus Sleep Diary':
+      case 'Consensus Sleep Diary Night':
         logo = CSDN
         break
       case 'STOP-BANG':
@@ -91,8 +91,10 @@ const Home = ({ navigation }) => {
 const styles = StyleSheet.create({
   tabBarStyle: {
     flex: 1,
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: '#191970'
   },
+
   proffileImage: {
     height: 40,
     width: 40

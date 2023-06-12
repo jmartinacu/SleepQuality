@@ -3,9 +3,9 @@ import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { getQuestionnarieById } from '../api/ApiQuestionnaries'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { getItemFromStorage } from '../utils/Utils'
+
 import ConsensusSleepDiary from '../components/typesQuestionnaries/ConsensusSleepDiary'
 import StopBang from '../components/typesQuestionnaries/StopBang'
-
 import PrimaryEnumQuestionnaire from '../components/typesQuestionnaries/PrimaryEnumQuestionnaire'
 import PittsburghSleepQualityIndex from '../components/typesQuestionnaries/PittsburghSleepQualityIndex'
 
@@ -53,7 +53,7 @@ const Questionnarie = ({ navigation, route }) => {
     <SafeAreaView style={styles.container}>
       {error
         ? (
-          <Text>An error ocurried. Refresh</Text>
+          <Text style={styles.errorMessage}>An error occurred. Please refresh the page.</Text>
           )
         : (
           <View>
@@ -77,8 +77,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 50,
-    textAlign: 'center'
+    textAlign: 'center',
+    backgroundColor: '#191970'
+  },
+
+  errorMessage: {
+    color: 'white',
+    fontSize: 18
   }
+
 })
 
 export default Questionnarie

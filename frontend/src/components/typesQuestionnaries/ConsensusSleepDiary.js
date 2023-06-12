@@ -217,8 +217,8 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
   const renderSubmitButton = () => {
     return (
       <View>
-        <Text>*: Mandatory question</Text>
-        <Text>**: Mandatory question. You can only answer with numbers</Text>
+        <Text>* Mandatory question</Text>
+        <Text>** Mandatory question. You can only answer with numbers</Text>
         <TouchableOpacity style={styles.button} onPress={handleSubmitAnswer}>
           <Text style={styles.text}>Submit</Text>
         </TouchableOpacity>
@@ -262,7 +262,7 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
           style={styles.button}
           onPress={() => setModalVisible(true)}
         >
-          <Text>See Instructions</Text>
+          <Text style={styles.text}>See Instructions</Text>
         </Pressable>
       </View>
 
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   wrapperInput: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'grey',
+    borderColor: 'white',
     marginTop: 10,
     alignItems: 'center',
     height: 50,
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'orange',
+    backgroundColor: '#FF7F50',
     borderRadius: 5,
     marginTop: 25
   },
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'grey',
+    backgroundColor: 'white',
     borderRadius: 5,
     marginTop: 25
   },
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
   picker: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: 'grey',
+    borderColor: 'white',
     marginTop: 10
   },
   birthdate: {

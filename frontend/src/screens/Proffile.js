@@ -5,6 +5,7 @@ import { userAddProffilePic, userGetProffilePic, userGetUserData } from '../api/
 import { EmptyProffile } from '../assests/perfil'
 import * as ImagePicker from 'expo-image-picker'
 import RegisterForm from '../components/users/RegisterForm'
+import { BackgroundImage } from 'react-native-elements/dist/config'
 
 const Proffile = ({ navigation }) => {
   const [accessToken, setAccessToken] = useState(null)
@@ -78,7 +79,7 @@ const Proffile = ({ navigation }) => {
 
       {error || name === ''
         ? (
-          <Text>Loading...</Text>
+          <Text style={{ color: 'white' }}>Loading...</Text>
           )
         : (
           <View style={styles.container}>
@@ -100,9 +101,7 @@ const Proffile = ({ navigation }) => {
             />
           </View>
           )}
-
     </View>
-
   )
 }
 
@@ -110,7 +109,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-around'
+    justifyContent: 'space-around',
+    backgroundColor: '#191970'
   },
   tabBarStyle: {
     flex: 1,
