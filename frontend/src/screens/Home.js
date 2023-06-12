@@ -72,7 +72,7 @@ const Home = ({ navigation }) => {
 
   const renderEmptyList = () => {
     return (
-      <Text>Error. Refresh the page</Text>
+      <Text>Loading...</Text>
     )
   }
 

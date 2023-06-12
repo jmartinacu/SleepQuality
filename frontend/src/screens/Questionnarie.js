@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { getQuestionnarieById } from '../api/ApiQuestionnaries'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { getItemFromStorage } from '../utils/Utils'
 
 import ConsensusSleepDiary from '../components/typesQuestionnaries/ConsensusSleepDiary'

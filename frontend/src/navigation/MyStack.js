@@ -1,8 +1,6 @@
-import { NavigationContainer, StackActions } from '@react-navigation/native'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { createAppContainer } from 'react-navigation'
+
 import { createStackNavigator } from '@react-navigation/stack'
-import { Alert, Button, Image, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 import Home from '../screens/Home'
 import Proffile from '../screens/Proffile'
 import AntDesign from 'react-native-vector-icons/AntDesign'
@@ -13,6 +11,7 @@ import EmailVerification from '../screens/EmailVerification'
 import TextAndButton from '../components/users/TextAndButton'
 import Questionnarie from '../screens/Questionnarie'
 import { EmptyProffile } from '../assests/perfil'
+import DeleteAccount from '../screens/DeleteAccount'
 
 const Stack = createStackNavigator()
 
@@ -100,6 +99,15 @@ const MyStack = () => {
       <Stack.Screen
         name='Questionnaire'
         component={Questionnarie}
+        options={{
+          headerTransparent: true,
+          title: ''
+        }}
+      />
+
+      <Stack.Screen
+        name='DeleteAccount'
+        component={DeleteAccount}
         options={{
           headerTransparent: true,
           title: ''

@@ -6,6 +6,7 @@ import { EmptyProffile } from '../assests/perfil'
 import * as ImagePicker from 'expo-image-picker'
 import RegisterForm from '../components/users/RegisterForm'
 import { BackgroundImage } from 'react-native-elements/dist/config'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Proffile = ({ navigation }) => {
   const [accessToken, setAccessToken] = useState(null)
@@ -17,6 +18,7 @@ const Proffile = ({ navigation }) => {
   const [gender, setGender] = useState('NEUTER')
   const [birthDate, setBirthDate] = useState(new Date(1598051730000))
   const [chronicDisorders, setChronicDisorders] = useState('')
+  const [BMI, setBMI] = useState('')
   const [error, setError] = useState(false)
 
   useEffect(() => {
@@ -33,6 +35,7 @@ const Proffile = ({ navigation }) => {
             setGender(result.data.gender)
             setBirthDate(result.data.birth)
             setChronicDisorders(result.data.chronicDisorders)
+            setBMI(result.data.BMI)
           } else {
             setError(true)
           }
@@ -41,11 +44,17 @@ const Proffile = ({ navigation }) => {
       userGetProffilePic(accessToken)
         .then(result => {
           if (result.status === 200) {
-            setImage(result.data.base64)
+            // setImage(result.data.base64)
           }
         })
     }
   }, [accessToken, name])
+
+  const handleLogOut = () => {
+    AsyncStorage.removeItem('accessToken')
+    AsyncStorage.removeItem('refreshToken')
+    navigation.replace('Login')
+  }
 
   const handleAddPic = async () => {
     // No permissions request is necessary for launching the image library
@@ -83,6 +92,7 @@ const Proffile = ({ navigation }) => {
           )
         : (
           <View style={styles.container}>
+
             <TouchableOpacity
               onPress={handleAddPic}
               activeOpacity={0.5}
@@ -92,13 +102,22 @@ const Proffile = ({ navigation }) => {
                 style={styles.proffileImage}
               />
             </TouchableOpacity>
+            <Text>{name}</Text>
+            <Text>{email}</Text>
+            <Text>{birthDate.split('T')[0]}</Text>
+            <Text>{BMI} kg/m^2</Text>
 
-            <RegisterForm navigation={navigation} update nameU={name} emailU={email} heightU={height} weightU={weight} genderU={gender} birthDateU={new Date(birthDate).getTime()} chronicDisordersU={chronicDisorders} />
+            <RegisterForm navigation={navigation} update heightU={height} weightU={weight} genderU={gender} chronicDisordersU={chronicDisorders} token={accessToken} />
 
             <Button
-              onPress={() => navigation.push('Login')}
+              onPress={handleLogOut}
               title='Log out'
             />
+            <TouchableOpacity
+              onPress={() => navigation.push('DeleteAccount', { accessToken })}
+            >
+              <Text>Delete account</Text>
+            </TouchableOpacity>
           </View>
           )}
     </View>

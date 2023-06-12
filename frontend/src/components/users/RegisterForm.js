@@ -1,20 +1,17 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Picker } from '@react-native-picker/picker'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, Platform, Button } from 'react-native'
-import { userLogin, userRegister } from '../../api/ApiUser'
+import { userRegister, userUpdateUserData } from '../../api/ApiUser'
 import { Eye, EyeActive } from '../../assests/eyes'
 import { Input } from 'react-native-elements'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { parseDateToString } from '../../utils/Utils'
 
-const RegisterForm = ({ navigation, update, nameU, emailU, heightU, weightU, genderU, birthDateU, chronicDisordersU }) => {
+const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDisordersU, token }) => {
   const [status, setStatus] = useState('')
 
-  console.log(nameU)
-
-  const [name, setName] = useState(nameU)
-  const [email, setEmail] = useState(emailU)
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmedPassword, setConfirmedPassword] = useState('')
 
@@ -38,6 +35,7 @@ const RegisterForm = ({ navigation, update, nameU, emailU, heightU, weightU, gen
   const [show, setShow] = useState(false)
 
   // VALIDATION
+
   const handleCheckName = text => {
     const regex = /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u
 
@@ -51,7 +49,7 @@ const RegisterForm = ({ navigation, update, nameU, emailU, heightU, weightU, gen
 
   const handleCheckEmail = text => {
     const re = /\S+@\S+\.\S+/
-    const regex = /^[+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im
+    const regex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im
 
     setEmail(text)
     if (re.test(text) || regex.test(text)) {
@@ -196,6 +194,7 @@ const RegisterForm = ({ navigation, update, nameU, emailU, heightU, weightU, gen
           }
         })
         .catch(err => {
+          setStatus('Conection error. Please reload the website')
           console.error(err)
         })
     } else {
@@ -203,174 +202,201 @@ const RegisterForm = ({ navigation, update, nameU, emailU, heightU, weightU, gen
     }
   }
 
+  const handleUpdate = () => {
+    userUpdateUserData({
+      gender,
+      height,
+      weight,
+      chronicDisorders: chronicDisorders === '' ? null : chronicDisorders.trim()
+    }, token)
+      .then(result => {
+        console.log(result)
+        if (result.status === 200) {
+          setStatus('')
+          navigation.replace('TextAndButton', { text: 'User Data Successfully Updated', button: 'Go Home', direction: 'Home' })
+        } else {
+          setStatus(result.data.message)
+        }
+      })
+      .catch(err => {
+        setStatus('Conection error. Please reload the website')
+        console.error(err)
+      })
+  }
+
   return (
     <View style={styles.container}>
 
       <View style={styles.container}>
 
-        {/* INPUT NAME */}
-        {checkValidName
-          ? (
-            <View>
-              <View style={styles.wrapperInputWrong}>
-                <Text style={styles.floatingLabel}>Name</Text>
-                <TextInput
-                  style={styles.input}
-                  value={name}
-                  onChangeText={text => handleCheckName(text)}
-                  returnKeyType='done'
-                  maxLength={40}
-                />
-              </View>
-              <Text style={styles.textFailed}>Name can not contain Numbers or Symbols</Text>
-            </View>
-            )
-          : (
-            <View>
-              <View style={styles.wrapperInput}>
-                <Text style={styles.floatingLabel}>Name</Text>
-                <TextInput
-                  style={styles.input}
-                  value={name}
-                  onChangeText={text => handleCheckName(text)}
-                  returnKeyType='done'
-                  maxLength={40}
-                />
-              </View>
-            </View>
+        {!update &&
 
-            )}
+          <View>
 
-        {/* INPUT EMAIL */}
-        {checkValidEmail
-          ? (
-            <View>
-              <View style={styles.wrapperInputWrong}>
-                <Text style={styles.floatingLabel}>Email</Text>
-                <TextInput
-                  style={styles.input}
-                  inputMode='email'
-                  keyboardType='email-address'
-                  value={email}
-                  onChangeText={text => handleCheckEmail(text)}
-                  returnKeyType='done'
-                  maxLength={40}
-                />
-              </View>
-              <Text style={styles.textFailed}>Wrong format email</Text>
-            </View>
+            {/* INPUT NAME */}
+            {checkValidName
+              ? (
+                <View>
+                  <View style={styles.wrapperInputWrong}>
+                    <Text style={styles.floatingLabel}>Name</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={name}
+                      onChangeText={text => handleCheckName(text)}
+                      returnKeyType='done'
+                      maxLength={40}
+                    />
+                  </View>
+                  <Text style={styles.textFailed}>Name can not contain Numbers or Symbols</Text>
+                </View>
+                )
+              : (
+                <View>
+                  <View style={styles.wrapperInput}>
+                    <Text style={styles.floatingLabel}>Name</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={name}
+                      onChangeText={text => handleCheckName(text)}
+                      returnKeyType='done'
+                      maxLength={40}
+                    />
+                  </View>
+                </View>
 
-            )
-          : (
-            <View>
-              <View style={styles.wrapperInput}>
-                <Text style={styles.floatingLabel}>Email</Text>
-                <TextInput
-                  style={styles.input}
-                  inputMode='email'
-                  keyboardType='email-address'
-                  value={email}
-                  onChangeText={text => handleCheckEmail(text)}
-                  returnKeyType='done'
-                  maxLength={40}
-                />
-              </View>
-              <Text style={styles.textFailed}> </Text>
-            </View>
+                )}
 
-            )}
+            {/* INPUT EMAIL */}
+            {checkValidEmail
+              ? (
+                <View>
+                  <View style={styles.wrapperInputWrong}>
+                    <Text style={styles.floatingLabel}>Email</Text>
+                    <TextInput
+                      style={styles.input}
+                      inputMode='email'
+                      keyboardType='email-address'
+                      value={email}
+                      onChangeText={text => handleCheckEmail(text)}
+                      returnKeyType='done'
+                      maxLength={40}
+                    />
+                  </View>
+                  <Text style={styles.textFailed}>Wrong format email</Text>
+                </View>
 
-        {/* INPUT PASSWORD */}
-        {checkValidPassword
-          ? (
-            <View>
-              <View style={styles.wrapperInputWrong}>
-                <Text style={styles.floatingLabel}>Password</Text>
-                <TextInput
-                  style={styles.input}
-                  value={password}
-                  secureTextEntry={seePassword}
-                  onChangeText={text => handleCheckPasswordValidity(text)}
-                  returnKeyType='done'
-                  maxLength={15}
-                />
-                <TouchableOpacity
-                  style={styles.wrapperIcon}
-                  onPress={() => setSeePassword(!seePassword)}
-                >
-                  <Image source={seePassword ? Eye : EyeActive} style={styles.icon} />
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.textFailed}>{checkPasswordValidity(password)}</Text>
-            </View>
-            )
-          : (
-            <View>
-              <View style={styles.wrapperInput}>
-                <Text style={styles.floatingLabel}>Password</Text>
-                <TextInput
-                  style={styles.input}
-                  value={password}
-                  secureTextEntry={seePassword}
-                  onChangeText={text => handleCheckPasswordValidity(text)}
-                  returnKeyType='done'
-                  maxLength={15}
-                />
-                <TouchableOpacity
-                  style={styles.wrapperIcon}
-                  onPress={() => setSeePassword(!seePassword)}
-                >
-                  <Image source={seePassword ? Eye : EyeActive} style={styles.icon} />
-                </TouchableOpacity>
-              </View>
-            </View>
-            )}
+                )
+              : (
+                <View>
+                  <View style={styles.wrapperInput}>
+                    <Text style={styles.floatingLabel}>Email</Text>
+                    <TextInput
+                      style={styles.input}
+                      inputMode='email'
+                      keyboardType='email-address'
+                      value={email}
+                      onChangeText={text => handleCheckEmail(text)}
+                      returnKeyType='done'
+                      maxLength={40}
+                    />
+                  </View>
+                  <Text style={styles.textFailed}> </Text>
+                </View>
 
-        {/* INPUT CONFIRM PASSWORD */}
-        {checkValidConfirmedPassword
-          ? (
-            <View>
-              <View style={styles.wrapperInputWrong}>
-                <Text style={styles.floatingLabel}>Confirm Password</Text>
-                <TextInput
-                  style={styles.input}
-                  value={confirmedPassword}
-                  secureTextEntry={seeConfirmedPassword}
-                  onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
-                  returnKeyType='done'
-                  maxLength={15}
-                />
-                <TouchableOpacity
-                  style={styles.wrapperIcon}
-                  onPress={() => setSeeConfirmedPassword(!seeConfirmedPassword)}
-                >
-                  <Image source={seeConfirmedPassword ? Eye : EyeActive} style={styles.icon} />
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.textFailed}>Passwords must coincide</Text>
-            </View>
-            )
-          : (
-            <View>
-              <View style={styles.wrapperInput}>
-                <Text style={styles.floatingLabel}>Confirm Password</Text>
-                <TextInput
-                  style={styles.input}
-                  value={confirmedPassword}
-                  secureTextEntry={seeConfirmedPassword}
-                  onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
-                  returnKeyType='done'
-                  maxLength={15}
-                />
-                <TouchableOpacity
-                  style={styles.wrapperIcon}
-                  onPress={() => setSeeConfirmedPassword(!seeConfirmedPassword)}
-                >
-                  <Image source={seeConfirmedPassword ? Eye : EyeActive} style={styles.icon} />
-                </TouchableOpacity>
-              </View>
-            </View>
-            )}
+                )}
+
+            {/* INPUT PASSWORD */}
+            {checkValidPassword
+              ? (
+                <View>
+                  <View style={styles.wrapperInputWrong}>
+                    <Text style={styles.floatingLabel}>Password</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={password}
+                      secureTextEntry={seePassword}
+                      onChangeText={text => handleCheckPasswordValidity(text)}
+                      returnKeyType='done'
+                      maxLength={15}
+                    />
+                    <TouchableOpacity
+                      style={styles.wrapperIcon}
+                      onPress={() => setSeePassword(!seePassword)}
+                    >
+                      <Image source={seePassword ? Eye : EyeActive} style={styles.icon} />
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.textFailed}>{checkPasswordValidity(password)}</Text>
+                </View>
+                )
+              : (
+                <View>
+                  <View style={styles.wrapperInput}>
+                    <Text style={styles.floatingLabel}>Password</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={password}
+                      secureTextEntry={seePassword}
+                      onChangeText={text => handleCheckPasswordValidity(text)}
+                      returnKeyType='done'
+                      maxLength={15}
+                    />
+                    <TouchableOpacity
+                      style={styles.wrapperIcon}
+                      onPress={() => setSeePassword(!seePassword)}
+                    >
+                      <Image source={seePassword ? Eye : EyeActive} style={styles.icon} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                )}
+
+            {/* INPUT CONFIRM PASSWORD */}
+            {checkValidConfirmedPassword
+              ? (
+                <View>
+                  <View style={styles.wrapperInputWrong}>
+                    <Text style={styles.floatingLabel}>Confirm Password</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={confirmedPassword}
+                      secureTextEntry={seeConfirmedPassword}
+                      onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
+                      returnKeyType='done'
+                      maxLength={15}
+                    />
+                    <TouchableOpacity
+                      style={styles.wrapperIcon}
+                      onPress={() => setSeeConfirmedPassword(!seeConfirmedPassword)}
+                    >
+                      <Image source={seeConfirmedPassword ? Eye : EyeActive} style={styles.icon} />
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.textFailed}>Passwords must coincide</Text>
+                </View>
+                )
+              : (
+                <View>
+                  <View style={styles.wrapperInput}>
+                    <Text style={styles.floatingLabel}>Confirm Password</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={confirmedPassword}
+                      secureTextEntry={seeConfirmedPassword}
+                      onChangeText={text => handleCheckConfirmedPasswordValidity(text)}
+                      returnKeyType='done'
+                      maxLength={15}
+                    />
+                    <TouchableOpacity
+                      style={styles.wrapperIcon}
+                      onPress={() => setSeeConfirmedPassword(!seeConfirmedPassword)}
+                    >
+                      <Image source={seeConfirmedPassword ? Eye : EyeActive} style={styles.icon} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                )}
+          </View>}
 
         {/* HORIZONTAL LINE */}
         <View
@@ -458,33 +484,37 @@ const RegisterForm = ({ navigation, update, nameU, emailU, heightU, weightU, gen
   )}
         <View />
 
-        {/* INPUT BIRTHDATE */}
-        <View style={styles.birthdate}>
-          <Text style={styles.input}>Introduce your birthdate:</Text>
-          {!(Platform.OS === 'ios') &&
-            <Button
-              onPress={showDatepicker}
-              title={birthDate.toLocaleDateString()}
-            />}
-          {show && !(Platform.OS === 'ios') &&
-            <DateTimePicker
-              testID='dateTimePicker'
-              value={birthDate}
-              mode='date'
-              is24Hour
-              onChange={onChange}
-              maximumDate={new Date(Date.now())}
-            />}
-          {Platform.OS === 'ios' &&
-            <DateTimePicker
-              testID='dateTimePicker'
-              value={birthDate}
-              mode='date'
-              is24Hour
-              onChange={(event, selectedDate) => handleCheckBirthdateValidity(selectedDate)}
-              maximumDate={new Date(Date.now())}
-            />}
-        </View>
+        {!update &&
+          <View>
+            {/* INPUT BIRTHDATE */}
+            <View style={styles.birthdate}>
+              <Text style={styles.input}>Introduce your birthdate:</Text>
+              {!(Platform.OS === 'ios') &&
+                <Button
+                  onPress={showDatepicker}
+                  title={birthDate.toLocaleDateString()}
+                />}
+              {show && !(Platform.OS === 'ios') &&
+                <DateTimePicker
+                  testID='dateTimePicker'
+                  value={birthDate}
+                  mode='date'
+                  is24Hour
+                  onChange={onChange}
+                  maximumDate={new Date(Date.now())}
+                />}
+              {Platform.OS === 'ios' &&
+                <DateTimePicker
+                  testID='dateTimePicker'
+                  value={birthDate}
+                  mode='date'
+                  is24Hour
+                  onChange={(event, selectedDate) => handleCheckBirthdateValidity(selectedDate)}
+                  maximumDate={new Date(Date.now())}
+                />}
+            </View>
+
+          </View>}
 
         {/* HORIZONTAL LINE */}
         <View
@@ -538,24 +568,48 @@ const RegisterForm = ({ navigation, update, nameU, emailU, heightU, weightU, gen
           </View>
         </View>
 
-        {/* CREATE ACCOUNT BUTTON */}
-        {name === '' || password === '' || email === '' || confirmedPassword === '' ||
+        {!update &&
+          <View>
+            {/* CREATE ACCOUNT BUTTON */}
+            {name === '' || password === '' || email === '' || confirmedPassword === '' ||
 height === '' || weight === '' || checkValidPassword || checkValidEmail ||
 checkValidName || checkValidConfirmedPassword || checkValidHeight || checkValidWeight || checkValidBirthdate
-          ? (
-            <TouchableOpacity
-              disabled
-              style={styles.buttonDisable}
-              onPress={handleRegister}
-            >
-              <Text style={styles.textCreate}>Create Account</Text>
-            </TouchableOpacity>
-            )
-          : (
-            <TouchableOpacity style={styles.button} onPress={handleRegister}>
-              <Text style={styles.textCreate}>Create Account</Text>
-            </TouchableOpacity>
-            )}
+              ? (
+                <TouchableOpacity
+                  disabled
+                  style={styles.buttonDisable}
+                  onPress={handleRegister}
+                >
+                  <Text style={styles.textCreate}>Create Account</Text>
+                </TouchableOpacity>
+                )
+              : (
+                <TouchableOpacity style={styles.button} onPress={handleRegister}>
+                  <Text style={styles.textCreate}>Create Account</Text>
+                </TouchableOpacity>
+                )}
+          </View>}
+
+        {update &&
+          <View>
+            {/* UPDATE BUTTON */}
+            {checkValidHeight || checkValidWeight || height === '' || weight === '' || (height == heightU && weight == weightU && gender === genderU && chronicDisorders === chronicDisordersU)
+              ? (
+                <TouchableOpacity
+                  disabled
+                  style={styles.buttonDisable}
+                  onPress={handleUpdate}
+                >
+                  <Text style={styles.textCreate}>Update User Data</Text>
+                </TouchableOpacity>
+                )
+              : (
+                <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+                  <Text style={styles.textCreate}>Update User Data</Text>
+                </TouchableOpacity>
+                )}
+          </View>}
+
         {status !== '' &&
           <Text style={styles.textFailed}>{status}</Text>}
       </View>

@@ -90,6 +90,7 @@ const LoginForm = ({ navigation }) => {
           }
         })
         .catch(err => {
+          setStatus('Conection error. Please reload the website')
           console.error(err)
         })
     } else {
