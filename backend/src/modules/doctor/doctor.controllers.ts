@@ -195,7 +195,7 @@ async function addDoctorToUserHandler (
       }
     })
 
-    const html = htmlAddDoctor(doctorCode)
+    const html = htmlAddDoctor(userId, doctorCode)
 
     await sendEmail({
       from: 'test@example.com',

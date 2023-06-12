@@ -109,10 +109,8 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
   )
 
   // TODO TESTING HAPPY PATH
-  server.post('/doctors/:doctorCode',
+  server.get('/doctors/:id/:doctorCode',
     {
-      onRequest: server.auth([server.authenticate]),
-      preHandler: server.auth([server.checkUserVerification]),
       schema: AcceptDoctorSchema
     },
     acceptDoctorHandler
@@ -141,6 +139,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     getProfilePictureHandler
   )
 
+  // TODO: AÑADIR RUTA PARA PODER CONSEGUIR LA CSV DATA DE CUESTIONARIOS ESPECIFICOS
   server.get('/data',
     {
       onRequest: server.auth([server.authenticate]),

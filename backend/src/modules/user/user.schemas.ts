@@ -212,6 +212,7 @@ const resetPasswordBodySchema = Type.Object({
 })
 
 const acceptDoctorParamsSchema = Type.Object({
+  id,
   doctorCode
 })
 
@@ -285,7 +286,8 @@ const getCSVDataQueryStringSchema = Type.Object({
     Type.Literal('answers'),
     Type.Literal('algorithms'),
     Type.Literal('all')
-  ]))
+  ])),
+  questionnaire: Type.Optional(Type.String())
 })
 
 // TODO CHECK RESPONSES PREHANDLERS
@@ -374,7 +376,9 @@ const AcceptDoctorSchema = {
   params: acceptDoctorParamsSchema,
   response: {
     200: verifyAccountResponseSchema,
+    401: errorResponseSchema,
     403: errorResponseSchema,
+    404: errorResponseSchema,
     500: Type.Unknown()
   }
 }

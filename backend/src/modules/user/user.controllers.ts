@@ -340,21 +340,26 @@ async function acceptDoctorHandler (
   reply: FastifyReplyTypebox<typeof AcceptDoctorSchema>
 ): Promise<VerifyAccountResponse> {
   try {
-    const { userId } = request.user as { userId: string }
-    const { doctorCode } = request.params
-    const { id, doctorId, acceptDoctor } = await findUserUnique('id', userId) as User
-    if (doctorId !== null) {
+    const { id: userId, doctorCode } = request.params
+    const user = await findUserUnique('id', userId)
+    if (user === null) {
+      return await reply.code(404).send({ message: 'User not found' })
+    }
+    if (!user.verified) {
+      return await reply.code(401).send({ message: 'Please verify your account' })
+    }
+    if (user.doctorId !== null) {
       return await reply.code(403).send({ message: 'User already has a doctor' })
     }
-    if (acceptDoctor as AcceptDoctor === null) {
+    if (user.acceptDoctor as AcceptDoctor === null) {
       return await reply.send({ message: 'User has not been chosen by any doctor. Please wait' })
     }
-    if ((acceptDoctor as AcceptDoctor)?.code !== Number(doctorCode)) {
+    if ((user.acceptDoctor as AcceptDoctor)?.code !== Number(doctorCode)) {
       return await reply.code(403).send({ message: 'Doctor Code invalid' })
     }
-    await updateUser(id, { doctorId: (acceptDoctor as AcceptDoctor)?.id, acceptDoctor: null })
+    await updateUser(userId, { doctorId: (user.acceptDoctor as AcceptDoctor)?.id, acceptDoctor: null })
     return await reply.send({
-      message: `Doctor ${(acceptDoctor as AcceptDoctor)?.id as string} accepted`
+      message: `Doctor ${(user.acceptDoctor as AcceptDoctor)?.id as string} accepted`
     })
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
@@ -435,13 +440,15 @@ async function getCSVDataHandler (
   const { userId } = request.user as { userId: string }
   const fileName = `${userId}.csv`
   try {
-    const { data } = request.query
+    const { data, questionnaire } = request.query
     if (typeof data === 'undefined' || data === 'all') {
       await saveCSV(userId, fileName, 'all')
     } else if (data === 'algorithms') {
       await saveCSV(userId, fileName, 'algorithms')
     } else {
-      await saveCSV(userId, fileName, 'answers')
+      if (typeof questionnaire === 'undefined') {
+        await saveCSV(userId, fileName, 'answers')
+      } else await saveCSV(userId, fileName, 'answers', questionnaire)
     }
     const fileStream = fs.createReadStream(fileName)
     return await reply.type('text/csv').send(fileStream)

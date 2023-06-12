@@ -327,12 +327,29 @@ async function updateSession (
 }
 
 async function findUserAnswers (userId: string): Promise<Answer[]> {
-  const answer = await prisma.answer.findMany({
+  const answers = await prisma.answer.findMany({
     where: {
       userId
     }
   })
-  return answer
+  return answers
+}
+
+async function findUserQuestionnaireAnswer (
+  userId: string,
+  questionnaireName: string
+): Promise<Answer[]> {
+  const answers = await prisma.answer.findMany({
+    where: {
+      AND: {
+        userId,
+        questionnaire: {
+          name: questionnaireName
+        }
+      }
+    }
+  })
+  return answers
 }
 
 async function findUserAlgorithms (userId: string): Promise<QuestionnaireAlgorithm[]> {
@@ -347,13 +364,17 @@ async function findUserAlgorithms (userId: string): Promise<QuestionnaireAlgorit
 async function saveCSV (
   userId: string,
   fileName: string,
-  mode: 'all' | 'answers' | 'algorithms'
+  mode: 'all' | 'answers' | 'algorithms',
+  questionnaire?: string
 ): Promise<void> {
   try {
     let answers: Answer[]
     let algorithms: QuestionnaireAlgorithm[]
     switch (mode) {
       case 'answers':
+        if (typeof questionnaire !== 'undefined') {
+          answers = await findUserQuestionnaireAnswer(userId, questionnaire)
+        }
         answers = await findUserAnswers(userId)
         await saveAnswersCSV(answers, fileName)
         break
@@ -518,6 +539,7 @@ export {
   updateSession,
   findSessionAndUserUnique,
   findUserAnswers,
+  findUserQuestionnaireAnswer,
   findUserAlgorithms,
   saveCSV
 }
