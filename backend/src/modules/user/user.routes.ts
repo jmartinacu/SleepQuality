@@ -13,7 +13,8 @@ import {
   updateUserHandler,
   acceptDoctorHandler,
   getCSVDataHandler,
-  getQuestionnaireInformationHandler
+  getQuestionnaireInformationHandler,
+  getAdminHandler
 } from './user.controllers'
 import {
   CreateUserSchema,
@@ -29,7 +30,8 @@ import {
   GetProfilePictureSchema,
   AcceptDoctorSchema,
   GetCSVDataSchema,
-  GetQuestionnaireInformationSchema
+  GetQuestionnaireInformationSchema,
+  GetAdminSchema
 } from './user.schemas'
 import { upload } from '../../server'
 
@@ -157,7 +159,20 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       preHandler: server.auth([server.checkUserVerification]),
       schema: GetQuestionnaireInformationSchema
     },
-    getQuestionnaireInformationHandler)
+    getQuestionnaireInformationHandler
+  )
+
+  server.get('/admin',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([
+        server.checkAdmin,
+        server.checkUserVerification
+      ]),
+      schema: GetAdminSchema
+    },
+    getAdminHandler
+  )
 }
 
 export default userRoutes

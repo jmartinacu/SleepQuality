@@ -8,6 +8,7 @@ import type {
   CreateUserSchema,
   DeleteUserAuthenticatedSchema,
   ForgotPasswordSchema,
+  GetAdminSchema,
   GetCSVDataSchema,
   GetProfilePictureSchema,
   GetQuestionnaireInformationSchema,
@@ -514,6 +515,26 @@ async function getQuestionnaireInformationHandler (
   }
 }
 
+async function getAdminHandler (
+  request: FastifyRequestTypebox<typeof GetAdminSchema>,
+  reply: FastifyReplyTypebox<typeof GetAdminSchema>
+): Promise<{ message: string }> {
+  try {
+    const { userId: adminId } = request.user as { userId: string }
+    return await reply.send({ message: `User ${adminId} is admin` })
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
 export {
   createUserHandler,
   deleteUserHandler,
@@ -528,5 +549,6 @@ export {
   getProfilePictureHandler,
   acceptDoctorHandler,
   getCSVDataHandler,
-  getQuestionnaireInformationHandler
+  getQuestionnaireInformationHandler,
+  getAdminHandler
 }

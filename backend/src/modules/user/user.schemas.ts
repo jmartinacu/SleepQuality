@@ -446,6 +446,15 @@ const GetQuestionnaireInformationSchema = {
   }
 }
 
+const GetAdminSchema = {
+  response: {
+    200: messageResponseSchema,
+    400: errorResponseSchema,
+    403: errorResponseSchema,
+    500: Type.Unknown()
+  }
+}
+
 type CreateUserInput = Static<typeof createUserSchema>
 type CreateUserResponse = Static<typeof createUserResponseSchema>
 type CreateUserServiceInput = Static<typeof createUserServiceSchema>
@@ -482,6 +491,7 @@ export {
   GetProfilePictureSchema,
   GetCSVDataSchema,
   GetQuestionnaireInformationSchema,
+  GetAdminSchema,
   type CreateUserResponse,
   type CreateUserInput,
   type CreateUserServiceInput,
