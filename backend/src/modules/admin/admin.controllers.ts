@@ -39,12 +39,12 @@ async function createDoctorHandler (
   reply: FastifyReplyTypebox<typeof CreateDoctorSchema>
 ): Promise<DoctorResponse> {
   try {
-    const { id } = request.params
-    const user = await findUserUnique('id', id)
+    const { email } = request.params
+    const user = await findUserUnique('email', email)
     if (user === null) {
       return await reply.code(404).send({ message: 'User not found' })
     }
-    const doctor = await createDoctor(id)
+    const doctor = await createDoctor(user.id)
     const { birth, ...rest } = doctor
     return await reply.code(201).send({ birth: parseDateToString(birth), ...rest })
   } catch (error) {

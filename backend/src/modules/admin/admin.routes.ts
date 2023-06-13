@@ -15,7 +15,7 @@ async function adminRoutes (server: FastifyInstance): Promise<void> {
     createAdminHandler
   )
 
-  server.post('/doctors/:id',
+  server.post('/doctors/:email',
     {
       onRequest: server.auth([server.authenticate]),
       preHandler: server.auth([server.checkUserVerification]),
