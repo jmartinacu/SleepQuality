@@ -39,8 +39,12 @@ const doctorAttributes = {
 const { gender, height, weight } = doctorCore
 const { id, message, name, email, ids, birthInput } = doctorAttributes
 
-const createDoctorParamsSchema = Type.Object({
+const idParamsSchema = Type.Object({
   id
+})
+
+const emailParamSchema = Type.Object({
+  email
 })
 
 const getUserQuestionnaireIdParamsSchema = Type.Object({
@@ -87,7 +91,7 @@ const getUserInformationQueryStringSchema = Type.Object({
 })
 
 const CreateDoctorSchema = {
-  params: createDoctorParamsSchema,
+  params: emailParamSchema,
   response: {
     201: createDoctorResponseSchema,
     404: errorResponseSchema,
@@ -112,7 +116,7 @@ const GetDoctorAuthenticatedSchema = {
 }
 
 const AddQuestionnairesToUserSchema = {
-  params: createDoctorParamsSchema,
+  params: idParamsSchema,
   body: addQuestionnaireToUserBodySchema,
   response: {
     200: messageResponseSchema,
@@ -123,7 +127,7 @@ const AddQuestionnairesToUserSchema = {
 }
 
 const AddDoctorToUserSchema = {
-  params: createDoctorParamsSchema,
+  params: idParamsSchema,
   response: {
     200: messageResponseSchema,
     404: errorResponseSchema,
@@ -186,7 +190,7 @@ const GetUsersSchema = {
 }
 
 const GetUserSchema = {
-  params: createDoctorParamsSchema,
+  params: idParamsSchema,
   response: {
     200: createUserResponseSchema,
     404: errorResponseSchema,
