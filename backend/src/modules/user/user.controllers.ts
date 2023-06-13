@@ -46,6 +46,7 @@ import {
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 import { errorCodeAndMessage } from '../../utils/error'
 import { findAnswers, findLastAnswer, findLastQuestionnaireAlgorithms, findQuestionnaireAlgorithmsOrderByCreatedAt } from '../questionnaire/questionnaire.services'
+import { findDoctorUnique } from '../doctor/doctor.services'
 
 async function createUserHandler (
   request: FastifyRequestTypebox<typeof CreateUserSchema>,
@@ -65,7 +66,7 @@ async function createUserHandler (
     }
 
     const checkEmailUserIsUnique = await findUserUnique('email', rest.email)
-    const checkEmailDoctorIsUnique = await findUserUnique('email', rest.email)
+    const checkEmailDoctorIsUnique = await findDoctorUnique('email', rest.email)
 
     if (checkEmailUserIsUnique !== null || checkEmailDoctorIsUnique !== null) {
       return await reply.code(400).send({ message: `Email ${rest.email} is already used` })
