@@ -12,7 +12,8 @@ import {
   deleteUserHandler,
   updateUserHandler,
   acceptDoctorHandler,
-  getCSVDataHandler
+  getCSVDataHandler,
+  getQuestionnaireInformationHandler
 } from './user.controllers'
 import {
   CreateUserSchema,
@@ -27,7 +28,8 @@ import {
   AddProfilePictureSchema,
   GetProfilePictureSchema,
   AcceptDoctorSchema,
-  GetCSVDataSchema
+  GetCSVDataSchema,
+  GetQuestionnaireInformationSchema
 } from './user.schemas'
 import { upload } from '../../server'
 
@@ -140,7 +142,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
   )
 
   // TODO: AÑADIR RUTA PARA PODER CONSEGUIR LA CSV DATA DE CUESTIONARIOS ESPECIFICOS
-  server.get('/data',
+  server.get('/data/csv',
     {
       onRequest: server.auth([server.authenticate]),
       preHandler: server.auth([server.checkUserVerification]),
@@ -148,6 +150,14 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     },
     getCSVDataHandler
   )
+
+  server.get('/data',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkUserVerification]),
+      schema: GetQuestionnaireInformationSchema
+    },
+    getQuestionnaireInformationHandler)
 }
 
 export default userRoutes
