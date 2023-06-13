@@ -1,4 +1,10 @@
 import { Static, Type } from '@fastify/type-provider-typebox'
+import {
+  answerResponseSchema,
+  answersResponseSchema,
+  getAlgorithmResponseSchema,
+  getAlgorithmsResponseSchema
+} from '../questionnaire/questionnaire.schemas'
 
 export const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹])([A-Za-z\d~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹]|[^ ]){8,15}$/
 export const regexObjectId = /^[a-fA-F0-9]{24}$/
@@ -290,6 +296,22 @@ const getCSVDataQueryStringSchema = Type.Object({
   questionnaire: Type.Optional(Type.String())
 })
 
+const getQuestionnaireInformationParamsSchema = Type.Object({
+  id
+})
+
+const getQuestionnaireInformationQueryStringSchema = Type.Object({
+  all: Type.Optional(Type.Boolean()),
+  info: Type.Union([
+    Type.Literal('answers'),
+    Type.Literal('algorithms')
+  ])
+})
+
+const messageResponseSchema = Type.Object({
+  message
+})
+
 // TODO CHECK RESPONSES PREHANDLERS
 const CreateUserSchema = {
   body: createUserSchema,
@@ -407,6 +429,23 @@ const GetCSVDataSchema = {
   }
 }
 
+const GetQuestionnaireInformationSchema = {
+  params: getQuestionnaireInformationParamsSchema,
+  querystring: getQuestionnaireInformationQueryStringSchema,
+  response: {
+    200: Type.Union([
+      answerResponseSchema,
+      answersResponseSchema,
+      getAlgorithmResponseSchema,
+      getAlgorithmsResponseSchema,
+      messageResponseSchema
+    ]),
+    403: errorResponseSchema,
+    404: errorResponseSchema,
+    500: Type.Unknown()
+  }
+}
+
 type CreateUserInput = Static<typeof createUserSchema>
 type CreateUserResponse = Static<typeof createUserResponseSchema>
 type CreateUserServiceInput = Static<typeof createUserServiceSchema>
@@ -442,6 +481,7 @@ export {
   AddProfilePictureSchema,
   GetProfilePictureSchema,
   GetCSVDataSchema,
+  GetQuestionnaireInformationSchema,
   type CreateUserResponse,
   type CreateUserInput,
   type CreateUserServiceInput,

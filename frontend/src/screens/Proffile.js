@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { View, StyleSheet, Button, TouchableOpacity, Image, Text } from 'react-native'
-import { DataURIToBlob, getItemFromStorage } from '../utils/Utils'
+import { b64toBlob, getItemFromStorage } from '../utils/Utils'
 import { userAddProffilePic, userGetProffilePic, userGetUserData } from '../api/ApiUser'
 import { EmptyProffile } from '../assests/perfil'
 import * as ImagePicker from 'expo-image-picker'
 import RegisterForm from '../components/users/RegisterForm'
-import { BackgroundImage } from 'react-native-elements/dist/config'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Proffile = ({ navigation }) => {
@@ -70,10 +69,22 @@ const Proffile = ({ navigation }) => {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri)
-      const imgBase64 = result.assets[0].uri
-      const file = DataURIToBlob(imgBase64)
+      const [imageInfo, imageBase64] = result.assets[0].uri.split(',')
+      const [dataAndContentType] = imageInfo.split(';')
+      const [, contentType] = dataAndContentType.split(':')
+      console.log({ imageInfo, imageBase64, contentType })
+      const blobImage = b64toBlob(imageBase64, contentType)
+      const file = new global.File(blobImage, new Date() + '_profile', {
+        type: contentType
+      })
+      console.log(blobImage.type)
+      console.log(blobImage.size)
       const formData = new FormData()
-      formData.append('profilePicture', file)
+      formData.append('profilePicture', {
+        name: new Date() + '_profile',
+        uri: file,
+        type: contentType
+      })
 
       userAddProffilePic(formData, accessToken)
         .then(res => {
