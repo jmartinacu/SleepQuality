@@ -25,7 +25,7 @@ const Proffile = ({ navigation }) => {
     if (accessToken !== null) {
       userGetUserData(accessToken)
         .then(result => {
-          console.log(result)
+          // console.log(result)
           if (result.status === 200) {
             setName(result.data.name)
             setEmail(result.data.email)
@@ -115,7 +115,7 @@ const Proffile = ({ navigation }) => {
             </TouchableOpacity>
             <Text>{name}</Text>
             <Text>{email}</Text>
-            <Text>{birthDate.split('T')[0]}</Text>
+            {typeof birthDate === 'string' && <Text>{birthDate.split('T')[0]}</Text>}
             <Text>{BMI} kg/m^2</Text>
 
             <RegisterForm navigation={navigation} update heightU={height} weightU={weight} genderU={gender} chronicDisordersU={chronicDisorders} token={accessToken} />

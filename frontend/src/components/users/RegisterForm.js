@@ -203,25 +203,27 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
   }
 
   const handleUpdate = () => {
-    userUpdateUserData({
-      gender,
-      height,
-      weight,
-      chronicDisorders: chronicDisorders === '' ? null : chronicDisorders.trim()
-    }, token)
-      .then(result => {
-        console.log(result)
-        if (result.status === 200) {
-          setStatus('')
-          navigation.replace('TextAndButton', { text: 'User Data Successfully Updated', button: 'Go Home', direction: 'Home' })
-        } else {
-          setStatus(result.data.message)
-        }
-      })
-      .catch(err => {
-        setStatus('Conection error. Please reload the website')
-        console.error(err)
-      })
+    if (heightU !== '') {
+      userUpdateUserData({
+        gender,
+        height,
+        weight,
+        chronicDisorders: chronicDisorders === '' ? null : chronicDisorders.trim()
+      }, token)
+        .then(result => {
+          console.log(result)
+          if (result.status === 200) {
+            setStatus('')
+            navigation.replace('TextAndButton', { text: 'User Data Successfully Updated', button: 'Go Home', direction: 'Home' })
+          } else {
+            setStatus(result.data.message)
+          }
+        })
+        .catch(err => {
+          setStatus('Conection error. Please reload the website')
+          console.error(err)
+        })
+    }
   }
 
   return (
@@ -592,7 +594,7 @@ checkValidName || checkValidConfirmedPassword || checkValidHeight || checkValidW
 
         {update &&
           <View>
-            {/* UPDATE BUTTON */}
+
             {checkValidHeight || checkValidWeight || height === '' || weight === '' || (height == heightU && weight == weightU && gender === genderU && chronicDisorders === chronicDisordersU)
               ? (
                 <TouchableOpacity
@@ -663,7 +665,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '400',
     height: 50,
-    marginTop: '0'
+    marginTop: 0
   },
 
   floatingLabel: {
