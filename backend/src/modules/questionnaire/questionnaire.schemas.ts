@@ -1,5 +1,6 @@
 import { Type, Static } from '@fastify/type-provider-typebox'
-import { regexObjectId } from '../user/user.schemas'
+
+const regexObjectId = /^[a-fA-F0-9]{24}$/
 
 const questionnaireAttributes = {
   id: Type.RegEx(regexObjectId),

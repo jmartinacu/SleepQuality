@@ -8,8 +8,10 @@ import type {
   CreateUserSchema,
   DeleteUserAuthenticatedSchema,
   ForgotPasswordSchema,
+  GetAdminSchema,
   GetCSVDataSchema,
   GetProfilePictureSchema,
+  GetQuestionnaireInformationSchema,
   GetUserAuthenticatedSchema,
   LogInSchema,
   LogInUserResponse,
@@ -31,7 +33,7 @@ import {
   updateUser
 } from './user.services'
 import sendEmail from '../../utils/mailer'
-import type { Session, User } from '../../utils/database'
+import type { Answer, QuestionnaireAlgorithm, Session, User } from '../../utils/database'
 import {
   checkBirth,
   checkTimeDiffOfGivenDateUntilNow,
@@ -43,6 +45,7 @@ import {
 } from '../../utils/helpers'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 import { errorCodeAndMessage } from '../../utils/error'
+import { findAnswers, findLastAnswer, findLastQuestionnaireAlgorithms, findQuestionnaireAlgorithmsOrderByCreatedAt } from '../questionnaire/questionnaire.services'
 
 async function createUserHandler (
   request: FastifyRequestTypebox<typeof CreateUserSchema>,
@@ -469,6 +472,69 @@ async function getCSVDataHandler (
   }
 }
 
+async function getQuestionnaireInformationHandler (
+  request: FastifyRequestTypebox<typeof GetQuestionnaireInformationSchema>,
+  reply: FastifyReplyTypebox<typeof GetQuestionnaireInformationSchema>
+): Promise<Answer | Answer[] | QuestionnaireAlgorithm | QuestionnaireAlgorithm[]> {
+  try {
+    const { userId } = request.user as { userId: string }
+    const { id: questionnaireId } = request.params
+    const { all, info } = request.query
+    console.log(all, info)
+    let result: Answer | Answer[] | QuestionnaireAlgorithm | QuestionnaireAlgorithm[] | null = []
+    if (info === 'algorithms') {
+      if (typeof all === 'undefined' || !all) {
+        result = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
+      } else {
+        result = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
+        if (result === null) {
+          return await reply.send({ message: `The user ${userId} does not have algorithms of the questionnaire ${questionnaireId} ` })
+        }
+      }
+    } else if (info === 'answers') {
+      if (typeof all === 'undefined' || !all) {
+        result = await findAnswers(questionnaireId, userId)
+      } else {
+        result = await findLastAnswer(questionnaireId, userId)
+        if (result === null) {
+          return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
+        }
+      }
+    }
+    return await reply.send(result)
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
+async function getAdminHandler (
+  request: FastifyRequestTypebox<typeof GetAdminSchema>,
+  reply: FastifyReplyTypebox<typeof GetAdminSchema>
+): Promise<{ message: string }> {
+  try {
+    const { userId: adminId } = request.user as { userId: string }
+    return await reply.send({ message: `User ${adminId} is admin` })
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
 export {
   createUserHandler,
   deleteUserHandler,
@@ -482,5 +548,7 @@ export {
   addProfilePictureHandler,
   getProfilePictureHandler,
   acceptDoctorHandler,
-  getCSVDataHandler
+  getCSVDataHandler,
+  getQuestionnaireInformationHandler,
+  getAdminHandler
 }

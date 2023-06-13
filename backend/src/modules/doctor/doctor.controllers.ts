@@ -316,18 +316,20 @@ async function getUserInformationHandler (
     if (info === 'algorithms') {
       if (typeof all === 'undefined' || !all) {
         result = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
-      } else result = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
-
-      if (result === null) {
-        return await reply.send({ message: `The user ${userId} does not have algorithms of the questionnaire ${questionnaireId} ` })
+      } else {
+        result = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
+        if (result === null) {
+          return await reply.send({ message: `The user ${userId} does not have algorithms of the questionnaire ${questionnaireId} ` })
+        }
       }
     } else if (info === 'answers') {
       if (typeof all === 'undefined' || !all) {
         result = await findAnswers(questionnaireId, userId)
-      } else result = await findLastAnswer(questionnaireId, userId)
-
-      if (result === null) {
-        return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
+      } else {
+        result = await findLastAnswer(questionnaireId, userId)
+        if (result === null) {
+          return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
+        }
       }
     }
     return await reply.send(result)
