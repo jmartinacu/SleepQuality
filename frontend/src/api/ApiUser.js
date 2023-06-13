@@ -155,3 +155,54 @@ export const userDeleteAccount = async (token) => {
     return err.response
   }
 }
+
+export const userGetNewAccessToken = async (refresh) => {
+  try {
+    const result = await ApiManager('/users/refresh', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        Refresh: refresh
+      }
+    })
+    return result
+  } catch (err) {
+    console.log(err.response)
+    return err.response
+  }
+}
+
+export const userIsAdmin = async (token) => {
+  try {
+    const result = await ApiManager('/users/admin', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        Authorization: 'Bearer ' + token
+      }
+    })
+    return result
+  } catch (err) {
+    console.log(err.response)
+    return err.response
+  }
+}
+
+export const userCreateDoctor = async (token, email) => {
+  try {
+    const result = await ApiManager(`/admins/doctors/${email}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        Authorization: 'Bearer ' + token
+      }
+    })
+    return result
+  } catch (err) {
+    console.log(err.response)
+    return err.response
+  }
+}
