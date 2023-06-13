@@ -91,7 +91,7 @@ export const userAddProffilePic = async (data, token) => {
     const result = await ApiManager('/users/images', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data',
         'Access-Control-Allow-Origin': '*',
         Authorization: 'Bearer ' + token
       },
