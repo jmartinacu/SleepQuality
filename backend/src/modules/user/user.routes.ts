@@ -153,7 +153,7 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     getCSVDataHandler
   )
 
-  server.get('/data',
+  server.get('/data/:id',
     {
       onRequest: server.auth([server.authenticate]),
       preHandler: server.auth([server.checkUserVerification]),
