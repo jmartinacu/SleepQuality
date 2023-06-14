@@ -391,7 +391,7 @@ async function addProfilePictureHandler (
     const { filename: profilePicture } = image
     const { userId } = request.user as { userId: string }
     const { profilePicture: profilePictureUser } = await findUserUnique('id', userId) as User
-    // TENGO QUE MIRAR SI AUNQUE SALTE ESTO MULTER AÑADE LA IMAGEN AL DIRECTORIO IMAGES
+    // TODO: TENGO QUE MIRAR SI AUNQUE SALTE ESTO MULTER AÑADE LA IMAGEN AL DIRECTORIO IMAGES
     if (profilePictureUser !== null) {
       return await reply.code(403).send({ message: 'User already has an profile picture' })
     }
@@ -501,7 +501,7 @@ async function getQuestionnaireInformationHandler (
       } else {
         result = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
         if (result === null) {
-          return await reply.send({ message: `The user ${userId} does not have algorithms of the questionnaire ${questionnaireId} ` })
+          return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId}` })
         }
       }
     } else if (info === 'answers') {
