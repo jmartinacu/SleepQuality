@@ -84,10 +84,10 @@ const getUserAnswerQueryStringSchema = Type.Object({
 
 const getUserInformationQueryStringSchema = Type.Object({
   all: Type.Optional(Type.Boolean()),
-  info: Type.Union([
+  info: Type.Optional(Type.Union([
     Type.Literal('answers'),
     Type.Literal('algorithms')
-  ])
+  ]))
 })
 
 const CreateDoctorSchema = {

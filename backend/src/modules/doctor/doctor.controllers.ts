@@ -50,7 +50,7 @@ import {
 } from '../questionnaire/questionnaire.services'
 import sendEmail from '../../utils/mailer'
 import { deleteDoctor, findDoctorUnique, findUsersDoctor } from './doctor.services'
-import { GetQuestionnaireSchema, GetQuestionnairesInformationSchema } from '../questionnaire/questionnaire.schemas'
+import { GetInformationResponseSchema, GetQuestionnaireSchema, GetQuestionnairesInformationSchema } from '../questionnaire/questionnaire.schemas'
 
 async function logInDoctorHandler (
   request: FastifyRequestTypebox<typeof LogInSchema>,
@@ -327,13 +327,24 @@ async function GetUserAlgorithmsHandler (
 async function getUserInformationHandler (
   request: FastifyRequestTypebox<typeof GetUserInformationSchema>,
   reply: FastifyReplyTypebox<typeof GetUserInformationSchema>
-): Promise<Answer | Answer[] | QuestionnaireAlgorithm | QuestionnaireAlgorithm[]> {
+): Promise<
+  Answer |
+  Answer[] |
+  QuestionnaireAlgorithm |
+  QuestionnaireAlgorithm[] |
+  GetInformationResponseSchema
+  > {
   try {
     const { doctorId } = request.user as { doctorId: string }
     const { userId, questionnaireId } = request.params
     const { all, info } = request.query
     console.log(all, info)
-    let result: Answer | Answer[] | QuestionnaireAlgorithm | QuestionnaireAlgorithm[] | null = []
+    let result: Answer |
+    Answer[] |
+    QuestionnaireAlgorithm |
+    QuestionnaireAlgorithm[] |
+    GetInformationResponseSchema |
+    null = []
     const user = await findUserUnique('id', userId)
     if (user === null) {
       return await reply.code(404).send({ message: 'User not found' })
@@ -360,7 +371,27 @@ async function getUserInformationHandler (
           return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
         }
       }
+    } else {
+      if (typeof all === 'undefined' || all) {
+        const algorithms = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
+        const answers = await findAnswers(questionnaireId, userId)
+        result = {
+          answers,
+          algorithms
+        }
+      } else {
+        const answer = await findLastAnswer(questionnaireId, userId)
+        const algorithm = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
+        if (answer === null && algorithm === null) {
+          return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
+        }
+        result = {
+          answers: answer,
+          algorithms: algorithm
+        }
+      }
     }
+
     return await reply.send(result)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)

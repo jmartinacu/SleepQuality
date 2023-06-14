@@ -47,6 +47,7 @@ import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 import { errorCodeAndMessage } from '../../utils/error'
 import { findAnswers, findLastAnswer, findLastQuestionnaireAlgorithms, findQuestionnaireAlgorithmsOrderByCreatedAt } from '../questionnaire/questionnaire.services'
 import { findDoctorUnique } from '../doctor/doctor.services'
+import { GetInformationResponseSchema } from '../questionnaire/questionnaire.schemas'
 
 async function createUserHandler (
   request: FastifyRequestTypebox<typeof CreateUserSchema>,
@@ -476,13 +477,24 @@ async function getCSVDataHandler (
 async function getQuestionnaireInformationHandler (
   request: FastifyRequestTypebox<typeof GetQuestionnaireInformationSchema>,
   reply: FastifyReplyTypebox<typeof GetQuestionnaireInformationSchema>
-): Promise<Answer | Answer[] | QuestionnaireAlgorithm | QuestionnaireAlgorithm[]> {
+): Promise<
+  Answer |
+  Answer[] |
+  QuestionnaireAlgorithm |
+  QuestionnaireAlgorithm[] |
+  GetInformationResponseSchema
+  > {
   try {
     const { userId } = request.user as { userId: string }
     const { id: questionnaireId } = request.params
     const { all, info } = request.query
     console.log(all, info)
-    let result: Answer | Answer[] | QuestionnaireAlgorithm | QuestionnaireAlgorithm[] | null = []
+    let result: Answer |
+    Answer[] |
+    QuestionnaireAlgorithm |
+    QuestionnaireAlgorithm[] |
+    GetInformationResponseSchema |
+    null = []
     if (info === 'algorithms') {
       if (typeof all === 'undefined' || all) {
         result = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
@@ -501,19 +513,27 @@ async function getQuestionnaireInformationHandler (
           return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
         }
       }
-    } /* else {
-      if (typeof all === 'undefined' || !all) {
+    } else {
+      if (typeof all === 'undefined' || all) {
         const algorithms = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
         const answers = await findAnswers(questionnaireId, userId)
+        result = {
+          answers,
+          algorithms
+        }
       } else {
         const answer = await findLastAnswer(questionnaireId, userId)
         const algorithm = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
-        if (result === null) {
+        if (answer === null && algorithm === null) {
           return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
+        }
+        result = {
+          answers: answer,
+          algorithms: algorithm
         }
       }
     }
- */ return await reply.send(result)
+    return await reply.send(result)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
     let code = 500

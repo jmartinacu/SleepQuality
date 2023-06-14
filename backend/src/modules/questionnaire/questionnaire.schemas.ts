@@ -1,4 +1,5 @@
 import { Type, Static } from '@fastify/type-provider-typebox'
+import { Answer, QuestionnaireAlgorithm } from '@prisma/client'
 
 const regexObjectId = /^[a-fA-F0-9]{24}$/
 
@@ -172,6 +173,19 @@ const getAlgorithmResponseSchema = Type.Object({
 
 const getAlgorithmsResponseSchema = Type.Array(getAlgorithmResponseSchema)
 
+const getAnswersAndAlgorithmsResponseSchema = Type.Object({
+  answers: Type.Union([
+    answerResponseSchema,
+    answersResponseSchema,
+    Type.Null()
+  ]),
+  algorithms: Type.Union([
+    getAlgorithmResponseSchema,
+    getAlgorithmsResponseSchema,
+    Type.Null()
+  ])
+})
+
 const createAlgorithmSchema = Type.Object(algorithmAttributes)
 
 const getDefaultAlgorithmInformationResponseSchema = Type.Array(Type.Object({
@@ -258,12 +272,17 @@ type EpworthSleepinessScaleWarning = Static<typeof epworthSleepinessScaleWarning
 type InsomniaSeverityIndexWarning = Static<typeof insomniaSeverityIndexWarning>
 type DefaultAlgorithmInformation = Static<typeof getDefaultAlgorithmInformationResponseSchema>
 type PerceivedStressQuestionnaireEmotions = Partial<Static<typeof perceivedStressQuestionnaireEmotions>>
+interface GetInformationResponseSchema {
+  answers: Answer | Answer[] | null
+  algorithms: QuestionnaireAlgorithm | QuestionnaireAlgorithm[] | null
+}
 
 export {
   getAlgorithmResponseSchema,
   getAlgorithmsResponseSchema,
   answerResponseSchema,
   answersResponseSchema,
+  getAnswersAndAlgorithmsResponseSchema,
   CreateQuestionnaireSchema,
   CreateAnswerSchema,
   GetQuestionnaireSchema,
@@ -284,5 +303,6 @@ export {
   type InsomniaSeverityIndexWarning,
   type DefaultAlgorithmInformation,
   type PerceivedStressQuestionnaireEmotions,
-  type PerceivedStressQuestionnaireAnswer
+  type PerceivedStressQuestionnaireAnswer,
+  type GetInformationResponseSchema
 }
