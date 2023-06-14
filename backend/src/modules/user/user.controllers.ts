@@ -484,7 +484,7 @@ async function getQuestionnaireInformationHandler (
     console.log(all, info)
     let result: Answer | Answer[] | QuestionnaireAlgorithm | QuestionnaireAlgorithm[] | null = []
     if (info === 'algorithms') {
-      if (typeof all === 'undefined' || !all) {
+      if (typeof all === 'undefined' || all) {
         result = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
       } else {
         result = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
@@ -493,7 +493,7 @@ async function getQuestionnaireInformationHandler (
         }
       }
     } else if (info === 'answers') {
-      if (typeof all === 'undefined' || !all) {
+      if (typeof all === 'undefined' || all) {
         result = await findAnswers(questionnaireId, userId)
       } else {
         result = await findLastAnswer(questionnaireId, userId)
@@ -501,8 +501,19 @@ async function getQuestionnaireInformationHandler (
           return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
         }
       }
+    } /* else {
+      if (typeof all === 'undefined' || !all) {
+        const algorithms = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
+        const answers = await findAnswers(questionnaireId, userId)
+      } else {
+        const answer = await findLastAnswer(questionnaireId, userId)
+        const algorithm = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
+        if (result === null) {
+          return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
+        }
+      }
     }
-    return await reply.send(result)
+ */ return await reply.send(result)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
     let code = 500

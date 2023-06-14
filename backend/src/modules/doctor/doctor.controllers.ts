@@ -343,7 +343,7 @@ async function getUserInformationHandler (
       return await reply.code(403).send({ message: `Not enough privileges over user ${userId}` })
     }
     if (info === 'algorithms') {
-      if (typeof all === 'undefined' || !all) {
+      if (typeof all === 'undefined' || all) {
         result = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
       } else {
         result = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
@@ -352,7 +352,7 @@ async function getUserInformationHandler (
         }
       }
     } else if (info === 'answers') {
-      if (typeof all === 'undefined' || !all) {
+      if (typeof all === 'undefined' || all) {
         result = await findAnswers(questionnaireId, userId)
       } else {
         result = await findLastAnswer(questionnaireId, userId)
