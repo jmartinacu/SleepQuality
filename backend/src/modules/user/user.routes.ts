@@ -143,7 +143,6 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
     getProfilePictureHandler
   )
 
-  // TODO: AÑADIR RUTA PARA PODER CONSEGUIR LA CSV DATA DE CUESTIONARIOS ESPECIFICOS
   server.get('/data/csv',
     {
       onRequest: server.auth([server.authenticate]),

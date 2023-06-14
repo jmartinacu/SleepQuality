@@ -517,6 +517,7 @@ async function getQuestionnaireInformationHandler (
       if (typeof all === 'undefined' || all) {
         const algorithms = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
         const answers = await findAnswers(questionnaireId, userId)
+        console.log({ algorithms, answers })
         result = {
           answers,
           algorithms
@@ -524,6 +525,7 @@ async function getQuestionnaireInformationHandler (
       } else {
         const answer = await findLastAnswer(questionnaireId, userId)
         const algorithm = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
+        console.log({ answer, algorithm })
         if (answer === null && algorithm === null) {
           return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
         }
@@ -533,6 +535,7 @@ async function getQuestionnaireInformationHandler (
         }
       }
     }
+    console.log({ result })
     return await reply.send(result)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
