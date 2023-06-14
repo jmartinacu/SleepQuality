@@ -84,10 +84,10 @@ const getUserAnswerQueryStringSchema = Type.Object({
 
 const getUserInformationQueryStringSchema = Type.Object({
   all: Type.Optional(Type.Boolean()),
-  info: Type.Union([
+  info: Type.Optional(Type.Union([
     Type.Literal('answers'),
     Type.Literal('algorithms')
-  ])
+  ]))
 })
 
 const CreateDoctorSchema = {
@@ -127,7 +127,7 @@ const AddQuestionnairesToUserSchema = {
 }
 
 const AddDoctorToUserSchema = {
-  params: idParamsSchema,
+  params: emailParamSchema,
   response: {
     200: messageResponseSchema,
     404: errorResponseSchema,
@@ -198,6 +198,13 @@ const GetUserSchema = {
   }
 }
 
+const DeleteDoctorAuthenticatedSchema = {
+  response: {
+    204: {},
+    500: Type.Unknown()
+  }
+}
+
 type MessageResponse = Static<typeof messageResponseSchema>
 type DoctorResponse = Static<typeof createDoctorResponseSchema>
 
@@ -212,6 +219,7 @@ export {
   GetUserInformationSchema,
   GetUsersSchema,
   GetUserSchema,
+  DeleteDoctorAuthenticatedSchema,
   type MessageResponse,
   type DoctorResponse
 }

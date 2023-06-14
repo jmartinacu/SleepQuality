@@ -3,7 +3,8 @@ import {
   answerResponseSchema,
   answersResponseSchema,
   getAlgorithmResponseSchema,
-  getAlgorithmsResponseSchema
+  getAlgorithmsResponseSchema,
+  getAnswersAndAlgorithmsResponseSchema
 } from '../questionnaire/questionnaire.schemas'
 
 export const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹])([A-Za-z\d~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹]|[^ ]){8,15}$/
@@ -32,7 +33,7 @@ const userCore = {
     Type.Literal('FEMININE'),
     Type.Literal('NEUTER')
   ]),
-  height: Type.Number({ exclusiveMinimum: 0, maximum: 3 }),
+  height: Type.Number({ exclusiveMinimum: 0, maximum: 300 }),
   weight: Type.Number({ exclusiveMinimum: 0, maximum: 600 }),
   chronicDisorders: Type.String(),
   BMI: Type.Number({ exclusiveMinimum: 0 })
@@ -302,10 +303,10 @@ const getQuestionnaireInformationParamsSchema = Type.Object({
 
 const getQuestionnaireInformationQueryStringSchema = Type.Object({
   all: Type.Optional(Type.Boolean()),
-  info: Type.Union([
+  info: Type.Optional(Type.Union([
     Type.Literal('answers'),
     Type.Literal('algorithms')
-  ])
+  ]))
 })
 
 const messageResponseSchema = Type.Object({
@@ -438,6 +439,7 @@ const GetQuestionnaireInformationSchema = {
       answersResponseSchema,
       getAlgorithmResponseSchema,
       getAlgorithmsResponseSchema,
+      getAnswersAndAlgorithmsResponseSchema,
       messageResponseSchema
     ]),
     403: errorResponseSchema,

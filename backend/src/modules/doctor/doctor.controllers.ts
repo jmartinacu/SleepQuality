@@ -30,6 +30,7 @@ import {
 import {
   AddDoctorToUserSchema,
   AddQuestionnairesToUserSchema,
+  DeleteDoctorAuthenticatedSchema,
   DoctorResponse,
   GetDoctorAuthenticatedSchema,
   GetUserAlgorithmsSchema,
@@ -39,10 +40,17 @@ import {
   GetUsersSchema,
   MessageResponse
 } from './doctor.schemas'
-import { findAnswers, findLastAnswer, findLastQuestionnaireAlgorithms, findQuestionnaireAlgorithmsOrderByCreatedAt, findQuestionnaireMany, findQuestionnaireUnique } from '../questionnaire/questionnaire.services'
+import {
+  findAnswers,
+  findLastAnswer,
+  findLastQuestionnaireAlgorithms,
+  findQuestionnaireAlgorithmsOrderByCreatedAt,
+  findQuestionnaireMany,
+  findQuestionnaireUnique
+} from '../questionnaire/questionnaire.services'
 import sendEmail from '../../utils/mailer'
-import { findDoctorUnique, findUsersDoctor } from './doctor.services'
-import { GetQuestionnaireSchema, GetQuestionnairesInformationSchema } from '../questionnaire/questionnaire.schemas'
+import { deleteDoctor, findDoctorUnique, findUsersDoctor } from './doctor.services'
+import { GetInformationResponseSchema, GetQuestionnaireSchema, GetQuestionnairesInformationSchema } from '../questionnaire/questionnaire.schemas'
 
 async function logInDoctorHandler (
   request: FastifyRequestTypebox<typeof LogInSchema>,
@@ -104,6 +112,27 @@ async function refreshAccessTokenHandler (
     return {
       accessToken
     }
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
+async function deleteDoctorHandler (
+  request: FastifyRequestTypebox<typeof DeleteDoctorAuthenticatedSchema>,
+  reply: FastifyReplyTypebox<typeof DeleteDoctorAuthenticatedSchema>
+): Promise<void> {
+  try {
+    const { userId: doctorId } = request.user as { userId: string }
+    await deleteDoctor(doctorId)
+    return await reply.code(204).send()
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
     let code = 500
@@ -182,8 +211,8 @@ async function addDoctorToUserHandler (
 ): Promise<MessageResponse> {
   try {
     const { doctorId } = request.user as { doctorId: string }
-    const { id: userId } = request.params
-    const user = await findUserUnique('id', userId)
+    const { email } = request.params
+    const user = await findUserUnique('email', email)
     if (user === null) {
       return await reply.code(404).send({ message: 'User not found' })
     }
@@ -195,7 +224,7 @@ async function addDoctorToUserHandler (
       }
     })
 
-    const html = htmlAddDoctor(userId, doctorCode)
+    const html = htmlAddDoctor(user.id, doctorCode)
 
     await sendEmail({
       from: 'test@example.com',
@@ -298,13 +327,24 @@ async function GetUserAlgorithmsHandler (
 async function getUserInformationHandler (
   request: FastifyRequestTypebox<typeof GetUserInformationSchema>,
   reply: FastifyReplyTypebox<typeof GetUserInformationSchema>
-): Promise<Answer | Answer[] | QuestionnaireAlgorithm | QuestionnaireAlgorithm[]> {
+): Promise<
+  Answer |
+  Answer[] |
+  QuestionnaireAlgorithm |
+  QuestionnaireAlgorithm[] |
+  GetInformationResponseSchema
+  > {
   try {
     const { doctorId } = request.user as { doctorId: string }
     const { userId, questionnaireId } = request.params
     const { all, info } = request.query
     console.log(all, info)
-    let result: Answer | Answer[] | QuestionnaireAlgorithm | QuestionnaireAlgorithm[] | null = []
+    let result: Answer |
+    Answer[] |
+    QuestionnaireAlgorithm |
+    QuestionnaireAlgorithm[] |
+    GetInformationResponseSchema |
+    null = []
     const user = await findUserUnique('id', userId)
     if (user === null) {
       return await reply.code(404).send({ message: 'User not found' })
@@ -314,7 +354,7 @@ async function getUserInformationHandler (
       return await reply.code(403).send({ message: `Not enough privileges over user ${userId}` })
     }
     if (info === 'algorithms') {
-      if (typeof all === 'undefined' || !all) {
+      if (typeof all === 'undefined' || all) {
         result = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
       } else {
         result = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
@@ -323,7 +363,7 @@ async function getUserInformationHandler (
         }
       }
     } else if (info === 'answers') {
-      if (typeof all === 'undefined' || !all) {
+      if (typeof all === 'undefined' || all) {
         result = await findAnswers(questionnaireId, userId)
       } else {
         result = await findLastAnswer(questionnaireId, userId)
@@ -331,7 +371,27 @@ async function getUserInformationHandler (
           return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
         }
       }
+    } else {
+      if (typeof all === 'undefined' || all) {
+        const algorithms = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
+        const answers = await findAnswers(questionnaireId, userId)
+        result = {
+          answers,
+          algorithms
+        }
+      } else {
+        const answer = await findLastAnswer(questionnaireId, userId)
+        const algorithm = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
+        if (answer === null && algorithm === null) {
+          return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
+        }
+        result = {
+          answers: answer,
+          algorithms: algorithm
+        }
+      }
     }
+
     return await reply.send(result)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
@@ -440,6 +500,7 @@ async function getUserHandler (
 export {
   logInDoctorHandler,
   refreshAccessTokenHandler,
+  deleteDoctorHandler,
   addQuestionnaireToUserHandler,
   addDoctorToUserHandler,
   GetUserAnswersHandler,

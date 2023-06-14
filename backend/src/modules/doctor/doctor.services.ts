@@ -116,8 +116,25 @@ async function findUsersDoctor (
   return users
 }
 
+async function deleteDoctor (id: string): Promise<void> {
+  await prisma.user.updateMany({
+    where: {
+      doctorId: id
+    },
+    data: {
+      doctorId: null
+    }
+  })
+  await prisma.doctor.delete({
+    where: {
+      id
+    }
+  })
+}
+
 export {
   createDoctor,
+  deleteDoctor,
   createManyDoctors,
   findDoctorUnique,
   findDoctorMany,

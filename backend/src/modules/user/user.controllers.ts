@@ -46,6 +46,8 @@ import {
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 import { errorCodeAndMessage } from '../../utils/error'
 import { findAnswers, findLastAnswer, findLastQuestionnaireAlgorithms, findQuestionnaireAlgorithmsOrderByCreatedAt } from '../questionnaire/questionnaire.services'
+import { findDoctorUnique } from '../doctor/doctor.services'
+import { GetInformationResponseSchema } from '../questionnaire/questionnaire.schemas'
 
 async function createUserHandler (
   request: FastifyRequestTypebox<typeof CreateUserSchema>,
@@ -59,13 +61,13 @@ async function createUserHandler (
       chronicDisorders: rest.chronicDisorders,
       email: rest.email,
       gender: rest.gender,
-      height: rest.height,
+      height: rest.height / 100,
       name: rest.name,
       weight: rest.weight
     }
 
     const checkEmailUserIsUnique = await findUserUnique('email', rest.email)
-    const checkEmailDoctorIsUnique = await findUserUnique('email', rest.email)
+    const checkEmailDoctorIsUnique = await findDoctorUnique('email', rest.email)
 
     if (checkEmailUserIsUnique !== null || checkEmailDoctorIsUnique !== null) {
       return await reply.code(400).send({ message: `Email ${rest.email} is already used` })
@@ -475,15 +477,26 @@ async function getCSVDataHandler (
 async function getQuestionnaireInformationHandler (
   request: FastifyRequestTypebox<typeof GetQuestionnaireInformationSchema>,
   reply: FastifyReplyTypebox<typeof GetQuestionnaireInformationSchema>
-): Promise<Answer | Answer[] | QuestionnaireAlgorithm | QuestionnaireAlgorithm[]> {
+): Promise<
+  Answer |
+  Answer[] |
+  QuestionnaireAlgorithm |
+  QuestionnaireAlgorithm[] |
+  GetInformationResponseSchema
+  > {
   try {
     const { userId } = request.user as { userId: string }
     const { id: questionnaireId } = request.params
     const { all, info } = request.query
     console.log(all, info)
-    let result: Answer | Answer[] | QuestionnaireAlgorithm | QuestionnaireAlgorithm[] | null = []
+    let result: Answer |
+    Answer[] |
+    QuestionnaireAlgorithm |
+    QuestionnaireAlgorithm[] |
+    GetInformationResponseSchema |
+    null = []
     if (info === 'algorithms') {
-      if (typeof all === 'undefined' || !all) {
+      if (typeof all === 'undefined' || all) {
         result = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
       } else {
         result = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
@@ -492,12 +505,31 @@ async function getQuestionnaireInformationHandler (
         }
       }
     } else if (info === 'answers') {
-      if (typeof all === 'undefined' || !all) {
+      if (typeof all === 'undefined' || all) {
         result = await findAnswers(questionnaireId, userId)
       } else {
         result = await findLastAnswer(questionnaireId, userId)
         if (result === null) {
           return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
+        }
+      }
+    } else {
+      if (typeof all === 'undefined' || all) {
+        const algorithms = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
+        const answers = await findAnswers(questionnaireId, userId)
+        result = {
+          answers,
+          algorithms
+        }
+      } else {
+        const answer = await findLastAnswer(questionnaireId, userId)
+        const algorithm = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
+        if (answer === null && algorithm === null) {
+          return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
+        }
+        result = {
+          answers: answer,
+          algorithms: algorithm
         }
       }
     }
