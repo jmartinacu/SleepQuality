@@ -32,7 +32,7 @@ const userCore = {
     Type.Literal('FEMININE'),
     Type.Literal('NEUTER')
   ]),
-  height: Type.Number({ exclusiveMinimum: 0, maximum: 3 }),
+  height: Type.Number({ exclusiveMinimum: 0, maximum: 300 }),
   weight: Type.Number({ exclusiveMinimum: 0, maximum: 600 }),
   chronicDisorders: Type.String(),
   BMI: Type.Number({ exclusiveMinimum: 0 })

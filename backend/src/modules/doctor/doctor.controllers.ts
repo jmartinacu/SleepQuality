@@ -182,8 +182,8 @@ async function addDoctorToUserHandler (
 ): Promise<MessageResponse> {
   try {
     const { doctorId } = request.user as { doctorId: string }
-    const { id: userId } = request.params
-    const user = await findUserUnique('id', userId)
+    const { email } = request.params
+    const user = await findUserUnique('email', email)
     if (user === null) {
       return await reply.code(404).send({ message: 'User not found' })
     }
@@ -195,7 +195,7 @@ async function addDoctorToUserHandler (
       }
     })
 
-    const html = htmlAddDoctor(userId, doctorCode)
+    const html = htmlAddDoctor(user.id, doctorCode)
 
     await sendEmail({
       from: 'test@example.com',

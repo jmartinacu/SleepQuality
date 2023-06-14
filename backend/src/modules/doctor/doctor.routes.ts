@@ -81,7 +81,7 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
     addQuestionnaireToUserHandler
   )
 
-  server.post('/users/:id',
+  server.post('/users/:email',
     {
       onRequest: server.auth([server.authenticate]),
       preHandler: server.auth([server.checkDoctorVerification]),

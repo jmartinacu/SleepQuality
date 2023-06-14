@@ -60,7 +60,7 @@ async function createUserHandler (
       chronicDisorders: rest.chronicDisorders,
       email: rest.email,
       gender: rest.gender,
-      height: rest.height,
+      height: rest.height / 100,
       name: rest.name,
       weight: rest.weight
     }

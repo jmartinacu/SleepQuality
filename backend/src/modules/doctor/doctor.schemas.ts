@@ -127,7 +127,7 @@ const AddQuestionnairesToUserSchema = {
 }
 
 const AddDoctorToUserSchema = {
-  params: idParamsSchema,
+  params: emailParamSchema,
   response: {
     200: messageResponseSchema,
     404: errorResponseSchema,
