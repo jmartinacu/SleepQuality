@@ -29,11 +29,11 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 20
   },
-
   textTitle: {
     color: 'white',
     fontWeight: 'bold',
-    textAlign: 'center'
+    textAlign: 'center',
+    fontSize: 30
   }
 })
 

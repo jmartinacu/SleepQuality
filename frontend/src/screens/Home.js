@@ -4,57 +4,75 @@ import { getQuestionnaires } from '../api/ApiQuestionnaries'
 import { getItemFromStorage } from '../utils/Utils'
 import PreviewQuestionnaire from '../components/questionnaries/PreviewQuestionnarie'
 import { CSDN, CSDM, AIS, ESS, IRLS, ISI, PSQ, PSQI, SB } from '../assests/questionnarieLogo'
-import { userCreateDoctor, userGetNewAccessToken, userIsAdmin } from '../api/ApiUser'
+import { userAddUserToDoctor, userCreateDoctor, userDoctorGetNewAccessToken, userGetNewAccessToken, userIsAdmin } from '../api/ApiUser'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import PreviewPatient from '../components/users/PreviewPatient'
 
 const Home = ({ navigation }) => {
   const [questionnaires, setQuestionnaires] = useState([])
+  const [patients, setPatients] = useState([])
+
   const [email, setEmail] = useState('')
   const [checkValidEmail, setCheckValidEmail] = useState(false)
 
   const [error, setError] = useState(false)
+  const [errorCreateDoctor, setErrorCreateDoctor] = useState('')
 
   const [accessToken, setAccessToken] = useState(null)
   const [refreshToken, setRefreshToken] = useState(null)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [isDoctor, setIsDoctor] = useState(null)
 
   useEffect(() => {
     getItemFromStorage('accessToken', setAccessToken).then()
     getItemFromStorage('refreshToken', setRefreshToken).then()
-    if (accessToken !== null && refreshToken !== null) {
-      userGetNewAccessToken(refreshToken)
-        .then(result => {
-          if (result.status === 200) {
-            setAccessToken(result.data.accessToken)
-            AsyncStorage.setItem('accessToken', result.data.accessToken)
-            userIsAdmin(result.data.accessToken)
-              .then(resultA => {
-                if (resultA.status === 200) {
-                  setIsAdmin(true)
-                } else {
-                  setIsAdmin(false)
-                  getQuestionnaires(result.data.accessToken)
-                    .then(resultQ => {
-                      if (resultQ.status === 200) {
-                        setError(false)
-                        setQuestionnaires(resultQ.data)
-                      } else {
+    getItemFromStorage('isDoctor', setIsDoctor).then()
+    if (accessToken !== null && refreshToken !== null && isDoctor !== null) {
+      if (isDoctor === 'true') {
+        userDoctorGetNewAccessToken(refreshToken)
+          .then(result => {
+            if (result.status === 200) {
+              setAccessToken(result.data.accessToken)
+              AsyncStorage.setItem('accessToken', result.data.accessToken)
+            } else {
+              navigation.replace('TextAndButton', { text: 'Session Expired. Log in again', button: 'Go Login', direction: 'Login' })
+            }
+          })
+      } else if (isDoctor === 'false') {
+        userGetNewAccessToken(refreshToken)
+          .then(result => {
+            if (result.status === 200) {
+              setAccessToken(result.data.accessToken)
+              AsyncStorage.setItem('accessToken', result.data.accessToken)
+              userIsAdmin(result.data.accessToken)
+                .then(resultA => {
+                  if (resultA.status === 200) {
+                    setIsAdmin(true)
+                  } else {
+                    setIsAdmin(false)
+                    getQuestionnaires(result.data.accessToken)
+                      .then(resultQ => {
+                        if (resultQ.status === 200) {
+                          setError(false)
+                          setQuestionnaires(resultQ.data)
+                        } else {
+                          setError(true)
+                          console.log(resultQ.data.message)
+                        }
+                      })
+                      .catch(err => {
                         setError(true)
-                        console.log(resultQ.data.message)
-                      }
-                    })
-                    .catch(err => {
-                      setError(true)
-                      console.error(err)
-                    })
-                }
-              })
-          } else {
-            navigation.replace('TextAndButton', { text: 'Session Expired. Log in again', button: 'Go Login', direction: 'Login' })
-          }
-        })
+                        console.error(err)
+                      })
+                  }
+                })
+            } else {
+              navigation.replace('TextAndButton', { text: 'Session Expired. Log in again', button: 'Go Login', direction: 'Login' })
+            }
+          })
+      }
     }
-  }, [accessToken])
+  }, [accessToken, isAdmin, isDoctor])
 
   const handleCheckEmail = text => {
     const re = /\S+@\S+\.\S+/
@@ -67,7 +85,6 @@ const Home = ({ navigation }) => {
       setCheckValidEmail(true)
     }
   }
-
   const renderQuestionnaires = ({ index, item }) => {
     let logo = null
     switch (item.name) {
@@ -105,6 +122,13 @@ const Home = ({ navigation }) => {
     )
   }
 
+  const renderPatients = ({ index, item }) => {
+    return (
+      <Text>H</Text>
+      // <PreviewPatient profPic={item.profPic} navigation={navigation} id={item.id} name={item.name} />
+    )
+  }
+
   const renderEmptyList = () => {
     return (
       <Text>Loading...</Text>
@@ -117,6 +141,21 @@ const Home = ({ navigation }) => {
         .then(result => {
           if (result.status === 200) {
             navigation.replace('TextAndButton', { text: `Doctor ${email} has been correctly approved`, button: 'Go Home', direction: 'Home' })
+          } else if (result.status === 404) {
+            setErrorCreateDoctor('User not found or already a doctor')
+          }
+        })
+    }
+  }
+
+  const handleAddUserToDoctor = () => {
+    if (email !== '') {
+      userAddUserToDoctor(accessToken, email)
+        .then(result => {
+          if (result.status === 200) {
+            navigation.replace('TextAndButton', { text: `An email request has correctly been sent to User ${email}. When the request gets accepted, you will be able to access to the patient's data `, button: 'Go Home', direction: 'Home' })
+          } else if (result.status === 404) {
+            setErrorCreateDoctor('User not found or already a patient')
           }
         })
     }
@@ -124,57 +163,88 @@ const Home = ({ navigation }) => {
 
   return (
     <View style={styles.tabBarStyle}>
-      {isAdmin &&
-        <View>
-          <Text>Introduce an email to make the user a doctor:</Text>
-          {checkValidEmail
-            ? (
-              <View>
-                <View style={styles.wrapperInputWrong}>
-                  <Text style={styles.floatingLabel}>Email</Text>
-                  <TextInput
-                    style={styles.input}
-                    inputMode='email'
-                    keyboardType='email-address'
-                    value={email}
-                    onChangeText={text => handleCheckEmail(text)}
-                    returnKeyType='done'
-                    maxLength={40}
-                  />
-                </View>
-                <Text style={styles.textFailed}>Wrong format email</Text>
-              </View>
-              )
-            : (
-              <View>
-                <View style={styles.wrapperInput}>
-                  <Text style={styles.floatingLabel}>Email</Text>
-                  <TextInput
-                    style={styles.input}
-                    inputMode='email'
-                    keyboardType='email-address'
-                    value={email}
-                    onChangeText={text => handleCheckEmail(text)}
-                    returnKeyType='done'
-                    maxLength={40}
-                  />
-                </View>
-                <Text style={styles.textFailed}> </Text>
-              </View>
-              )}
-          <TouchableOpacity
-            onPress={handleCreateDoctor}
 
-          >
-            <Text>Create Doctor</Text>
-          </TouchableOpacity>
-        </View>}
-      <FlatList
-        data={questionnaires}
-        renderItem={renderQuestionnaires}
-        keyExtractor={(item, index) => index}
-        ListEmptyComponent={renderEmptyList}
-      />
+      <View>
+        {(isAdmin || isDoctor === 'true') &&
+          <View>
+            {isAdmin && <Text>Introduce an email to make the user a doctor:</Text>}
+            {isDoctor === 'true' && <Text>Introduce an email to add the user to your patients list:</Text>}
+            {checkValidEmail
+              ? (
+                <View>
+                  <View style={styles.wrapperInputWrong}>
+                    <Text style={styles.floatingLabel}>Email</Text>
+                    <TextInput
+                      style={styles.input}
+                      inputMode='email'
+                      keyboardType='email-address'
+                      value={email}
+                      onChangeText={text => handleCheckEmail(text)}
+                      returnKeyType='done'
+                      maxLength={40}
+                    />
+                  </View>
+                  <Text style={styles.textFailed}>Wrong format email</Text>
+                </View>
+                )
+              : (
+                <View>
+                  <View style={styles.wrapperInput}>
+                    <Text style={styles.floatingLabel}>Email</Text>
+                    <TextInput
+                      style={styles.input}
+                      inputMode='email'
+                      keyboardType='email-address'
+                      value={email}
+                      onChangeText={text => handleCheckEmail(text)}
+                      returnKeyType='done'
+                      maxLength={40}
+                    />
+                  </View>
+                  <Text style={styles.textFailed}> </Text>
+                </View>
+                )}
+            {!checkValidEmail && email !== ''
+              ? (
+                <TouchableOpacity
+                  onPress={isDoctor === 'true' ? handleAddUserToDoctor : handleCreateDoctor}
+                  style={styles.button}
+                >
+                  {isDoctor === 'false' && <Text style={styles.textCreate}>Create Doctor</Text>}
+                  {isDoctor === 'true' && <Text style={styles.textCreate}>Add User to List of Patients</Text>}
+
+                </TouchableOpacity>
+                )
+              : (
+                <TouchableOpacity
+                  onPress={handleCreateDoctor}
+                  style={styles.buttonDisable}
+                >
+                  {isDoctor === 'false' && <Text style={styles.textCreate}>Create Doctor</Text>}
+                  {isDoctor === 'true' && <Text style={styles.textCreate}>Add User to List of Patients</Text>}
+                </TouchableOpacity>
+                )}
+            <Text style={styles.textFailed}>{errorCreateDoctor}</Text>
+          </View>}
+
+        {isDoctor === 'true' &&
+          <FlatList
+            ListHeaderComponent={<Text>Patients List</Text>}
+            data={patients}
+            renderItem={renderPatients}
+            keyExtractor={(item, index) => index}
+            ListEmptyComponent={renderEmptyList}
+          />}
+
+        {!isAdmin && isDoctor === 'false' &&
+          <FlatList
+            data={questionnaires}
+            renderItem={renderQuestionnaires}
+            keyExtractor={(item, index) => index}
+            ListEmptyComponent={renderEmptyList}
+          />}
+      </View>
+
     </View>
   )
 }
