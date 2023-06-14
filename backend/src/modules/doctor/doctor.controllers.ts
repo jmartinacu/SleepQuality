@@ -30,6 +30,7 @@ import {
 import {
   AddDoctorToUserSchema,
   AddQuestionnairesToUserSchema,
+  DeleteDoctorAuthenticatedSchema,
   DoctorResponse,
   GetDoctorAuthenticatedSchema,
   GetUserAlgorithmsSchema,
@@ -39,9 +40,16 @@ import {
   GetUsersSchema,
   MessageResponse
 } from './doctor.schemas'
-import { findAnswers, findLastAnswer, findLastQuestionnaireAlgorithms, findQuestionnaireAlgorithmsOrderByCreatedAt, findQuestionnaireMany, findQuestionnaireUnique } from '../questionnaire/questionnaire.services'
+import {
+  findAnswers,
+  findLastAnswer,
+  findLastQuestionnaireAlgorithms,
+  findQuestionnaireAlgorithmsOrderByCreatedAt,
+  findQuestionnaireMany,
+  findQuestionnaireUnique
+} from '../questionnaire/questionnaire.services'
 import sendEmail from '../../utils/mailer'
-import { findDoctorUnique, findUsersDoctor } from './doctor.services'
+import { deleteDoctor, findDoctorUnique, findUsersDoctor } from './doctor.services'
 import { GetQuestionnaireSchema, GetQuestionnairesInformationSchema } from '../questionnaire/questionnaire.schemas'
 
 async function logInDoctorHandler (
@@ -104,6 +112,27 @@ async function refreshAccessTokenHandler (
     return {
       accessToken
     }
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
+async function deleteDoctorHandler (
+  request: FastifyRequestTypebox<typeof DeleteDoctorAuthenticatedSchema>,
+  reply: FastifyReplyTypebox<typeof DeleteDoctorAuthenticatedSchema>
+): Promise<void> {
+  try {
+    const { userId: doctorId } = request.user as { userId: string }
+    await deleteDoctor(doctorId)
+    return await reply.code(204).send()
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
     let code = 500
@@ -440,6 +469,7 @@ async function getUserHandler (
 export {
   logInDoctorHandler,
   refreshAccessTokenHandler,
+  deleteDoctorHandler,
   addQuestionnaireToUserHandler,
   addDoctorToUserHandler,
   GetUserAnswersHandler,

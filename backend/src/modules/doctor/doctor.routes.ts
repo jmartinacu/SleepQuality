@@ -10,11 +10,13 @@ import {
   getQuestionnairesHandler,
   getQuestionnaireHandler,
   getUsersHandler,
-  getUserHandler
+  getUserHandler,
+  deleteDoctorHandler
 } from './doctor.controllers'
 import {
   AddDoctorToUserSchema,
   AddQuestionnairesToUserSchema,
+  DeleteDoctorAuthenticatedSchema,
   GetDoctorAuthenticatedSchema,
   GetUserInformationSchema,
   GetUserSchema,
@@ -33,6 +35,15 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
       schema: GetDoctorAuthenticatedSchema
     },
     getDoctorAuthenticatedHandler
+  )
+
+  server.delete('/',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkDoctorVerification]),
+      schema: DeleteDoctorAuthenticatedSchema
+    },
+    deleteDoctorHandler
   )
 
   server.post('/login',

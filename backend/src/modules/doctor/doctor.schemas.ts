@@ -198,6 +198,13 @@ const GetUserSchema = {
   }
 }
 
+const DeleteDoctorAuthenticatedSchema = {
+  response: {
+    204: {},
+    500: Type.Unknown()
+  }
+}
+
 type MessageResponse = Static<typeof messageResponseSchema>
 type DoctorResponse = Static<typeof createDoctorResponseSchema>
 
@@ -212,6 +219,7 @@ export {
   GetUserInformationSchema,
   GetUsersSchema,
   GetUserSchema,
+  DeleteDoctorAuthenticatedSchema,
   type MessageResponse,
   type DoctorResponse
 }
