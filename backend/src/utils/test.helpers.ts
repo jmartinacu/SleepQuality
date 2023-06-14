@@ -167,6 +167,35 @@ const correctAnswers = [
     }
   },
   {
+    name: 'Pittsburgh Sleep Quality Index',
+    answers: {
+      'During the past month, what time have you usually gone to bed at night?': '17/05/2023-01:30',
+      'During the past month, how long (in minutes) has it usually taken you to fall asleep each night?': 20,
+      'During the past month, what time have you usually gotten up in the morning?': '17/05/2023-07:30',
+      'During the past month, how many hours of actual sleep did you get at night? (This may be different than the number of hours you spent in bed.)': 5,
+      'Cannot get to sleep within 30 minutes': 'Not during the past month',
+      'Wake up in the middle of the night or early morning': 'Less than once a week',
+      'Have to get up to use the bathroom': 'Not during the past month',
+      'Cannot breathe comfortably': 'Not during the past month',
+      'Cough or snore loudly': 'Not during the past month',
+      'Feel too cold': 'Not during the past month',
+      'Feel too hot': 'Not during the past month',
+      'Have bad dreams': 'Less than once a week',
+      'Have pain': 'Not during the past month',
+      'Other reason(s), please describe:': null,
+      'During the past month, how often have you taken medicine to help you sleep (prescribed or "over the counter")?': 'Not during the past month',
+      'During the past month, how often have you had trouble staying awake while driving, eating meals, or engaging in social activity?': 'Not during the past month',
+      'During the past month, how much of a problem has it been for you to keep up enough enthusiasm to get things done?': 'Somewhat of a problem',
+      'During the past month, how would you rate your sleep quality overall?': 'Fairly good',
+      'Do you have a bed partner or room mate': 'Not bed partner or room mate',
+      'Loud snoring': null,
+      'Long pauses between breaths while asleep': null,
+      'Legs twitching or jerking while you sleep': null,
+      'Episodes of disorientation or confusion during sleep': null,
+      'Other restlessness while you sleep, please describe:': 'I am so sleepy after lunch meal'
+    }
+  },
+  {
     name: 'Consensus Sleep Diary',
     answers: {
       'What time did you get into bed?': 'Around 1 am',

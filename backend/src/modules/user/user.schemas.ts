@@ -1,11 +1,4 @@
 import { Static, Type } from '@fastify/type-provider-typebox'
-import {
-  answerResponseSchema,
-  answersResponseSchema,
-  getAlgorithmResponseSchema,
-  getAlgorithmsResponseSchema,
-  getAnswersAndAlgorithmsResponseSchema
-} from '../questionnaire/questionnaire.schemas'
 
 export const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹])([A-Za-z\d~`!@#$%^&*()--+={}[\]|\\:;"'<>.?/_₹]|[^ ]){8,15}$/
 export const regexObjectId = /^[a-fA-F0-9]{24}$/
@@ -434,14 +427,6 @@ const GetQuestionnaireInformationSchema = {
   params: getQuestionnaireInformationParamsSchema,
   querystring: getQuestionnaireInformationQueryStringSchema,
   response: {
-    200: Type.Union([
-      answerResponseSchema,
-      answersResponseSchema,
-      getAlgorithmResponseSchema,
-      getAlgorithmsResponseSchema,
-      getAnswersAndAlgorithmsResponseSchema,
-      messageResponseSchema
-    ]),
     403: errorResponseSchema,
     404: errorResponseSchema,
     500: Type.Unknown()

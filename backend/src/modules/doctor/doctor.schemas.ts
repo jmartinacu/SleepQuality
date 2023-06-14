@@ -154,13 +154,6 @@ const GetUserInformationSchema = {
   params: getUserQuestionnaireIdParamsSchema,
   querystring: getUserInformationQueryStringSchema,
   response: {
-    200: Type.Union([
-      answerResponseSchema,
-      answersResponseSchema,
-      getAlgorithmResponseSchema,
-      getAlgorithmsResponseSchema,
-      messageResponseSchema
-    ]),
     403: errorResponseSchema,
     404: errorResponseSchema,
     500: Type.Unknown()
