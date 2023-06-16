@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
-import { FlatList, StyleSheet, Text, View } from 'react-native'
-import { getItemFromStorage } from '../utils/Utils'
-import { userGetNewAccessToken } from '../api/ApiUser'
+import { FlatList, Image, StyleSheet, Text, View } from 'react-native'
+import { getItemFromStorage } from '../../utils/Utils'
+import { userGetNewAccessToken } from '../../api/ApiUser'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { getQuestionnaires } from '../api/ApiQuestionnaries'
-import PreviewQuestionnaire from '../components/questionnaries/PreviewQuestionnarie'
-import { AIS, CSDM, CSDN, ESS, IRLS, ISI, PSQ, PSQI, SB } from '../assests/questionnarieLogo'
+import { getAnswers } from '../../api/ApiQuestionnaries'
+import PreviewAnswer from './PreviewAnswer'
 
-const CalendarPage = ({ navigation }) => {
-  const [questionnaires, setQuestionnaires] = useState([])
+const AnswersList = ({ navigation, route }) => {
+  const [answers, setAnswers] = useState([])
+  const [algorithms, setAlgorithms] = useState([])
 
   const [accessToken, setAccessToken] = useState(null)
   const [refreshToken, setRefreshToken] = useState(null)
@@ -27,11 +27,12 @@ const CalendarPage = ({ navigation }) => {
             if (result.status === 200) {
               setAccessToken(result.data.accessToken)
               AsyncStorage.setItem('accessToken', result.data.accessToken)
-              getQuestionnaires(result.data.accessToken)
+              getAnswers(result.data.accessToken, route.params.id)
                 .then(resultQ => {
                   if (resultQ.status === 200) {
                     setError(false)
-                    setQuestionnaires(resultQ.data)
+                    setAnswers(resultQ.data.answers)
+                    setAlgorithms(resultQ.data.algorithms)
                   } else {
                     setError(true)
                     console.log(resultQ.data.message)
@@ -49,61 +50,33 @@ const CalendarPage = ({ navigation }) => {
     }
   }, [accessToken, isDoctor])
 
-  const renderQuestionnaires = ({ index, item }) => {
-    let logo = null
-    switch (item.name) {
-      case 'Consensus Sleep Diary Morning':
-        logo = CSDM
-        break
-      case 'Consensus Sleep Diary Night':
-        logo = CSDN
-        break
-      case 'STOP-BANG':
-        logo = SB
-        break
-      case 'Epworth Sleepiness Scale':
-        logo = ESS
-        break
-      case 'Pittsburgh Sleep Quality Index':
-        logo = PSQI
-        break
-      case 'Perceived Stress Questionnaire':
-        logo = PSQ
-        break
-      case 'Athens Insomnia Scale':
-        logo = AIS
-        break
-      case 'International Restless Legs Scale':
-        logo = IRLS
-        break
-      case 'Insomnia Severity Index':
-        logo = ISI
-        break
-    }
-
+  const renderAnswer = ({ index, item }) => {
     return (
-      <PreviewQuestionnaire answers logo={logo} navigation={navigation} id={item.id} name={item.name} />
+      <PreviewAnswer name={route.params.name} algorithms={algorithms[index]} answers={item.answers} date={item.createdAt} />
+
     )
   }
 
   const renderEmptyList = () => {
     return (
-      <Text>Loading...</Text>
+      <Text>There are no answers for this questionnarie yet</Text>
     )
   }
 
   return (
-
     <View style={styles.container}>
-      <Text>Press on a Questionnarie to check your Answers:</Text>
+      <Image
+        source={route.params.logo}
+        style={styles.logo}
+      />
+      <Text style={styles.textTitle}>{route.params.name}</Text>
       <FlatList
-        data={questionnaires}
-        renderItem={renderQuestionnaires}
+        data={answers}
+        renderItem={renderAnswer}
         keyExtractor={(item, index) => index}
         ListEmptyComponent={renderEmptyList}
       />
     </View>
-
   )
 }
 
@@ -112,7 +85,17 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     backgroundColor: '#191970'
+  },
+  logo: {
+    height: 100,
+    width: 100
+  },
+  textTitle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 30
   }
 })
 
-export default CalendarPage
+export default AnswersList

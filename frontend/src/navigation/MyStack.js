@@ -12,6 +12,8 @@ import TextAndButton from '../components/users/TextAndButton'
 import Questionnarie from '../screens/Questionnarie'
 import { EmptyProffile } from '../assests/perfil'
 import DeleteAccount from '../screens/DeleteAccount'
+import UserInfo from '../components/users/UserInfo'
+import AnswersList from '../components/questionnaries/AnswersList'
 
 const Stack = createStackNavigator()
 
@@ -79,6 +81,26 @@ const MyStack = () => {
       <Stack.Screen
         name='Proffile'
         component={Proffile}
+        options={{
+          backgroundColor: '#FF7F50',
+          title: '',
+          headerTitleAlign: 'center'
+        }}
+      />
+
+      <Stack.Screen
+        name='UserInfo'
+        component={UserInfo}
+        options={{
+          backgroundColor: '#FF7F50',
+          title: '',
+          headerTitleAlign: 'center'
+        }}
+      />
+
+      <Stack.Screen
+        name='AnswersList'
+        component={AnswersList}
         options={{
           backgroundColor: '#FF7F50',
           title: '',

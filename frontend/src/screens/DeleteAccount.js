@@ -11,12 +11,21 @@ const DeleteAccount = ({ navigation, route }) => {
       })
   }
 
+  const handleDeleteAccountDoctor = () => {
+    userDeleteAccount(route.params.accessToken)
+      .then(result => {
+        if (result.status === 204) {
+          navigation.replace('Login')
+        }
+      })
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <Text>If you pressed this button you will never can get your account back. Are you sure you want to delete this account?</Text>
 
       <TouchableOpacity
-        onPress={handleDeleteAccount}
+        onPress={route.isDoctor === 'true' ? handleDeleteAccountDoctor : handleDeleteAccount}
         style={styles.button}
       >
         <Text>Yes, I want to delete my account</Text>
@@ -29,7 +38,6 @@ const DeleteAccount = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1
-
   },
   button: {
     padding: 10,

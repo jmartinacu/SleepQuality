@@ -14,7 +14,7 @@ const SignUp = ({ navigation }) => {
 
       <Text style={styles.textTitle}>Sleep Sheep </Text>
 
-      <RegisterForm navigation={navigation} heightU='' weightU='' genderU='NEUTER' chronicDisorders='' />
+      <RegisterForm navigation={navigation} heightU='' weightU='' genderU='NEUTER' chronicDisordersU='' />
     </KeyboardAwareScrollView>
   )
 }
@@ -35,7 +35,8 @@ const styles = StyleSheet.create({
   textTitle: {
     color: 'white',
     fontWeight: 'bold',
-    textAlign: 'center'
+    textAlign: 'center',
+    fontSize: 30
   }
 })
 

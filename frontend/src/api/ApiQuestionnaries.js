@@ -68,3 +68,20 @@ export const getDefaultInfo = async (token, id) => {
     return err.response
   }
 }
+
+export const getAnswers = async (token, id) => {
+  try {
+    const result = await ApiManager(`users/data/${id}?all=true`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        Authorization: 'Bearer ' + token
+      }
+    })
+    return result
+  } catch (err) {
+    console.log(err.response)
+    return err.response
+  }
+}

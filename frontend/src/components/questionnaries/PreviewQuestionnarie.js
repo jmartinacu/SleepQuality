@@ -1,10 +1,18 @@
 import { Image, StyleSheet, Text, TouchableOpacity } from 'react-native'
 
-const PreviewQuestionnaire = ({ navigation, id, name, logo }) => {
+const PreviewQuestionnaire = ({ navigation, id, name, logo, answers }) => {
+  const handlePressed = () => {
+    if (answers) {
+      navigation.push('AnswersList', { id, name, logo })
+    } else {
+      navigation.push('Questionnaire', { id, name, logo })
+    }
+  }
+
   return (
     <TouchableOpacity
       style={styles.container}
-      onPress={() => navigation.push('Questionnaire', { id })}
+      onPress={handlePressed}
       activeOpacity={0.5}
     >
       <Image
@@ -20,7 +28,11 @@ const PreviewQuestionnaire = ({ navigation, id, name, logo }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    borderWidth: 3,
+    borderColor: 'white',
+    marginTop: 10
+
   },
 
   image: {

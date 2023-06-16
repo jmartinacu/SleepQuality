@@ -5,7 +5,7 @@ import { userRegister, userUpdateUserData } from '../../api/ApiUser'
 import { Eye, EyeActive } from '../../assests/eyes'
 import { Input } from 'react-native-elements'
 import DateTimePicker from '@react-native-community/datetimepicker'
-import { parseDateToString } from '../../utils/Utils'
+import { parseDateToString, parseWebDateToString } from '../../utils/Utils'
 
 const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDisordersU, token }) => {
   const [status, setStatus] = useState('')
@@ -16,6 +16,7 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
   const [confirmedPassword, setConfirmedPassword] = useState('')
 
   const [birthDate, setBirthDate] = useState(new Date(1598051730000))
+  const [birthWeb, setBirthWeb] = useState(new Date(1598051730000).toISOString().slice(0, 10))
   const [gender, setGender] = useState(genderU)
   const [height, setHeight] = useState(heightU)
   const [weight, setWeight] = useState(weightU)
@@ -181,7 +182,7 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
         gender,
         height,
         weight,
-        birth: parseDateToString(birthDate),
+        birth: Platform.OS !== 'web' ? parseDateToString(birthDate) : parseWebDateToString(birthWeb),
         chronicDisorders: chronicDisorders === '' ? null : chronicDisorders.trim(),
         password
       })
@@ -491,12 +492,20 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
             {/* INPUT BIRTHDATE */}
             <View style={styles.birthdate}>
               <Text style={styles.input}>Introduce your birthdate:</Text>
-              {!(Platform.OS === 'ios') &&
+
+              {Platform.OS === 'web' &&
+                <input
+                  type='date'
+                  value={birthWeb}
+                  max={new Date(Date.now()).toISOString().slice(0, 10)}
+                  onChange={(e) => setBirthWeb(e.target.value)}
+                />}
+              {!(Platform.OS === 'ios' || Platform.OS === 'web') &&
                 <Button
                   onPress={showDatepicker}
                   title={birthDate.toLocaleDateString()}
                 />}
-              {show && !(Platform.OS === 'ios') &&
+              {show && !(Platform.OS === 'ios' || Platform.OS === 'web') &&
                 <DateTimePicker
                   testID='dateTimePicker'
                   value={birthDate}

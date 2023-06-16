@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import { userLogin } from '../../api/ApiUser'
+import { userLogin, userLoginDoctor } from '../../api/ApiUser'
 import { Eye, EyeActive } from '../../assests/eyes'
 
 const LoginForm = ({ navigation }) => {
@@ -18,6 +18,7 @@ const LoginForm = ({ navigation }) => {
   const [password, setPassword] = useState('')
   const [seePassword, setSeePassword] = useState(true)
   const [checkValidEmail, setCheckValidEmail] = useState(false)
+  const [doctorView, setDoctorView] = useState(false)
 
   const handleCheckEmail = text => {
     const re = /\S+@\S+\.\S+/
@@ -83,10 +84,40 @@ const LoginForm = ({ navigation }) => {
             setStatus('')
             AsyncStorage.setItem('accessToken', result.data.accessToken)
             AsyncStorage.setItem('refreshToken', result.data.refreshToken)
+            AsyncStorage.setItem('isDoctor', 'false')
             navigation.replace('Home')
           } else {
             console.log(result)
             setStatus(result.message)
+          }
+        })
+        .catch(err => {
+          setStatus('Conection error. Please reload the website')
+          console.error(err)
+        })
+    } else {
+      console.error(checkPassword)
+      setStatus('Email or password wrong')
+    }
+  }
+
+  const handleLoginDoctor = () => {
+    const checkPassword = checkPasswordValidity(password)
+    if (!checkPassword) {
+      userLoginDoctor({
+        email: email.toLocaleLowerCase().trim(),
+        password
+      })
+        .then(result => {
+          if (result.status === 200) {
+            setStatus('')
+            AsyncStorage.setItem('accessToken', result.data.accessToken)
+            AsyncStorage.setItem('refreshToken', result.data.refreshToken)
+            AsyncStorage.setItem('isDoctor', 'true')
+            navigation.replace('Home')
+          } else {
+            console.log(result)
+            setStatus(result.data.message)
           }
         })
         .catch(err => {
@@ -109,6 +140,8 @@ const LoginForm = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {doctorView && <Text style={styles.textTitle}>Doctor Login</Text>}
+      {!doctorView && <Text style={styles.textTitle}>Patient Login</Text>}
       {checkValidEmail
         ? (
           <View>
@@ -165,6 +198,7 @@ const LoginForm = ({ navigation }) => {
       >
         <Text style={styles.underline}>Forgot password?</Text>
       </TouchableOpacity>
+
       {(email === '' || password === '' || checkValidEmail)
         ? (
           <TouchableOpacity
@@ -172,12 +206,17 @@ const LoginForm = ({ navigation }) => {
             style={styles.buttonDisable}
             onPress={handleLogin}
           >
-            <Text style={styles.textLogin}>Login</Text>
+            {doctorView && <Text style={styles.textLogin}>Login as a Doctor</Text>}
+            {!doctorView && <Text style={styles.textLogin}>Login as a Patient</Text>}
           </TouchableOpacity>
           )
         : (
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.textLogin}>Login</Text>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={doctorView ? handleLoginDoctor : handleLogin}
+          >
+            {doctorView && <Text style={styles.textLogin}>Login as a Doctor</Text>}
+            {!doctorView && <Text style={styles.textLogin}>Login as a Patient</Text>}
           </TouchableOpacity>
           )}
       {status !== '' && <Text style={styles.textFailed}>{status}</Text>}
@@ -187,6 +226,23 @@ const LoginForm = ({ navigation }) => {
       >
         <Text style={styles.underline}>Don't have an account?</Text>
       </TouchableOpacity>
+      {doctorView
+        ? (
+          <TouchableOpacity
+            style={styles.forgotPass}
+            onPress={() => setDoctorView(!doctorView)}
+          >
+            <Text style={styles.underline}>Are you a patient?</Text>
+          </TouchableOpacity>
+          )
+        : (
+          <TouchableOpacity
+            style={styles.forgotPass}
+            onPress={() => setDoctorView(!doctorView)}
+          >
+            <Text style={styles.underline}>Are you a doctor?</Text>
+          </TouchableOpacity>
+          )}
     </View>
   )
 }
@@ -288,6 +344,12 @@ const styles = StyleSheet.create({
   underline: {
     textDecorationLine: 'underline',
     color: 'white'
+  },
+  textTitle: {
+    marginTop: 15,
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center'
   }
 })
 
