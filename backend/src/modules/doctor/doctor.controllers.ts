@@ -488,7 +488,6 @@ async function getUsersImagesHandler (
         const filePath = path.resolve(`images/${filename}`)
         zip.addLocalFile(filePath)
       })
-    // TODO ADD ALL FILES TO ZIP AND SEND ZIP
     const zipBuffer = zip.toBuffer()
     return await reply.type('application/zip').send(zipBuffer)
   } catch (error) {
