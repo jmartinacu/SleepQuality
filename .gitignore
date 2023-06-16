@@ -4,10 +4,10 @@ backend/.env.development
 backend/.env.test
 backend/node_modules/
 backend/.nyc_output
-images/*.jpg 
-images/*.jpeg
-images/*.jfif
-images/*.pjpeg
-images/*.pjp
-images/*.png
-images/*.webp
+backend/images/*.jpg 
+backend/images/*.jpeg
+backend/images/*.jfif
+backend/images/*.pjpeg
+backend/images/*.pjp
+backend/images/*.png
+backend/images/*.webp

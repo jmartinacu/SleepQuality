@@ -1,3 +1,6 @@
+import { ReadStream } from 'node:fs'
+import path from 'node:path'
+import AdmZip from 'adm-zip'
 import { FastifyReplyTypebox, FastifyRequestTypebox } from '../../server'
 import { errorCodeAndMessage } from '../../utils/error'
 import {
@@ -37,6 +40,7 @@ import {
   GetUserAnswerSchema,
   GetUserInformationSchema,
   GetUserSchema,
+  GetUsersImagesSchema,
   GetUsersSchema,
   MessageResponse
 } from './doctor.schemas'
@@ -293,7 +297,6 @@ async function GetUserAlgorithmsHandler (
     const { doctorId } = request.user as { doctorId: string }
     const { userId, questionnaireId } = request.params
     const { all } = request.query
-    console.log(all)
     let algorithms: QuestionnaireAlgorithm | QuestionnaireAlgorithm[] | null
     const user = await findUserUnique('id', userId)
     if (user === null) {
@@ -471,6 +474,36 @@ async function getUsersHandler (
   }
 }
 
+async function getUsersImagesHandler (
+  request: FastifyRequestTypebox<typeof GetUsersImagesSchema>,
+  reply: FastifyReplyTypebox<typeof GetUsersImagesSchema>
+): Promise<ReadStream[]> {
+  try {
+    const { doctorId } = request.user as { doctorId: string }
+    const users = await findUsersDoctor('id', doctorId)
+    const zip = new AdmZip()
+    users.filter(user => user.profilePicture !== null)
+      .forEach(user => {
+        const filename = user.profilePicture as string
+        const filePath = path.resolve(`images/${filename}`)
+        zip.addLocalFile(filePath)
+      })
+    // TODO ADD ALL FILES TO ZIP AND SEND ZIP
+    const zipBuffer = zip.toBuffer()
+    return await reply.type('application/zip').send(zipBuffer)
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
 async function getUserHandler (
   request: FastifyRequestTypebox<typeof GetUserSchema>,
   reply: FastifyReplyTypebox<typeof GetUserSchema>
@@ -510,5 +543,6 @@ export {
   getQuestionnairesHandler,
   getQuestionnaireHandler,
   getUsersHandler,
-  getUserHandler
+  getUserHandler,
+  getUsersImagesHandler
 }

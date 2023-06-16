@@ -115,6 +115,17 @@ async function findLastAnswer (
   return answer
 }
 
+async function findAnswersUser (
+  userId: string
+): Promise<Answer[]> {
+  const answers = await prisma.answer.findMany({
+    where: {
+      userId
+    }
+  })
+  return answers
+}
+
 async function findAnswers (
   questionnaireId: string,
   userId: string
@@ -177,6 +188,7 @@ export {
   findQuestionnaireMany,
   findLastAnswer,
   findAnswers,
+  findAnswersUser,
   findQuestionnaireAlgorithmsOrderByCreatedAt,
   findLastQuestionnaireAlgorithms
 }

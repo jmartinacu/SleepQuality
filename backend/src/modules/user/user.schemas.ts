@@ -264,7 +264,7 @@ const emailUserSchema = Type.Object({
   email
 })
 
-const getProfilePictureResponseSchema = Type.Union([
+export const getProfilePictureResponseSchema = Type.Union([
   profilePictureJPG,
   profilePicturePNG,
   profilePictureWEBP

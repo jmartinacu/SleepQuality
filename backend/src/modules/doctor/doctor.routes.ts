@@ -11,7 +11,8 @@ import {
   getQuestionnaireHandler,
   getUsersHandler,
   getUserHandler,
-  deleteDoctorHandler
+  deleteDoctorHandler,
+  getUsersImagesHandler
 } from './doctor.controllers'
 import {
   AddDoctorToUserSchema,
@@ -20,6 +21,7 @@ import {
   GetDoctorAuthenticatedSchema,
   GetUserInformationSchema,
   GetUserSchema,
+  GetUsersImagesSchema,
   GetUsersSchema
 } from './doctor.schemas'
 import {
@@ -65,6 +67,7 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
     refreshAccessTokenHandler
   )
 
+  // TODO: AÑADIR RUTA PARA MANDAR FOTOS PERFILES DE SUS USUARIOS
   server.get('/users',
     {
       onRequest: server.auth([server.authenticate]),
@@ -72,6 +75,15 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
       schema: GetUsersSchema
     },
     getUsersHandler
+  )
+
+  server.get('/users/images',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkDoctorVerification]),
+      schema: GetUsersImagesSchema
+    },
+    getUsersImagesHandler
   )
 
   server.get('/users/:id',

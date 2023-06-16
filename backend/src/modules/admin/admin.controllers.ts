@@ -8,6 +8,7 @@ import { errorCodeAndMessage } from '../../utils/error'
 import { createDoctor, createManyDoctors } from '../doctor/doctor.services'
 import { CreateDoctorSchema, CreateManyDoctorsSchema, DoctorResponse } from '../doctor/doctor.schemas'
 import { parseDateToString } from '../../utils/helpers'
+import { findAnswersUser } from '../questionnaire/questionnaire.services'
 
 async function createAdminHandler (
   request: FastifyRequestTypebox<typeof CreateAdminSchema>,
@@ -43,6 +44,10 @@ async function createDoctorHandler (
     const user = await findUserUnique('email', email)
     if (user === null) {
       return await reply.code(404).send({ message: 'User not found' })
+    }
+    const answers = await findAnswersUser(user.id)
+    if (answers.length !== 0) {
+      return await reply.code(400).send({ message: 'This user cannot be a doctor' })
     }
     const doctor = await createDoctor(user.id)
     const { birth, ...rest } = doctor
