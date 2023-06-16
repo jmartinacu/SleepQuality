@@ -58,7 +58,7 @@ const Proffile = ({ navigation }) => {
             if (result.status === 200) {
               setAccessToken(result.data.accessToken)
               AsyncStorage.setItem('accessToken', result.data.accessToken)
-              userGetUserData(accessToken)
+              userGetUserData(result.data.accessToken)
                 .then(resultData => {
                   if (resultData.status === 200) {
                     setName(resultData.data.name)

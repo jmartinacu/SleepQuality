@@ -1,10 +1,14 @@
-import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Button, FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useState } from 'react'
 import { Picker } from '@react-native-picker/picker'
 import { createAswer } from '../../api/ApiQuestionnaries'
+import DateTimePicker from '@react-native-community/datetimepicker'
 
 const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions, additionalInfo, instructions, desc1, desc2 }) => {
   const [modalVisible, setModalVisible] = useState(false)
+
+  const [answers, setAnswers] = useState(new Array(24).fill(''))
+  const [error, setError] = useState(false)
 
   const result = Object.entries(questions)
     .reduce((accumulator, current) => {
@@ -21,9 +25,6 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
   const isSecondary = []
 
   const EnumForEachQuestion = new Map()
-
-  const [answers, setAnswers] = useState(new Array(24).fill(''))
-  const [error, setError] = useState(false)
 
   for (const obj of result) {
     if (obj.type.split('_')[0] === 'SECONDARY') {
@@ -62,26 +63,33 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
   }
 
   const handleSubmitAnswer = () => {
+    const regexHour = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/
     const isOnlyNumbers = /^\d+$/
     let submit = []
     let err = false
     let i = 0
     for (const obj of result) {
       if (isNumber[i] && !isOnlyNumbers.test(answers[i])) {
-        console.log('HOLa')
         setError('Some questions can only be filled with numbers: **')
         err = true
         submit = []
         break
       } else if ((!isSecondary[i] || isBoolean[i] || keys.includes(i)) && answers[i] === '') {
-        console.log('ADIOS')
         setError('You need to fill all the mandatory questions: *')
+        err = true
+        submit = []
+        break
+      } else if ((i === 0 || i === 2) && !regexHour.test(answers[i])) {
+        setError('Wrong hour format. Correct format is: HH:MM')
         err = true
         submit = []
         break
       } else {
         if (isSecondary[i] && answers[i] === '') {
           const listInList = [obj.question, null]
+          submit.push(listInList)
+        } else if ((i === 0 || i === 2)) {
+          const listInList = [obj.question, `17/05/2023-${answers[i]}`]
           submit.push(listInList)
         } else {
           const listInList = [obj.question, answers[i].trim()]
@@ -176,6 +184,7 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
                         maxLength={20}
                       />
                     </View>}
+
                   {isNumber[index] &&
                     <View style={styles.wrapperInput}>
                       <TextInput
@@ -261,7 +270,7 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
                 )
               : (
                 <View>
-                  {isText[index] &&
+                  {isText[index] && (index !== 0 && index !== 2) &&
                     <View style={styles.wrapperInput}>
                       <TextInput
                         style={styles.input}
@@ -271,6 +280,26 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
                         returnKeyType='done'
                         maxLength={20}
                       />
+                    </View>}
+                  {isText[index] && (index === 0 || index === 2) &&
+                    <View>
+                      {Platform.OS === 'web' &&
+                        <input
+                          type='time'
+                          value={answers[index]}
+                          onChange={(e) => handleAddAnswer(e.target.value, index)}
+                        />}
+                      {Platform.OS !== 'web' &&
+                        <View style={styles.wrapperInput}>
+                          <TextInput
+                            style={styles.input}
+                            placeholder='00:00'
+                            value={answers[index]}
+                            onChangeText={text => handleAddAnswer(text, index)}
+                            returnKeyType='done'
+                            maxLength={5}
+                          />
+                        </View>}
                     </View>}
                   {isNumber[index] &&
                     <View style={styles.wrapperInput}>

@@ -22,7 +22,13 @@ const PreviewAnswer = ({ date, answers, algorithms, name }) => {
     return (
       <View>
         <Text style={styles.modalText}>{item.question}</Text>
-        <Text style={styles.modalText}>{item.answer === null ? 'No answer' : item.answer.toString()}</Text>
+        {(name === 'Pittsburgh Sleep Quality Index' && (index === 0 || index === 2))
+          ? (
+            <Text style={styles.modalText}>{item.answer.split('-')[1]}</Text>
+            )
+          : (
+            <Text style={styles.modalText}>{item.answer === null ? 'No answer' : item.answer.toString()}</Text>
+            )}
       </View>
     )
   }

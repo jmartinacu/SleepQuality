@@ -14,7 +14,7 @@ const SignUp = ({ navigation }) => {
 
       <Text style={styles.textTitle}>Sleep Sheep </Text>
 
-      <RegisterForm navigation={navigation} heightU='' weightU='' genderU='NEUTER' chronicDisorders='' />
+      <RegisterForm navigation={navigation} heightU='' weightU='' genderU='NEUTER' chronicDisordersU='' />
     </KeyboardAwareScrollView>
   )
 }
