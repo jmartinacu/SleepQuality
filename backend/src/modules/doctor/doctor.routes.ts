@@ -59,7 +59,6 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
     logInDoctorHandler
   )
 
-  // TODO: HANDLE FASTIFY TokenError: The token signature is invalid.
   server.post('/refresh',
     {
       schema: RefreshTokenSchema
@@ -67,7 +66,6 @@ async function doctorRoutes (server: FastifyInstance): Promise<void> {
     refreshAccessTokenHandler
   )
 
-  // TODO: AÑADIR RUTA PARA MANDAR FOTOS PERFILES DE SUS USUARIOS
   server.get('/users',
     {
       onRequest: server.auth([server.authenticate]),

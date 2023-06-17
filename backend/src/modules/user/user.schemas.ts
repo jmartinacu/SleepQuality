@@ -276,6 +276,7 @@ const idsUserSchema = Type.Object({
 
 const getUser = Type.Object({
   email,
+  name,
   id
 })
 
