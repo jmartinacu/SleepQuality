@@ -11,6 +11,7 @@ import type {
   GetAdminSchema,
   GetCSVDataSchema,
   GetProfilePictureSchema,
+  GetQuestionnaireConsensusDiarySchema,
   GetQuestionnaireInformationSchema,
   GetUserAuthenticatedSchema,
   LogInSchema,
@@ -557,6 +558,44 @@ async function getQuestionnaireInformationHandler (
   }
 }
 
+async function getQuestionnaireConsensusDiaryHandler (
+  request: FastifyRequestTypebox<typeof GetQuestionnaireConsensusDiarySchema>,
+  reply: FastifyReplyTypebox<typeof GetQuestionnaireConsensusDiarySchema>
+): Promise<Answer | Answer[]> {
+  try {
+    const { userId } = request.user as { userId: string }
+    const { all, type } = request.query
+    let questionnaireId: string
+    if (type === 'morning') {
+      const questionnaire = await findQuestionnaireUnique('name', 'Consensus Sleep Diary Morning') as Questionnaire
+      questionnaireId = questionnaire.id
+    } else {
+      const questionnaire = await findQuestionnaireUnique('name', 'Consensus Sleep Diary Night') as Questionnaire
+      questionnaireId = questionnaire.id
+    }
+    let result: Answer | Answer[] | null = []
+    if (typeof all === 'undefined' || all) {
+      result = await findAnswers(questionnaireId, userId)
+    } else {
+      result = await findLastAnswer(questionnaireId, userId)
+      if (result === null) {
+        return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
+      }
+    }
+    return await reply.send(result)
+  } catch (error) {
+    const processedError = errorCodeAndMessage(error)
+    let code = 500
+    let message = error
+    if (Array.isArray(processedError)) {
+      const [errorCode, errorMessage] = processedError
+      code = errorCode
+      message = errorMessage
+    }
+    return await reply.code(code).send(message)
+  }
+}
+
 async function getAdminHandler (
   request: FastifyRequestTypebox<typeof GetAdminSchema>,
   reply: FastifyReplyTypebox<typeof GetAdminSchema>
@@ -592,5 +631,6 @@ export {
   acceptDoctorHandler,
   getCSVDataHandler,
   getQuestionnaireInformationHandler,
+  getQuestionnaireConsensusDiaryHandler,
   getAdminHandler
 }

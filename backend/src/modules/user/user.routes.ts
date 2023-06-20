@@ -14,7 +14,8 @@ import {
   acceptDoctorHandler,
   getCSVDataHandler,
   getQuestionnaireInformationHandler,
-  getAdminHandler
+  getAdminHandler,
+  getQuestionnaireConsensusDiaryHandler
 } from './user.controllers'
 import {
   CreateUserSchema,
@@ -31,7 +32,8 @@ import {
   AcceptDoctorSchema,
   GetCSVDataSchema,
   GetQuestionnaireInformationSchema,
-  GetAdminSchema
+  GetAdminSchema,
+  GetQuestionnaireConsensusDiarySchema
 } from './user.schemas'
 import { upload } from '../../server'
 
@@ -145,6 +147,15 @@ async function userRoutes (server: FastifyInstance): Promise<void> {
       schema: GetCSVDataSchema
     },
     getCSVDataHandler
+  )
+
+  server.get('/data/consensusdiary',
+    {
+      onRequest: server.auth([server.authenticate]),
+      preHandler: server.auth([server.checkUserVerification]),
+      schema: GetQuestionnaireConsensusDiarySchema
+    },
+    getQuestionnaireConsensusDiaryHandler
   )
 
   server.get('/data/:id',

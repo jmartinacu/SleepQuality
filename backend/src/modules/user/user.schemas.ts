@@ -303,6 +303,14 @@ const getQuestionnaireInformationQueryStringSchema = Type.Object({
   ]))
 })
 
+const getQuestionnaireConsensusDiaryQueryStringSchema = Type.Object({
+  type: Type.Union([
+    Type.Literal('morning'),
+    Type.Literal('night')
+  ]),
+  all: Type.Optional(Type.Boolean())
+})
+
 const messageResponseSchema = Type.Object({
   message
 })
@@ -428,8 +436,13 @@ const GetQuestionnaireInformationSchema = {
   params: getQuestionnaireInformationParamsSchema,
   querystring: getQuestionnaireInformationQueryStringSchema,
   response: {
-    403: errorResponseSchema,
-    404: errorResponseSchema,
+    500: Type.Unknown()
+  }
+}
+
+const GetQuestionnaireConsensusDiarySchema = {
+  querystring: getQuestionnaireConsensusDiaryQueryStringSchema,
+  response: {
     500: Type.Unknown()
   }
 }
@@ -479,6 +492,7 @@ export {
   GetProfilePictureSchema,
   GetCSVDataSchema,
   GetQuestionnaireInformationSchema,
+  GetQuestionnaireConsensusDiarySchema,
   GetAdminSchema,
   type CreateUserResponse,
   type CreateUserInput,

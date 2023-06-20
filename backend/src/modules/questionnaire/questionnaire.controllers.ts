@@ -110,6 +110,11 @@ async function createAnswerHandler (
         message: `Questionnaire ${name} does not exist`
       })
     }
+    if (!questionnairesToDo.includes(questionnaire.id)) {
+      return await reply.code(400).send({
+        message: `User ${userId} doesn't have to do questionnaire ${name}`
+      })
+    }
     // CHECK THAT THE QUESTIONS IN QUESTIONNAIRE AND THE QUESTIONS IN ANSWER ARE THE SAME
     if (JSON.stringify(Object.keys(questionnaire.questions as object)) !== JSON.stringify(Object.keys(answers))) {
       return await reply.code(400).send({ message: 'Answer does not have the right questions or answer questions are not in the correct order' })
