@@ -33,7 +33,7 @@ import {
   updateUser
 } from './user.services'
 import sendEmail from '../../utils/mailer'
-import type { Answer, QuestionnaireAlgorithm, Session, User } from '../../utils/database'
+import type { Answer, Questionnaire, QuestionnaireAlgorithm, Session, User } from '../../utils/database'
 import {
   checkBirth,
   checkTimeDiffOfGivenDateUntilNow,
@@ -45,10 +45,11 @@ import {
 } from '../../utils/helpers'
 import type { FastifyRequestTypebox, FastifyReplyTypebox } from '../../server'
 import { errorCodeAndMessage } from '../../utils/error'
-import { findAnswers, findLastAnswer, findLastQuestionnaireAlgorithms, findQuestionnaireAlgorithmsOrderByCreatedAt } from '../questionnaire/questionnaire.services'
+import { findAnswers, findLastAnswer, findLastQuestionnaireAlgorithms, findQuestionnaireAlgorithmsOrderByCreatedAt, findQuestionnaireUnique } from '../questionnaire/questionnaire.services'
 import { findDoctorUnique } from '../doctor/doctor.services'
 import { GetInformationResponseSchema } from '../questionnaire/questionnaire.schemas'
 
+// todo: AÑADIR CONSENSUS DIARY CUANDO SE CREE EN QUESTIONNAIRESTODO
 async function createUserHandler (
   request: FastifyRequestTypebox<typeof CreateUserSchema>,
   reply: FastifyReplyTypebox<typeof CreateUserSchema>
@@ -63,7 +64,8 @@ async function createUserHandler (
       gender: rest.gender,
       height: rest.height / 100,
       name: rest.name,
-      weight: rest.weight
+      weight: rest.weight,
+      questionnairesToDo: ['']
     }
 
     const checkEmailUserIsUnique = await findUserUnique('email', rest.email)
@@ -78,6 +80,11 @@ async function createUserHandler (
     if (!checkBirth(rest.birth)) {
       return await reply.code(400).send({ message: 'Incorrect user birth' })
     }
+
+    const { id: idMorning } = await findQuestionnaireUnique('name', 'Consensus Sleep Diary Morning') as Questionnaire
+    const { id: idNight } = await findQuestionnaireUnique('name', 'Consensus Sleep Diary Night') as Questionnaire
+
+    restOfData.questionnairesToDo = [idMorning, idNight]
 
     const user = await createUser({ ...restOfData, password: passwordHash })
 

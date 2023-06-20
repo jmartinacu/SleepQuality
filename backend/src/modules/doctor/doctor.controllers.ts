@@ -169,7 +169,9 @@ async function addQuestionnaireToUserHandler (
     if (user.doctorId !== doctorId) {
       return await reply.code(403).send({ message: `Doctor ${doctorId} does not have enough privileges over user ${userId}` })
     }
-    await updateUser(userId, { questionnairesToDo: questionnaireIds })
+    const questionnairesToDo = questionnaireIds
+      .filter(questionnaireId => !user.questionnairesToDo.includes(questionnaireId))
+    await updateUser(userId, { questionnairesToDo })
     return await reply.send({ message: `Questionnaires added to user ${userId}` })
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
@@ -341,7 +343,6 @@ async function getUserInformationHandler (
     const { doctorId } = request.user as { doctorId: string }
     const { userId, questionnaireId } = request.params
     const { all, info } = request.query
-    console.log(all, info)
     let result: Answer |
     Answer[] |
     QuestionnaireAlgorithm |

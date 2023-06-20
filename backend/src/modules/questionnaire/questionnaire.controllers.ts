@@ -25,7 +25,7 @@ import {
   convertToCorrectType
 } from '../../utils/helpers'
 import { errorCodeAndMessage } from '../../utils/error'
-import { findUserUnique } from '../user/user.services'
+import { findUserUnique, updateUser } from '../user/user.services'
 
 async function createQuestionnaireHandler (
   request: FastifyRequestTypebox<typeof CreateQuestionnaireSchema>,
@@ -72,20 +72,13 @@ async function getQuestionnaireHandler (
   }
 }
 
-// TODO: CHANGE DEV PARAMETERS
+// TODO: NO MANDAR CUESTIONARIOS QUE YA ESTAN HECHOS
 async function getUserQuestionnairesInformationHandler (
   request: FastifyRequestTypebox<typeof GetQuestionnairesInformationSchema>,
   reply: FastifyReplyTypebox<typeof GetQuestionnairesInformationSchema>
 ): Promise<Questionnaire[]> {
   try {
     const { userId } = request.user as { userId: string }
-    /// ELIMINAR DESDE AQUI
-    const { dev } = request.query
-    if (typeof dev !== 'undefined') {
-      const resultDEV = await findQuestionnaireMany('all', [])
-      return await reply.send(resultDEV)
-    }
-    // HASTA AQUI Y ELIMINAR EL QUERYSTRING DE GETQUESTINONAIRESINFORMATIONSCHEMA
     const { questionnairesToDo } = await findUserUnique('id', userId) as User
     const questionnaires = await findQuestionnaireMany('id', questionnairesToDo)
     return await reply.send(questionnaires)
@@ -111,6 +104,7 @@ async function createAnswerHandler (
     const { answers, name } = request.body
     const server = request.server
     const questionnaire = await findQuestionnaireUnique('name', name)
+    const { questionnairesToDo } = await findUserUnique('id', userId) as User
     if (questionnaire === null) {
       return await reply.code(400).send({
         message: `Questionnaire ${name} does not exist`
@@ -158,12 +152,11 @@ async function createAnswerHandler (
       index++
     }
     await server.algorithms[name](answers, questionnaire.id, userId)
-    const {
-      id,
-      answers: answersDB
-    } = await createAnswer(questionnaire.id, userId, answers)
+    const { id: answerId, answers: answersDB } = await createAnswer(questionnaire.id, userId, answers)
+    questionnairesToDo.splice(questionnairesToDo.indexOf(questionnaire.id), 1)
+    await updateUser(userId, { questionnairesToDo })
     return await reply.code(201).send({
-      id,
+      id: answerId,
       questionnaireId: questionnaire.id,
       name,
       answers: answersDB
