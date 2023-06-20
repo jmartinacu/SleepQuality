@@ -10,13 +10,9 @@ export default server
 async function main (): Promise<void> {
   try {
     await prisma.$connect()
-
     const port = config.get<number>('port')
-
     addConsensusDiaryTask.start()
-
     const hostname = await server.listen({ port })
-
     console.log(`Server listening at ${hostname}`)
   } catch (error) {
     console.error(error)

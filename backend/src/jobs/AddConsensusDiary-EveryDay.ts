@@ -1,10 +1,10 @@
 import cron from 'node-cron'
-import prisma, { Questionnaire } from '../utils/database'
+import prisma, { Questionnaire, User } from '../utils/database'
 
 const everyDayCron = '0 0 * * *'
 
 const addConsensusDiary = async (): Promise<void> => {
-  const users = await prisma.user.findMany()
+  const users = (await prisma.user.findMany()).filter(user => user.role !== 'ADMIN')
   const { id: idMorning } = await prisma.questionnaire.findFirst({
     where: {
       name: 'Consensus Sleep Diary Morning'
@@ -32,12 +32,17 @@ const addConsensusDiary = async (): Promise<void> => {
     })
   }))
   await Promise.all(usersWithoutConsensusDiaryNight.map(async user => {
+    const { questionnairesToDo } = await prisma.user.findUnique({
+      where: {
+        id: user.id
+      }
+    }) as User
     await prisma.user.update({
       where: {
         id: user.id
       },
       data: {
-        questionnairesToDo: [...user.questionnairesToDo, idNight]
+        questionnairesToDo: [...questionnairesToDo, idNight]
       }
     })
   }))
