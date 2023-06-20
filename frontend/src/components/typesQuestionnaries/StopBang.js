@@ -7,6 +7,10 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
   const [modalVisible, setModalVisible] = useState(false)
 
   const [answers, setAnswers] = useState(new Array(8).fill(''))
+  const [answer4, setAnswer4] = useState('')
+  const [answer5, setAnswer5] = useState('')
+  const [answer7, setAnswer7] = useState('')
+
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -17,6 +21,15 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
           if (result.data !== []) {
             const copy = [...answers]
             for (const obj of result.data) {
+              if (obj.index === 4) {
+                setAnswer4(obj.dbInformation)
+              }
+              if (obj.index === 5) {
+                setAnswer5(obj.answer)
+              }
+              if (obj.index === 7) {
+                setAnswer7(obj.dbInformation)
+              }
               copy.splice(obj.index, 0, obj.answer)
             }
             console.log(copy)
@@ -85,27 +98,48 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
     return (
       <View>
         <Text style={styles.textQuiz}>{item.question} *</Text>
-        <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
-          <Picker
-            selectedValue={answers[index]}
-            onValueChange={(itemValue, itemIndex) => handleAddAnswer(itemValue, index)}
-            prompt='Answer'
-            mode='dropdown'
-          >
-            <Picker.Item
-              label='Select an answer...'
-              value=''
-            />
-            <Picker.Item
-              label='Yes'
-              value='true'
-            />
-            <Picker.Item
-              label='No'
-              value='false'
-            />
-          </Picker>
-        </View>
+        {index !== 4 && index !== 5 && index !== 7 &&
+          <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
+            <Picker
+              selectedValue={answers[index]}
+              onValueChange={(itemValue, itemIndex) => handleAddAnswer(itemValue, index)}
+              prompt='Answer'
+              mode='dropdown'
+            >
+              <Picker.Item
+                label='Select an answer...'
+                value=''
+              />
+              <Picker.Item
+                label='Yes'
+                value='true'
+              />
+              <Picker.Item
+                label='No'
+                value='false'
+              />
+            </Picker>
+          </View>}
+
+        {index === 5 &&
+          <View>
+            {answer5
+              ? (
+                <Text>YES</Text>
+                )
+              : (
+                <Text>NO</Text>
+                )}
+          </View>}
+        {index === 4 &&
+          <View>
+            <Text>BMI: {answer4} kg/m^2</Text>
+            <Text>If you need to update your height or weight go to your ptoffile information</Text>
+          </View>}
+        {index === 7 &&
+          <View>
+            <Text>{answer7}</Text>
+          </View>}
       </View>
 
     )
