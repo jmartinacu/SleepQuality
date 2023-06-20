@@ -7,9 +7,9 @@ const questionnaires = [
     questions: {
       'What time did you get into bed?': 'PRIMARY_TEXT',
       'What did you you try to go to sleep?': 'PRIMARY_TEXT',
-      'How long did it take you to fall asleep?': 'PRIMARY_TEXT',
+      'How long did it take you to fall asleep (in minutes)?': 'PRIMARY_TEXT',
       'How many times did you wake up, not counting your final awakening?': 'PRIMARY_NUMBER',
-      'In total, how long did these awakenings last?': 'PRIMARY_TEXT',
+      'In total, how long did these awakenings last (in minutes)?': 'PRIMARY_TEXT',
       'What time was your final awakening?': 'PRIMARY_TEXT',
       'After your final awakening, how long did you spend in bed trying to sleep?': 'PRIMARY_TEXT',
       'Did you wake up earlier than you planed?': 'PRIMARY_BOOL',
