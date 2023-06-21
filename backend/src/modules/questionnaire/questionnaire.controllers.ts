@@ -72,13 +72,17 @@ async function getQuestionnaireHandler (
   }
 }
 
-// TODO: NO MANDAR CUESTIONARIOS QUE YA ESTAN HECHOS
 async function getUserQuestionnairesInformationHandler (
   request: FastifyRequestTypebox<typeof GetQuestionnairesInformationSchema>,
   reply: FastifyReplyTypebox<typeof GetQuestionnairesInformationSchema>
 ): Promise<Questionnaire[]> {
   try {
     const { userId } = request.user as { userId: string }
+    const { all } = request.query
+    if (typeof all !== 'undefined' && all) {
+      const questionnaires = await findQuestionnaireMany('all', [])
+      return await reply.send(questionnaires)
+    }
     const { questionnairesToDo } = await findUserUnique('id', userId) as User
     const questionnaires = await findQuestionnaireMany('id', questionnairesToDo)
     return await reply.send(questionnaires)

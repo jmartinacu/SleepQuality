@@ -186,6 +186,10 @@ const getAnswersAndAlgorithmsResponseSchema = Type.Object({
   ])
 })
 
+const getQuestionnairesInformationQueryStringSchema = Type.Object({
+  all: Type.Optional(Type.Boolean())
+})
+
 const createAlgorithmSchema = Type.Object(algorithmAttributes)
 
 const getDefaultAlgorithmInformationResponseSchema = Type.Array(Type.Object({
@@ -217,6 +221,7 @@ const GetQuestionnaireSchema = {
 }
 
 const GetQuestionnairesInformationSchema = {
+  querystring: getQuestionnairesInformationQueryStringSchema,
   response: {
     200: getQuestionnairesInformationResponseSchema,
     500: Type.Unknown()

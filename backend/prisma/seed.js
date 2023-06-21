@@ -6,7 +6,7 @@ const questionnaires = [
     name: 'Consensus Sleep Diary Morning',
     questions: {
       'What time did you get into bed?': 'PRIMARY_TEXT',
-      'What did you you try to go to sleep?': 'PRIMARY_TEXT',
+      'What did you try to go to sleep?': 'PRIMARY_TEXT',
       'How long did it take you to fall asleep (in minutes)?': 'PRIMARY_TEXT',
       'How many times did you wake up, not counting your final awakening?': 'PRIMARY_NUMBER',
       'In total, how long did these awakenings last (in minutes)?': 'PRIMARY_TEXT',

@@ -4,12 +4,12 @@
   "accessTokenKey": "",
   "refreshTokenKey": "",
   "smpt": {
-    "host": "smtp.ethereal.email",
+    "host": "",
     "port": 587,
     "secure": false,
     "auth": {
-      "user": "s47cszg4kdpgpqda@ethereal.email",
-      "pass": "nmfhFxjaj9SyPxrFXg"
+      "user": "",
+      "pass": ""
     }
   }
 }

@@ -94,7 +94,7 @@ async function createUserHandler (
     const html = htmlVerifyUser(verificationLink)
 
     await sendEmail({
-      from: 'test@example.com',
+      from: 'sleep.questionnaires@htwg-konstanz.de',
       to: user.email,
       html
     })

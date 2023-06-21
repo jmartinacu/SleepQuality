@@ -169,8 +169,7 @@ async function addQuestionnaireToUserHandler (
     if (user.doctorId !== doctorId) {
       return await reply.code(403).send({ message: `Doctor ${doctorId} does not have enough privileges over user ${userId}` })
     }
-    const questionnairesToDo = questionnaireIds
-      .filter(questionnaireId => !user.questionnairesToDo.includes(questionnaireId))
+    const questionnairesToDo = [...new Set([...questionnaireIds, ...user.questionnairesToDo])]
     await updateUser(userId, { questionnairesToDo })
     return await reply.send({ message: `Questionnaires added to user ${userId}` })
   } catch (error) {

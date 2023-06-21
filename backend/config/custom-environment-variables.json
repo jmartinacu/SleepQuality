@@ -1,5 +1,12 @@
 {
   "accessTokenKey": "ACCESS_TOKEN_KEY",
   "refreshTokenKey": "REFRESH_TOKEN_KEY",
-  "databaseUrl": "DATABASE_URL"
+  "databaseUrl": "DATABASE_URL",
+  "smpt": {
+    "host": "EMAIL_HOST",
+    "auth": {
+      "user": "EMAIL_USER",
+      "pass": "EMAIL_PASS"
+    }
+  }
 }
