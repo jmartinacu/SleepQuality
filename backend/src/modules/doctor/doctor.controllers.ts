@@ -352,8 +352,9 @@ async function getUserInformationHandler (
     if (user === null) {
       return await reply.code(404).send({ message: 'User not found' })
     }
-    const doctorUsers = await findUsersDoctor('id', doctorId)
-    if (!doctorUsers.some(user => user.doctorId === userId)) {
+    const doctorUsers = await (await findUsersDoctor('id', doctorId))
+      .map(user => user.id)
+    if (!doctorUsers.includes(userId)) {
       return await reply.code(403).send({ message: `Not enough privileges over user ${userId}` })
     }
     if (info === 'algorithms') {
