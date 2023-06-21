@@ -516,7 +516,7 @@ async function getUserHandler (
     if (typeof user === 'undefined') {
       return await reply.code(404).send({ message: 'User not found' })
     }
-    user.height = user.height / 100
+    user.height = user.height * 100
     return await reply.send(user)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)

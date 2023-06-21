@@ -197,7 +197,7 @@ async function getMeHandler (
   try {
     const { userId } = request.user as { userId: string }
     const user = await findUserUnique('id', userId) as User
-    user.height = user.height / 100
+    user.height = user.height * 100
     return await reply.send(user)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
