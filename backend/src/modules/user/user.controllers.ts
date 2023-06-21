@@ -193,10 +193,11 @@ async function logInUserHandler (
 async function getMeHandler (
   request: FastifyRequestTypebox<typeof GetUserAuthenticatedSchema>,
   reply: FastifyReplyTypebox<typeof GetUserAuthenticatedSchema>
-): Promise<CreateUserResponse> {
+): Promise<User> {
   try {
     const { userId } = request.user as { userId: string }
     const user = await findUserUnique('id', userId) as User
+    user.height = user.height / 100
     return await reply.send(user)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
