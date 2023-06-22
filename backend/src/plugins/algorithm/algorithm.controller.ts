@@ -321,8 +321,6 @@ async function InsomniaSeverityIndexAlgorithm (
 }
 
 const questionnairesAlgorithms = {
-  'Consensus Sleep Diary Morning': () => {},
-  'Consensus Sleep Diary Night': () => {},
   'STOP-BANG': StopBangAlgorithm,
   'Epworth Sleepiness Scale': EpworthSleepinessScaleAlgorithm,
   'Pittsburgh Sleep Quality Index': PittsburghSleepQualityIndexAlgorithm,

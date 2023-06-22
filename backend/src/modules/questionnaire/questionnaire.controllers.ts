@@ -160,7 +160,9 @@ async function createAnswerHandler (
       answers[question] = answerUser
       index++
     }
-    await server.algorithms[name](answers, questionnaire.id, userId)
+    if (name in server.algorithms) {
+      await server.algorithms[name](answers, questionnaire.id, userId)
+    }
     const { id: answerId, answers: answersDB } = await createAnswer(questionnaire.id, userId, answers)
     questionnairesToDo.splice(questionnairesToDo.indexOf(questionnaire.id), 1)
     await updateUser(userId, { questionnairesToDo })
@@ -242,10 +244,13 @@ async function getDefaultAlgorithmInformationHandler (
     if (questionnaire === null) {
       return await reply.code(404).send({ message: 'Not found' })
     }
-    const defaultInformation = await server.algorithmDefaults[questionnaire.name](
-      questionnaire.id,
-      userId
-    )
+    let defaultInformation = []
+    if (questionnaire.name in server.algorithmDefaults) {
+      defaultInformation = await server.algorithmDefaults[questionnaire.name](
+        questionnaire.id,
+        userId
+      )
+    }
     return await reply.send(defaultInformation)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)
