@@ -42,14 +42,7 @@ async function StopBangDefaultInformation (
 }
 
 const questionnairesDefaultInformation = {
-  'Consensus Sleep Diary': () => [],
-  'STOP-BANG': StopBangDefaultInformation,
-  'Epworth Sleepiness Scale': () => [],
-  'Pittsburgh Sleep Quality Index': () => [],
-  'Perceived Stress Questionnaire': () => [],
-  'Athens Insomnia Scale': () => [],
-  'International Restless Legs Scale': () => [],
-  'Insomnia Severity Index': () => []
+  'STOP-BANG': StopBangDefaultInformation
 }
 
 export default questionnairesDefaultInformation
