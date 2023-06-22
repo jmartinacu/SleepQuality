@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react'
-import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, StyleSheet, Text, View } from 'react-native'
 import { getItemFromStorage } from '../utils/Utils'
-import { userDoctorGetNewAccessToken, userGetNewAccessToken } from '../api/ApiUser'
+import { userDoctorGetNewAccessToken } from '../api/ApiUser'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { getAllCSV, getAllQuestionnaires } from '../api/ApiQuestionnaries'
 import PreviewQuestionnaire from '../components/questionnaries/PreviewQuestionnarie'
 import { AIS, CSDM, CSDN, ESS, IRLS, ISI, PSQ, PSQI, SB } from '../assests/questionnarieLogo'
 
-const CalendarPage = ({ navigation }) => {
-  const [questionnaires, setQuestionnaires] = useState([])
-
+const UserInfoAnswers = ({ navigation, route }) => {
   const [accessToken, setAccessToken] = useState(null)
   const [refreshToken, setRefreshToken] = useState(null)
   const [isDoctor, setIsDoctor] = useState(null)
@@ -19,28 +16,7 @@ const CalendarPage = ({ navigation }) => {
     getItemFromStorage('refreshToken', setRefreshToken).then()
     getItemFromStorage('isDoctor', setIsDoctor).then()
     if (accessToken !== null && refreshToken !== null && isDoctor !== null) {
-      if (isDoctor === 'false') {
-        userGetNewAccessToken(refreshToken)
-          .then(result => {
-            if (result.status === 200) {
-              setAccessToken(result.data.accessToken)
-              AsyncStorage.setItem('accessToken', result.data.accessToken)
-              getAllQuestionnaires(result.data.accessToken)
-                .then(resultQ => {
-                  if (resultQ.status === 200) {
-                    setQuestionnaires(resultQ.data)
-                  } else {
-                    console.log(resultQ.data.message)
-                  }
-                })
-                .catch(err => {
-                  console.error(err)
-                })
-            } else {
-              navigation.replace('TextAndButton', { text: 'Session Expired. Log in again', button: 'Go Login', direction: 'Login' })
-            }
-          })
-      } else if (isDoctor === 'true') {
+      if (isDoctor === 'true') {
         userDoctorGetNewAccessToken(refreshToken)
           .then(result => {
             if (result.status === 200) {
@@ -53,23 +29,6 @@ const CalendarPage = ({ navigation }) => {
       }
     }
   }, [accessToken, isDoctor])
-
-  const handleExportCSV = () => {
-    if (accessToken !== null) {
-      if (Platform.OS === 'web') {
-        getAllCSV(accessToken)
-          .then(result => {
-            const url = window.URL.createObjectURL(new Blob([result.data]))
-            const link = document.createElement('a')
-            link.href = url
-            link.setAttribute('download', 'SleepSheepData.csv')
-            link.click()
-          })
-      } else {
-        console.log('Feuture only for web')
-      }
-    }
-  }
 
   const renderQuestionnaires = ({ index, item }) => {
     let logo = null
@@ -104,7 +63,7 @@ const CalendarPage = ({ navigation }) => {
     }
 
     return (
-      <PreviewQuestionnaire answers logo={logo} navigation={navigation} id={item.id} name={item.name} />
+      <PreviewQuestionnaire answers logo={logo} navigation={navigation} id={item.id} name={item.name} idUser={route.params.idUser} />
     )
   }
 
@@ -118,20 +77,10 @@ const CalendarPage = ({ navigation }) => {
 
     <View style={{ backgroundColor: '#191970', flex: 1 }}>
       {isDoctor === 'true' &&
-        <Text style={styles.textHeaderFlatlist}>This is a feature only for patients. Please go back</Text>}
-      {isDoctor === 'false' &&
-
         <View style={styles.container}>
-          {Platform.OS === 'web' &&
-            <TouchableOpacity
-              style={styles.button}
-              onPress={handleExportCSV}
-            >
-              <Text style={styles.textCreate}>Export CSV of ALL your data</Text>
-            </TouchableOpacity>}
-          <Text style={styles.textHeaderFlatlist}>Press on a Questionnarie to check your Answers:</Text>
+          <Text style={styles.textHeaderFlatlist}>Press on a Questionnarie to check the Answers of {route.params.userName}:</Text>
           <FlatList
-            data={questionnaires}
+            data={route.params.questionnaires}
             renderItem={renderQuestionnaires}
             keyExtractor={(item, index) => index}
             ListEmptyComponent={renderEmptyList}
@@ -153,19 +102,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '700',
     paddingTop: 50
-  },
-  button: {
-    padding: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FF7F50',
-    borderRadius: 5,
-    marginTop: 25
-  },
-  textCreate: {
-    color: '#191970',
-    fontWeight: '700'
   }
 })
 
-export default CalendarPage
+export default UserInfoAnswers

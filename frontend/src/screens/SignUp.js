@@ -22,14 +22,14 @@ const SignUp = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 50,
     backgroundColor: '#191970'
   },
 
   image: {
     height: 150,
     width: '100%',
-    marginBottom: 20
+    marginBottom: 20,
+    marginTop: 50
   },
 
   textTitle: {

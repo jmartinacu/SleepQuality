@@ -1,6 +1,6 @@
 
 import { createStackNavigator } from '@react-navigation/stack'
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import Home from '../screens/Home'
 import Proffile from '../screens/Proffile'
 import AntDesign from 'react-native-vector-icons/AntDesign'
@@ -10,10 +10,10 @@ import SignUp from '../screens/SignUp'
 import EmailVerification from '../screens/EmailVerification'
 import TextAndButton from '../components/users/TextAndButton'
 import Questionnarie from '../screens/Questionnarie'
-import { EmptyProffile } from '../assests/perfil'
 import DeleteAccount from '../screens/DeleteAccount'
-import UserInfo from '../components/users/UserInfo'
+import UserInfo from '../screens/UserInfo'
 import AnswersList from '../components/questionnaries/AnswersList'
+import UserInfoAnswers from '../screens/UserInfoAnswers'
 
 const Stack = createStackNavigator()
 
@@ -39,7 +39,8 @@ const MyStack = () => {
         component={SignUp}
         options={{
           headerTransparent: true,
-          title: ''
+          title: '',
+          headerTintColor: 'white'
         }}
       />
 
@@ -56,9 +57,9 @@ const MyStack = () => {
               onPress={() => navigation.push('Proffile')}
               activeOpacity={0.5}
             >
-              <Image
-                source={EmptyProffile}
-                style={styles.proffileImage}
+              <AntDesign
+                name='profile'
+                style={styles.profile}
               />
             </TouchableOpacity>
           ),
@@ -113,7 +114,17 @@ const MyStack = () => {
         component={CalendarPage}
         options={{
           backgroundColor: '#FF7F50',
-          title: '',
+          title: 'Dashboard',
+          headerTitleAlign: 'center'
+        }}
+      />
+
+      <Stack.Screen
+        name='UserInfoAnswers'
+        component={UserInfoAnswers}
+        options={{
+          backgroundColor: '#FF7F50',
+          title: 'Dashboard',
           headerTitleAlign: 'center'
         }}
       />
@@ -123,7 +134,8 @@ const MyStack = () => {
         component={Questionnarie}
         options={{
           headerTransparent: true,
-          title: ''
+          title: '',
+          headerTintColor: 'white'
         }}
       />
 
@@ -132,7 +144,8 @@ const MyStack = () => {
         component={DeleteAccount}
         options={{
           headerTransparent: true,
-          title: ''
+          title: '',
+          headerTintColor: 'white'
         }}
       />
 
@@ -141,7 +154,8 @@ const MyStack = () => {
         component={EmailVerification}
         options={{
           headerTransparent: true,
-          title: ''
+          title: '',
+          headerTintColor: 'white'
         }}
       />
 
@@ -159,6 +173,11 @@ const MyStack = () => {
 }
 
 const styles = StyleSheet.create({
+  profile: {
+    justifyContent: 'center',
+    fontSize: 30,
+    marginLeft: 60
+  },
   calendar: {
     justifyContent: 'center',
     fontSize: 30,

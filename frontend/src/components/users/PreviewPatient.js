@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 const PreviewPatient = ({ navigation, id, name, profPic, email }) => {
   return (
@@ -7,14 +7,9 @@ const PreviewPatient = ({ navigation, id, name, profPic, email }) => {
       onPress={() => navigation.push('UserInfo', { id })}
       activeOpacity={0.5}
     >
-      <Image
-        source={profPic}
-        resizeMode='contain'
-        style={styles.image}
-      />
-      <View>
-        <Text style={styles.quesText}>{name}</Text>
-        <Text style={styles.quesText}>{email}</Text>
+      <View style={styles.containerPatient}>
+        <Text style={styles.textTitle}>{name}</Text>
+        <Text style={styles.text}>{email}</Text>
       </View>
     </TouchableOpacity>
   )
@@ -22,17 +17,30 @@ const PreviewPatient = ({ navigation, id, name, profPic, email }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    flexDirection: 'row'
+    flex: 1
   },
-
+  containerPatient: {
+    flex: 1,
+    borderColor: 'white',
+    borderWidth: 3,
+    textAlign: 'center'
+  },
   image: {
     height: 40,
     width: 40
   },
-
-  quesText: {
-    color: 'white'
+  textTitle: {
+    color: 'white',
+    fontWeight: '600',
+    marginTop: 7,
+    marginBottom: 4,
+    marginHorizontal: 7,
+    textDecorationLine: 'underline'
+  },
+  text: {
+    color: 'white',
+    marginBottom: 7,
+    marginHorizontal: 7
   }
 })
 

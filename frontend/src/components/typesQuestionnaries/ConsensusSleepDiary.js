@@ -1,10 +1,10 @@
-import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import { useEffect, useState } from 'react'
+import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native'
+import { useState } from 'react'
 import { Picker } from '@react-native-picker/picker'
 import { createAswer } from '../../api/ApiQuestionnaries'
 import { ScrollView } from 'react-native-gesture-handler'
 
-const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additionalInfo, instructions }) => {
+const ConsensusSleepDiary = ({ logo, accessToken, navigation, name, questions, additionalInfo, instructions }) => {
   const [modalVisible, setModalVisible] = useState(false)
 
   const result = Object.entries(questions)
@@ -26,13 +26,14 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
   const [answers, setAnswers] = useState(new Array(22).fill(''))
   const [error, setError] = useState(false)
 
+  let i = 0
   for (const obj of result) {
     if (obj.type.split('_')[0] === 'SECONDARY') {
       isSecondary.push(true)
     } else {
       isSecondary.push(false)
     }
-    if (obj.type.split('_')[1] === 'TEXT') {
+    if (obj.type.split('_')[1] === 'TEXT' && !((name === 'Consensus Sleep Diary Morning') && (i === 2 || i === 4))) {
       isText.push(true)
       isBoolean.push(false)
       isNumber.push(false)
@@ -40,11 +41,12 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
       isBoolean.push(true)
       isText.push(false)
       isNumber.push(false)
-    } else if (obj.type.split('_')[1] === 'NUMBER') {
+    } else if (obj.type.split('_')[1] === 'NUMBER' || ((name === 'Consensus Sleep Diary Morning') && (i === 2 || i === 4))) {
       isBoolean.push(false)
       isText.push(false)
       isNumber.push(true)
     }
+    i++
   }
   for (const obj of additionalInfo) {
     if (obj.questions !== []) {
@@ -63,31 +65,37 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
   }
 
   const handleSubmitAnswer = () => {
+    const regexHour = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/
     const isOnlyNumbers = /^\d+$/
     let submit = []
     let err = false
-    let i = 0
+    let ind = 0
     for (const obj of result) {
-      if (isNumber[i] && !isOnlyNumbers.test(answers[i])) {
+      if (isNumber[ind] && !isOnlyNumbers.test(answers[ind])) {
         setError('Some questions can only be filled with numbers: **')
         err = true
         submit = []
         break
-      } else if ((!isSecondary[i] || isBoolean[i] || keys.includes(i)) && answers[i] === '') {
+      } else if ((!isSecondary[ind] || isBoolean[ind] || keys.includes(i)) && answers[ind] === '') {
         setError('You need to fill all the mandatory questions: *')
         err = true
         submit = []
         break
+      } else if ((ind === 0 || ind === 5 || ind === 9) && !regexHour.test(answers[ind])) {
+        setError('Wrong hour format. Correct format is: HH:MM')
+        err = true
+        submit = []
+        break
       } else {
-        if (isSecondary[i] && answers[i] === '') {
+        if (isSecondary[ind] && answers[ind] === '') {
           const listInList = [obj.question, null]
           submit.push(listInList)
         } else {
-          const listInList = [obj.question, answers[i].trim()]
+          const listInList = [obj.question, answers[ind].trim()]
           submit.push(listInList)
         }
       }
-      i++
+      ind++
     }
     if (!err) {
       createAswer(accessToken, {
@@ -119,16 +127,16 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
       <View>
         {isSecondary[index]
           ? (
-            <Text>{item.question}</Text>
+            <Text style={styles.textQuiz}>{item.question}</Text>
             )
           : (
             <View>
               {isNumber[index]
                 ? (
-                  <Text>{item.question} **</Text>
+                  <Text style={styles.textQuiz}>{item.question} **</Text>
                   )
                 : (
-                  <Text>{item.question} *</Text>
+                  <Text style={styles.textQuiz}>{item.question} *</Text>
                   )}
             </View>
             )}
@@ -143,12 +151,14 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
                 mode='dropdown'
               >
                 <Picker.Item
+                  style={{ color: 'white' }}
                   label='Select an answer...'
                   value=''
                 />
                 {EnumForEachQuestion.get(index).map((value, index) => {
                   return (
                     <Picker.Item
+                      style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
                       key={index}
                       label={value}
                       value={value}
@@ -160,7 +170,7 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
             )
           : (
             <View>
-              {isText[index] &&
+              {isText[index] && !(name === 'Consensus Sleep Diary Morning' && (index === 0 || index === 5 || index === 9)) &&
                 <View style={styles.wrapperInput}>
                   <TextInput
                     style={styles.input}
@@ -170,6 +180,27 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
                     returnKeyType='done'
                     maxLength={20}
                   />
+                </View>}
+              {isText[index] && (name === 'Consensus Sleep Diary Morning' && (index === 0 || index === 5 || index === 9)) &&
+                <View>
+                  {Platform.OS === 'web' &&
+                    <input
+                      type='time'
+                      value={answers[index]}
+                      onChange={(e) => handleAddAnswer(e.target.value, index)}
+                    />}
+                  {Platform.OS !== 'web' &&
+                    <View style={styles.wrapperInput}>
+                      <TextInput
+                        placeholderTextColor='white'
+                        style={styles.input}
+                        placeholder='00:00'
+                        value={answers[index]}
+                        onChangeText={text => handleAddAnswer(text, index)}
+                        returnKeyType='done'
+                        maxLength={5}
+                      />
+                    </View>}
                 </View>}
               {isNumber[index] &&
                 <View style={styles.wrapperInput}>
@@ -193,14 +224,17 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
                     mode='dropdown'
                   >
                     <Picker.Item
+                      style={{ color: 'white' }}
                       label='Select an answer...'
                       value=''
                     />
                     <Picker.Item
+                      style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
                       label='Yes'
                       value='true'
                     />
                     <Picker.Item
+                      style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
                       label='No'
                       value='false'
                     />
@@ -217,8 +251,8 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
   const renderSubmitButton = () => {
     return (
       <View>
-        <Text>* Mandatory question</Text>
-        <Text>** Mandatory question. You can only answer with numbers</Text>
+        <Text style={styles.mandatoryText}>* Mandatory question</Text>
+        <Text style={styles.mandatoryText2}>** Mandatory question. You can only answer with numbers</Text>
         <TouchableOpacity style={styles.button} onPress={handleSubmitAnswer}>
           <Text style={styles.text}>Submit</Text>
         </TouchableOpacity>
@@ -256,35 +290,44 @@ const ConsensusSleepDiary = ({ accessToken, navigation, name, questions, additio
         </ScrollView>
       </Modal>
 
-      <View style={styles.row}>
-        <Text>{name}</Text>
+      <View style={styles.container1}>
+
+        <Image
+          source={logo}
+          style={styles.logo}
+        />
+        <Text style={styles.textTitle}>{name}</Text>
         <Pressable
           style={styles.button}
           onPress={() => setModalVisible(true)}
         >
           <Text style={styles.text}>See Instructions</Text>
         </Pressable>
+
+        <FlatList
+          data={result}
+          renderItem={renderQuestion}
+          keyExtractor={(item, index) => index}
+          nestedScrollEnabled
+          ListFooterComponent={renderSubmitButton}
+          removeClippedSubviews
+        />
       </View>
-
-      <FlatList
-        data={result}
-        renderItem={renderQuestion}
-        keyExtractor={(item, index) => index}
-        nestedScrollEnabled
-        ListFooterComponent={renderSubmitButton}
-        removeClippedSubviews={false}
-      />
-
     </KeyboardAvoidingView>
 
   )
 }
 
 const styles = StyleSheet.create({
+  container1: {
+    alignItems: 'center'
+  },
   container: {
     justifyContent: 'center',
-    marginBottom: 50,
-    marginHorizontal: 20
+    marginBottom: 35,
+    marginHorizontal: 20,
+    alignItems: 'center',
+    marginTop: 20
   },
   wrapperInput: {
     borderWidth: 0.5,
@@ -292,8 +335,7 @@ const styles = StyleSheet.create({
     borderColor: 'white',
     marginTop: 10,
     alignItems: 'center',
-    height: 50,
-    width: '75%'
+    width: '100%'
   },
   wrapperInputWrong: {
     borderWidth: 0.5,
@@ -310,7 +352,9 @@ const styles = StyleSheet.create({
   },
   input: {
     padding: 10,
-    width: '100%'
+    width: '100%',
+    color: 'white',
+    fontWeight: '400'
   },
   wrapperIcon: {
     position: 'absolute',
@@ -391,6 +435,33 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center'
+  },
+  textQuiz: {
+    marginTop: 15,
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  mandatoryText: {
+    marginTop: 25,
+    color: 'white',
+    textAlign: 'left'
+  },
+  mandatoryText2: {
+    color: 'white',
+    textAlign: 'left'
+  },
+  textTitle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    alignContent: 'center',
+    fontSize: 30
+  },
+  logo: {
+    height: 100,
+    width: 100
   }
 })
 

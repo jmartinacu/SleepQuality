@@ -21,10 +21,10 @@ const PreviewAnswer = ({ date, answers, algorithms, name }) => {
   const renderAnswer = ({ index, item }) => {
     return (
       <View>
-        <Text style={styles.modalText}>{item.question}</Text>
+        <Text style={styles.modalTextQuiz}>{item.question}</Text>
         {(name === 'Pittsburgh Sleep Quality Index' && (index === 0 || index === 2))
           ? (
-            <Text style={styles.modalText}>{item.answer.split('-')[1]}</Text>
+            <Text style={styles.modalTextQuiz}>{item.answer.split('-')[1]}</Text>
             )
           : (
             <Text style={styles.modalText}>{item.answer === null ? 'No answer' : item.answer.toString()}</Text>
@@ -91,19 +91,20 @@ const PreviewAnswer = ({ date, answers, algorithms, name }) => {
           <Text style={styles.quesText}>{year}</Text>
           <Text style={styles.quesText}>{hour}</Text>
         </View>
+        {algorithms !== undefined && <View style={styles.separator} />}
         {algorithms !== undefined &&
           <View>
-            {name === 'STOP-BANG' && <Text>STOP BANG Risk: {algorithms.stopBangRisk}</Text>}
-            {name === 'STOP-BANG' && <Text>STOP BANG Warning: {algorithms.stopBangWarning}</Text>}
-            {name === 'Epworth Sleepiness Scale' && <Text>Epworth Sleepiness Scale Risk: {algorithms.epworthSleepinessScaleRisk}</Text>}
-            {name === 'Epworth Sleepiness Scale' && <Text>Epworth Sleepiness Scale Warning: {algorithms.epworthSleepinessScaleWarning}</Text>}
-            {name === 'Pittsburgh Sleep Quality Index' && <Text>Pittsburgh Sleep Quality Index: {algorithms.pittsburghSleepQualityIndex}</Text>}
-            {name === 'Perceived Stress Questionnaire' && <Text>Perceived Stress Questionnaire Risk: {algorithms.perceivedStressQuestionnaireRisk}</Text>}
-            {name === 'Perceived Stress Questionnaire' && <Text>Perceived Stress Questionnaire Emotions: {algorithms.perceivedStressQuestionnaireEmotions}</Text>}
-            {name === 'Athens Insomnia Scale' && <Text>Athens Insomnia Scale: {algorithms.athensInsomniaScale}</Text>}
-            {name === 'International Restless Legs Scale' && <Text>International Restless Legs Scale: {algorithms.internationalRestlessLegsScale}</Text>}
-            {name === 'Insomnia Severity Index' && <Text>Insomnia Severity Index Risk: {algorithms.insomniaSeverityIndexRisk}</Text>}
-            {name === 'Insomnia Severity Index' && <Text>Insomnia Severity Index Warning: {algorithms.insomniaSeverityIndexWarning}</Text>}
+            {name === 'STOP-BANG' && <Text style={styles.quesText}>STOP BANG Risk: {algorithms.stopBangRisk}</Text>}
+            {name === 'STOP-BANG' && <Text style={styles.quesText}>STOP BANG Warning: {algorithms.stopBangWarning}</Text>}
+            {name === 'Epworth Sleepiness Scale' && <Text style={styles.quesText}>Epworth Sleepiness Scale Risk: {algorithms.epworthSleepinessScaleRisk}</Text>}
+            {name === 'Epworth Sleepiness Scale' && <Text style={styles.quesText}>Epworth Sleepiness Scale Warning: {algorithms.epworthSleepinessScaleWarning}</Text>}
+            {name === 'Pittsburgh Sleep Quality Index' && <Text style={styles.quesText}>Pittsburgh Sleep Quality Index: {algorithms.pittsburghSleepQualityIndex}</Text>}
+            {name === 'Perceived Stress Questionnaire' && <Text style={styles.quesText}>Perceived Stress Questionnaire Risk: {algorithms.perceivedStressQuestionnaireRisk}</Text>}
+            {name === 'Perceived Stress Questionnaire' && <Text style={styles.quesText}>Perceived Stress Questionnaire Emotions: {algorithms.perceivedStressQuestionnaireEmotions}</Text>}
+            {name === 'Athens Insomnia Scale' && <Text style={styles.quesText}>Athens Insomnia Scale: {algorithms.athensInsomniaScale}</Text>}
+            {name === 'International Restless Legs Scale' && <Text style={styles.quesText}>International Restless Legs Scale: {algorithms.internationalRestlessLegsScale}</Text>}
+            {name === 'Insomnia Severity Index' && <Text style={styles.quesText}>Insomnia Severity Index Risk: {algorithms.insomniaSeverityIndexRisk}</Text>}
+            {name === 'Insomnia Severity Index' && <Text style={styles.quesText}>Insomnia Severity Index Warning: {algorithms.insomniaSeverityIndexWarning}</Text>}
           </View>}
 
       </TouchableOpacity>
@@ -118,7 +119,8 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: 'white',
     marginTop: 10,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    padding: 10
   },
   centeredView: {
     flex: 1,
@@ -150,6 +152,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center'
   },
+  modalTextQuiz: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: '700'
+  },
   button: {
     padding: 10,
     alignItems: 'center',
@@ -160,6 +168,11 @@ const styles = StyleSheet.create({
   },
   quesText: {
     color: 'white'
+  },
+  separator: {
+    borderColor: 'white',
+    borderWidth: 2,
+    marginHorizontal: 10
   }
 })
 

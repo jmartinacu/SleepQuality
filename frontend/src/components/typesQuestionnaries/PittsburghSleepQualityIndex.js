@@ -1,10 +1,9 @@
-import { Button, FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native'
 import { useState } from 'react'
 import { Picker } from '@react-native-picker/picker'
 import { createAswer } from '../../api/ApiQuestionnaries'
-import DateTimePicker from '@react-native-community/datetimepicker'
 
-const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions, additionalInfo, instructions, desc1, desc2 }) => {
+const PittsburghSleepQualityIndex = ({ logo, accessToken, navigation, name, questions, additionalInfo, instructions, desc1, desc2 }) => {
   const [modalVisible, setModalVisible] = useState(false)
 
   const [answers, setAnswers] = useState(new Array(24).fill(''))
@@ -127,102 +126,109 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
     return (
       <View>
         {((index >= 4 && index <= 12) || (index >= 19 && index <= 22)) &&
-          <View style={styles.hasDesc}>
-            {index === 4 && <Text>{desc1}</Text>}
-            {index === 19 && <Text>{desc2}</Text>}
-            {isSecondary[index]
-              ? (
-                <Text style={styles.textQuiz}>{item.question}</Text>
-                )
-              : (
-                <View>
-                  {isNumber[index]
-                    ? (
-                      <Text style={styles.textQuiz}>{item.question} **</Text>
-                      )
-                    : (
-                      <Text style={styles.textQuiz}>{item.question} *</Text>
-                      )}
-                </View>
-                )}
+          <View>
+            {index === 4 && <Text style={styles.textQuiz}>{desc1}</Text>}
+            {index === 19 && <Text style={styles.textQuiz}>{desc2}</Text>}
+            <View style={styles.hasDesc}>
+              {isSecondary[index]
+                ? (
+                  <Text style={styles.textQuizSub}>{item.question}</Text>
+                  )
+                : (
+                  <View>
+                    {isNumber[index]
+                      ? (
+                        <Text style={styles.textQuizSub}>{item.question} **</Text>
+                        )
+                      : (
+                        <Text style={styles.textQuizSub}>{item.question} *</Text>
+                        )}
+                  </View>
+                  )}
 
-            {isEnum
-              ? (
-                <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
-                  <Picker
-                    selectedValue={answers[index]}
-                    onValueChange={(itemValue, itemIndex) => handleAddAnswer(itemValue, index)}
-                    prompt='Answer'
-                    mode='dropdown'
-                  >
-                    <Picker.Item
-                      label='Select an answer...'
-                      value=''
-                    />
-                    {EnumForEachQuestion.get(index).map((value, index) => {
-                      return (
-                        <Picker.Item
-                          key={index}
-                          label={value}
-                          value={value}
-                        />
-                      )
-                    })}
-                  </Picker>
-                </View>
-                )
-              : (
-                <View>
-                  {isText[index] &&
-                    <View style={styles.wrapperInput}>
-                      <TextInput
-                        style={styles.input}
-                        placeholder=''
-                        value={answers[index]}
-                        onChangeText={text => handleAddAnswer(text, index)}
-                        returnKeyType='done'
-                        maxLength={20}
+              {isEnum
+                ? (
+                  <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
+                    <Picker
+                      selectedValue={answers[index]}
+                      onValueChange={(itemValue, itemIndex) => handleAddAnswer(itemValue, index)}
+                      prompt='Answer'
+                      mode='dropdown'
+                    >
+                      <Picker.Item
+                        style={{ color: 'white' }}
+                        label='Select an answer...'
+                        value=''
                       />
-                    </View>}
+                      {EnumForEachQuestion.get(index).map((value, index) => {
+                        return (
+                          <Picker.Item
+                            style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
+                            key={index}
+                            label={value}
+                            value={value}
+                          />
+                        )
+                      })}
+                    </Picker>
+                  </View>
+                  )
+                : (
+                  <View>
+                    {isText[index] &&
+                      <View style={styles.wrapperInput}>
+                        <TextInput
+                          style={styles.input}
+                          placeholder=''
+                          value={answers[index]}
+                          onChangeText={text => handleAddAnswer(text, index)}
+                          returnKeyType='done'
+                          maxLength={20}
+                        />
+                      </View>}
 
-                  {isNumber[index] &&
-                    <View style={styles.wrapperInput}>
-                      <TextInput
-                        style={styles.input}
-                        inputMode='numeric'
-                        keyboardType='numeric'
-                        placeholder=''
-                        value={answers[index]}
-                        onChangeText={text => handleAddAnswer(text, index)}
-                        returnKeyType='done'
-                        maxLength={3}
-                      />
-                    </View>}
-                  {isBoolean[index] &&
-                    <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
-                      <Picker
-                        selectedValue={answers[index]}
-                        onValueChange={(itemValue, itemIndex) => handleAddAnswer(itemValue, index)}
-                        prompt='Answer'
-                        mode='dropdown'
-                      >
-                        <Picker.Item
-                          label='Select an answer...'
-                          value=''
+                    {isNumber[index] &&
+                      <View style={styles.wrapperInput}>
+                        <TextInput
+                          style={styles.input}
+                          inputMode='numeric'
+                          keyboardType='numeric'
+                          placeholder=''
+                          value={answers[index]}
+                          onChangeText={text => handleAddAnswer(text, index)}
+                          returnKeyType='done'
+                          maxLength={3}
                         />
-                        <Picker.Item
-                          label='Yes'
-                          value='true'
-                        />
-                        <Picker.Item
-                          label='No'
-                          value='false'
-                        />
-                      </Picker>
-                    </View>}
-                </View>
+                      </View>}
+                    {isBoolean[index] &&
+                      <View style={!(Platform.OS === 'ios') ? styles.picker : null}>
+                        <Picker
+                          selectedValue={answers[index]}
+                          onValueChange={(itemValue, itemIndex) => handleAddAnswer(itemValue, index)}
+                          prompt='Answer'
+                          mode='dropdown'
+                        >
+                          <Picker.Item
+                            style={{ color: 'white' }}
+                            label='Select an answer...'
+                            value=''
+                          />
+                          <Picker.Item
+                            style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
+                            label='Yes'
+                            value='true'
+                          />
+                          <Picker.Item
+                            style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
+                            label='No'
+                            value='false'
+                          />
+                        </Picker>
+                      </View>}
+                  </View>
 
-                )}
+                  )}
+            </View>
           </View>}
 
         {(index < 4 || (index >= 14 && index <= 18)) &&
@@ -253,12 +259,14 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
                     mode='dropdown'
                   >
                     <Picker.Item
+                      style={{ color: 'white' }}
                       label='Select an answer...'
                       value=''
                     />
                     {EnumForEachQuestion.get(index).map((value, index) => {
                       return (
                         <Picker.Item
+                          style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
                           key={index}
                           label={value}
                           value={value}
@@ -292,6 +300,7 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
                       {Platform.OS !== 'web' &&
                         <View style={styles.wrapperInput}>
                           <TextInput
+                            placeholderTextColor='white'
                             style={styles.input}
                             placeholder='00:00'
                             value={answers[index]}
@@ -323,14 +332,17 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
                         mode='dropdown'
                       >
                         <Picker.Item
+                          style={{ color: 'white' }}
                           label='Select an answer...'
                           value=''
                         />
                         <Picker.Item
+                          style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
                           label='Yes'
                           value='true'
                         />
                         <Picker.Item
+                          style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
                           label='No'
                           value='false'
                         />
@@ -349,8 +361,8 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
   const renderSubmitButton = () => {
     return (
       <View>
-        <Text style={styles.textQuiz}>* Mandatory question</Text>
-        <Text style={styles.textQuiz}>** Mandatory question. You can only answer with numbers</Text>
+        <Text style={styles.mandatoryText}>* Mandatory question</Text>
+        <Text style={styles.mandatoryText2}>** Mandatory question. You can only answer with numbers</Text>
         <TouchableOpacity style={styles.button} onPress={handleSubmitAnswer}>
           <Text style={styles.text}>Submit</Text>
         </TouchableOpacity>
@@ -388,7 +400,12 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
         </ScrollView>
       </Modal>
 
-      <View style={styles.row}>
+      <View style={styles.container1}>
+
+        <Image
+          source={logo}
+          style={styles.logo}
+        />
         <Text style={styles.textTitle}>{name}</Text>
         <Pressable
           style={styles.button}
@@ -396,26 +413,30 @@ const PittsburghSleepQualityIndex = ({ accessToken, navigation, name, questions,
         >
           <Text style={styles.text}>See Instructions</Text>
         </Pressable>
-      </View>
-      <FlatList
-        data={result}
-        renderItem={renderQuestion}
-        keyExtractor={(item, index) => index}
-        nestedScrollEnabled
-        ListFooterComponent={renderSubmitButton}
-        removeClippedSubviews={false}
-      />
 
+        <FlatList
+          data={result}
+          renderItem={renderQuestion}
+          keyExtractor={(item, index) => index}
+          nestedScrollEnabled
+          ListFooterComponent={renderSubmitButton}
+          removeClippedSubviews
+        />
+      </View>
     </KeyboardAvoidingView>
 
   )
 }
 
 const styles = StyleSheet.create({
+  container1: {
+    alignItems: 'center'
+  },
   container: {
     justifyContent: 'center',
-    marginBottom: 50,
-    marginHorizontal: 20
+    marginBottom: 35,
+    marginHorizontal: 20,
+    alignItems: 'center'
   },
 
   wrapperInput: {
@@ -424,8 +445,7 @@ const styles = StyleSheet.create({
     borderColor: 'white',
     marginTop: 10,
     alignItems: 'center',
-    height: 50,
-    width: '75%'
+    width: '100%'
   },
 
   wrapperInputWrong: {
@@ -445,7 +465,9 @@ const styles = StyleSheet.create({
 
   input: {
     padding: 10,
-    width: '100%'
+    width: '100%',
+    color: 'white',
+    fontWeight: '400'
   },
 
   wrapperIcon: {
@@ -485,7 +507,9 @@ const styles = StyleSheet.create({
   textTitle: {
     color: 'white',
     fontWeight: 'bold',
-    textAlign: 'center'
+    textAlign: 'center',
+    alignContent: 'center',
+    fontSize: 30
   },
 
   textFailed: {
@@ -513,7 +537,7 @@ const styles = StyleSheet.create({
   hasDesc: {
     marginLeft: 30,
     borderLeftWidth: 10,
-    borderColor: 'black'
+    borderColor: 'white'
   },
 
   row: {
@@ -550,13 +574,36 @@ const styles = StyleSheet.create({
   },
 
   textQuiz: {
+    marginTop: 15,
     color: 'white',
-    textAlign: 'center'
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  textQuizSub: {
+    marginTop: 15,
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 15,
+    fontWeight: 'bold'
   },
 
   modalText: {
     marginBottom: 15,
     textAlign: 'center'
+  },
+  mandatoryText: {
+    marginTop: 25,
+    color: 'white',
+    textAlign: 'left'
+  },
+  mandatoryText2: {
+    color: 'white',
+    textAlign: 'left'
+  },
+  logo: {
+    height: 100,
+    width: 100
   }
 })
 

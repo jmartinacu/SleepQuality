@@ -132,6 +132,7 @@ const PasswordChangeVerification = ({ navigation, email }) => {
           <View>
             <View style={styles.wrapperInputWrong}>
               <TextInput
+                placeholderTextColor='white'
                 style={styles.input}
                 placeholder='XXXXX'
                 inputMode='numeric'

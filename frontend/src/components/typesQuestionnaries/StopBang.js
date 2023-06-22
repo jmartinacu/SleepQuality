@@ -1,12 +1,12 @@
 import { Picker } from '@react-native-picker/picker'
 import { useEffect, useState } from 'react'
-import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
 import { createAswer, getDefaultInfo } from '../../api/ApiQuestionnaries'
 
-const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo, instructions }) => {
+const StopBang = ({ n, logo, id, accessToken, navigation, name, questions, additionalInfo, instructions }) => {
   const [modalVisible, setModalVisible] = useState(false)
 
-  const [answers, setAnswers] = useState(new Array(8).fill(''))
+  const [answers, setAnswers] = useState(new Array(n).fill(''))
   const [answer4, setAnswer4] = useState('')
   const [answer5, setAnswer5] = useState('')
   const [answer7, setAnswer7] = useState('')
@@ -17,7 +17,6 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
     getDefaultInfo(accessToken, id)
       .then(result => {
         if (result.status === 200) {
-          console.log(result.data)
           if (result.data !== []) {
             const copy = [...answers]
             for (const obj of result.data) {
@@ -32,7 +31,6 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
               }
               copy.splice(obj.index, 0, obj.answer)
             }
-            console.log(copy)
             setAnswers(copy)
           }
         } else {
@@ -107,14 +105,17 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
               mode='dropdown'
             >
               <Picker.Item
+                style={{ color: 'white' }}
                 label='Select an answer...'
                 value=''
               />
               <Picker.Item
+                style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
                 label='Yes'
                 value='true'
               />
               <Picker.Item
+                style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
                 label='No'
                 value='false'
               />
@@ -122,23 +123,25 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
           </View>}
 
         {index === 5 &&
-          <View>
+          <View style={styles.picker}>
             {answer5
               ? (
-                <Text>YES</Text>
+                <Text style={styles.answer}>YES</Text>
                 )
               : (
-                <Text>NO</Text>
+                <Text style={styles.answer}>NO</Text>
                 )}
           </View>}
         {index === 4 &&
           <View>
-            <Text>BMI: {answer4} kg/m^2</Text>
-            <Text>If you need to update your height or weight go to your ptoffile information</Text>
+            <View style={styles.picker}>
+              <Text style={styles.answer}>BMI: {answer4} kg/m^2</Text>
+            </View>
+            <Text style={styles.comment}>If you need to update your height or weight go to your proffile information</Text>
           </View>}
         {index === 7 &&
-          <View>
-            <Text>{answer7}</Text>
+          <View style={styles.picker}>
+            <Text style={styles.answer}>{answer7}</Text>
           </View>}
       </View>
 
@@ -148,7 +151,7 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
   const renderSubmitButton = () => {
     return (
       <View>
-        <Text style={styles.textQuiz}>* Mandatory question</Text>
+        <Text style={styles.mandatoryText}>* Mandatory question</Text>
         <TouchableOpacity style={styles.button} onPress={handleSubmitAnswer}>
           <Text style={styles.text}>Submit</Text>
         </TouchableOpacity>
@@ -186,7 +189,12 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
         </ScrollView>
       </Modal>
 
-      <View style={styles.row}>
+      <View style={styles.container1}>
+
+        <Image
+          source={logo}
+          style={styles.logo}
+        />
         <Text style={styles.textTitle}>{name}</Text>
         <Pressable
           style={styles.button}
@@ -194,25 +202,29 @@ const StopBang = ({ id, accessToken, navigation, name, questions, additionalInfo
         >
           <Text style={styles.textStyle}>See Instructions</Text>
         </Pressable>
-      </View>
-      <FlatList
-        data={result}
-        renderItem={renderQuestion}
-        keyExtractor={(item, index) => index}
-        nestedScrollEnabled
-        ListFooterComponent={renderSubmitButton}
-        removeClippedSubviews={false}
-      />
 
+        <FlatList
+          data={result}
+          renderItem={renderQuestion}
+          keyExtractor={(item, index) => index}
+          nestedScrollEnabled
+          ListFooterComponent={renderSubmitButton}
+          removeClippedSubviews
+        />
+      </View>
     </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
+  container1: {
+    alignItems: 'center'
+  },
   container: {
     justifyContent: 'center',
-    marginBottom: 50,
-    marginHorizontal: 20
+    marginBottom: 35,
+    marginHorizontal: 20,
+    alignItems: 'center'
   },
 
   button: {
@@ -232,7 +244,9 @@ const styles = StyleSheet.create({
   textTitle: {
     color: 'white',
     fontWeight: 'bold',
-    textAlign: 'center'
+    textAlign: 'center',
+    alignContent: 'center',
+    fontSize: 30
   },
 
   textFailed: {
@@ -282,13 +296,37 @@ const styles = StyleSheet.create({
   },
 
   textQuiz: {
+    marginTop: 15,
     color: 'white',
-    textAlign: 'center'
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold'
   },
 
   modalText: {
     marginBottom: 15,
     textAlign: 'center'
+  },
+  mandatoryText: {
+    marginTop: 25,
+    color: 'white',
+    textAlign: 'left'
+  },
+  logo: {
+    height: 100,
+    width: 100
+  },
+  answer: {
+    color: 'white',
+    fontSize: 15,
+    textAlign: 'center'
+  },
+  comment: {
+    color: 'white',
+    fontSize: 10,
+    textAlign: 'center',
+    marginTop: 10,
+    fontWeight: 'bold'
   }
 })
 

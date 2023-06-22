@@ -63,3 +63,92 @@ export const b64toBlob = (b64Data, contentType = '', sliceSize = 512) => {
   const blob = new Blob(byteArrays, { type: contentType })
   return blob
 }
+
+export const handleAnswersToGraphicByNQuestion = (lista, n) => {
+  const map = new Map()
+  if (n === 0 || n === 5 || n === 9) {
+    map.set('Monday', 'No Data')
+    map.set('Tuesday', 'No Data')
+    map.set('Wednesday', 'No Data')
+    map.set('Thursday', 'No Data')
+    map.set('Friday', 'No Data')
+    map.set('Saturday', 'No Data')
+    map.set('Sunday', 'No Data')
+  } else {
+    map.set('Monday', 0)
+    map.set('Tuesday', 0)
+    map.set('Wednesday', 0)
+    map.set('Thursday', 0)
+    map.set('Friday', 0)
+    map.set('Saturday', 0)
+    map.set('Sunday', 0)
+  }
+  for (let i = 0; i < 7; i++) {
+    const answer = lista[i]
+    if (answer !== undefined) {
+      const answersToRender = Object.entries(answer.answers)
+        .reduce((accumulator, current) => {
+          const obj = {
+            question: current[0],
+            answer: current[1]
+          }
+          accumulator.push(obj)
+          return accumulator
+        }, [])
+      const date = new Date(answer.createdAt)
+      switch (date.getDay()) {
+        case 1 :
+          map.set('Monday', answersToRender[n].answer)
+          break
+        case 2:
+          map.set('Tuesday', answersToRender[n].answer)
+          break
+        case 3:
+          map.set('Wednesday', answersToRender[n].answer)
+          break
+        case 4:
+          map.set('Thursday', answersToRender[n].answer)
+          break
+        case 5:
+          map.set('Friday', answersToRender[n].answer)
+          break
+        case 6:
+          map.set('Saturday', answersToRender[n].answer)
+          break
+        case 0:
+          map.set('Sunday', answersToRender[n].answer)
+          break
+      }
+    }
+  }
+  return map
+}
+
+// export const checkPermissionsToExport = async (url, token) => {
+//   try {
+//     const isPermittedExternalStorage = await PermissionsAndroid.check(
+//       PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+//     )
+
+//     if (!isPermittedExternalStorage) {
+//       const granted = await PermissionsAndroid.request(
+//         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+//         {
+//           title: 'Storage permission',
+//           buttonNeutral: 'Ask Me Later',
+//           buttonNegative: 'Cancel',
+//           buttonPositive: 'OK'
+//         }
+//       )
+//       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+//         exportToExcell(url, token)
+//         console.log('Permission granted')
+//       } else {
+//         console.log('Permission denied')
+//       }
+//     }
+//   } catch (err) {
+//     console.log('Error while checking permission')
+//     console.log(err)
+//   }
+// }

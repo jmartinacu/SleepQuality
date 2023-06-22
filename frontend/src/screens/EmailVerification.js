@@ -1,5 +1,5 @@
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { View, StyleSheet, Image } from 'react-native'
+import { StyleSheet, Image } from 'react-native'
 import RegisterVerification from '../components/users/RegisterVerification'
 import ForgotPasswordVerification from '../components/users/ForgotPasswordVerification'
 import PasswordChangeVerification from '../components/users/PasswordChangeVerification'
@@ -23,13 +23,13 @@ const EmailVerification = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 50,
     backgroundColor: '#191970'
   },
   image: {
     height: 150,
     width: '100%',
-    marginBottom: 20
+    marginBottom: 20,
+    marginTop: 50
   }
 })
 

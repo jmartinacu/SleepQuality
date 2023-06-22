@@ -6,6 +6,8 @@ import { EmptyProffile } from '../assests/perfil'
 import * as ImagePicker from 'expo-image-picker'
 import RegisterForm from '../components/users/RegisterForm'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { ScrollView } from 'react-native-gesture-handler'
 
 const Proffile = ({ navigation }) => {
   const [accessToken, setAccessToken] = useState(null)
@@ -54,7 +56,6 @@ const Proffile = ({ navigation }) => {
       } else if (isDoctor === 'false') {
         userGetNewAccessToken(refreshToken)
           .then(result => {
-            console.log(result)
             if (result.status === 200) {
               setAccessToken(result.data.accessToken)
               AsyncStorage.setItem('accessToken', result.data.accessToken)
@@ -73,13 +74,8 @@ const Proffile = ({ navigation }) => {
                     setError(true)
                   }
                 })
-
-              userGetProffilePic(accessToken)
-                .then(result => {
-                  if (result.status === 200) {
-                    // setImage(result.data.base64)
-                  }
-                })
+            } else {
+              navigation.replace('TextAndButton', { text: 'Session Expired. Log in again', button: 'Go Login', direction: 'Login' })
             }
           })
       }
@@ -93,98 +89,106 @@ const Proffile = ({ navigation }) => {
     AsyncStorage.removeItem('isDoctor')
   }
 
-  const handleAddPic = async () => {
-    // No permissions request is necessary for launching the image library
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-      base64: true
-    })
+  // const handleAddPic = async () => {
+  //   // No permissions request is necessary for launching the image library
+  //   const result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //     base64: true
+  //   })
 
-    console.log(result)
+  //   if (!result.canceled) {
+  //     setImage(result.assets[0].uri)
+  //     const [imageInfo, imageBase64] = result.assets[0].uri.split(',')
+  //     const [dataAndContentType] = imageInfo.split(';')
+  //     const [, contentType] = dataAndContentType.split(':')
+  //     console.log({ imageInfo, imageBase64, contentType })
+  //     const blobImage = b64toBlob(imageBase64, contentType)
+  //     const file = new global.File(blobImage, new Date() + '_profile', {
+  //       type: contentType
+  //     })
+  //     console.log(blobImage.type)
+  //     console.log(blobImage.size)
+  //     const formData = new FormData()
+  //     formData.append('profilePicture', {
+  //       name: new Date() + '_profile',
+  //       uri: file,
+  //       type: contentType
+  //     })
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri)
-      const [imageInfo, imageBase64] = result.assets[0].uri.split(',')
-      const [dataAndContentType] = imageInfo.split(';')
-      const [, contentType] = dataAndContentType.split(':')
-      console.log({ imageInfo, imageBase64, contentType })
-      const blobImage = b64toBlob(imageBase64, contentType)
-      const file = new global.File(blobImage, new Date() + '_profile', {
-        type: contentType
-      })
-      console.log(blobImage.type)
-      console.log(blobImage.size)
-      const formData = new FormData()
-      formData.append('profilePicture', {
-        name: new Date() + '_profile',
-        uri: file,
-        type: contentType
-      })
-
-      userAddProffilePic(formData, accessToken)
-        .then(res => {
-          console.log(res)
-        })
-    }
-  }
+  //     userAddProffilePic(formData, accessToken)
+  //       .then(res => {
+  //         console.log(res)
+  //       })
+  //   }
+  // }
 
   return (
+    <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }}>
+      <View style={styles.container1}>
 
-    <View style={styles.container}>
+        {error || name === '' || isDoctor === null
+          ? (
+            <Text style={{ color: 'white' }}>Loading...</Text>
+            )
+          : (
+            <View>
+              <View style={{ alignItems: 'center', marginBottom: 25, marginTop: 20 }}>
+                {isDoctor === 'true'
+                  ? (
+                    <Text style={styles.textTitle}>Doctor Proffile</Text>
+                    )
+                  : (
+                    <Text style={styles.textTitle}>Patient Proffile</Text>
+                    )}
+                <View style={{ alignItems: 'center', marginBottom: 60 }}>
+                  <Text style={styles.textName}>{name}</Text>
+                  <Text style={styles.subText}>{email}</Text>
+                  {isDoctor === 'true' && typeof birthDate === 'string' && <Text style={styles.subText}>{birthDate.split('T')[0].split('-')[0]}</Text>}
+                  {isDoctor === 'false' && typeof birthDate === 'string' && <Text style={styles.subText}>{birthDate.split('T')[0]}</Text>}
+                  {isDoctor === 'false' && <Text style={styles.subText}>BMI: {BMI} kg/m^2</Text>}
+                </View>
+              </View>
+              {isDoctor === 'false' &&
+                <ScrollView>
 
-      {error || name === '' || isDoctor === null
-        ? (
-          <Text style={{ color: 'white' }}>Loading...</Text>
-          )
-        : (
-          <View style={styles.container}>
-
-            {isDoctor === 'true'
-              ? (
-                <Text style={styles.textTitle}>Doctor</Text>
-                )
-              : (
-                <TouchableOpacity
-                  onPress={handleAddPic}
-                  activeOpacity={0.5}
-                >
-                  <Image
-                    source={image}
-                    style={styles.proffileImage}
+                  <RegisterForm
+                    navigation={navigation} update heightU={height} weightU={weight} genderU={gender} chronicDisordersU={chronicDisorders} token={accessToken}
                   />
-                </TouchableOpacity>
-                )}
+                </ScrollView>}
 
-            <Text>{name}</Text>
-            <Text>{email}</Text>
-            {typeof birthDate === 'string' && <Text>{birthDate.split('T')[0]}</Text>}
-            {isDoctor === 'false' && <Text>{BMI} kg/m^2</Text>}
-            {isDoctor === 'false' && <RegisterForm navigation={navigation} update heightU={height} weightU={weight} genderU={gender} chronicDisordersU={chronicDisorders} token={accessToken} />}
-
-            <Button
-              onPress={handleLogOut}
-              title='Log out'
-            />
-            <TouchableOpacity
-              onPress={() => navigation.push('DeleteAccount', { accessToken, isDoctor })}
-            >
-              <Text>Delete account</Text>
-            </TouchableOpacity>
-          </View>
-          )}
-    </View>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleLogOut}
+              >
+                <Text style={styles.textLogin}>Log out</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.forgotPass}
+                onPress={() => navigation.push('DeleteAccount', { accessToken, isDoctor })}
+              >
+                <Text style={styles.underline}>Delete account</Text>
+              </TouchableOpacity>
+            </View>
+            )}
+      </View>
+    </KeyboardAwareScrollView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container1: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-around',
     backgroundColor: '#191970'
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#191970',
+    alignItems: 'center',
+    marginBottom: 0
   },
   tabBarStyle: {
     flex: 1,
@@ -200,7 +204,47 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
-    fontSize: 30
+    fontSize: 30,
+    marginBottom: 10,
+    textDecorationLine: 'underline'
+  },
+  textName: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 25
+  },
+  forgotPass: {
+    alignSelf: 'center',
+    padding: 10,
+    flexDirection: 'row'
+  },
+  underline: {
+    textDecorationLine: 'underline',
+    color: 'white'
+  },
+  button: {
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FF7F50',
+    borderRadius: 5
+  },
+  buttonDisable: {
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    borderRadius: 5
+  },
+  textLogin: {
+    color: '#191970',
+    fontWeight: '700'
+  },
+  subText: {
+    color: 'white',
+    fontSize: 15,
+    padding: 5
   }
 })
 
