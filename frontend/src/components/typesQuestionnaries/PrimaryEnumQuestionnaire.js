@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { createAswer } from '../../api/ApiQuestionnaries'
-import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
 import { Picker } from '@react-native-picker/picker'
 
-const PrimaryEnumQuestionnaire = ({ n, accessToken, navigation, name, questions, additionalInfo, instructions }) => {
+const PrimaryEnumQuestionnaire = ({ logo, n, accessToken, navigation, name, questions, additionalInfo, instructions }) => {
   const [modalVisible, setModalVisible] = useState(false)
 
   const [answers, setAnswers] = useState(new Array(n).fill(''))
@@ -89,12 +89,14 @@ const PrimaryEnumQuestionnaire = ({ n, accessToken, navigation, name, questions,
                 mode='dropdown'
               >
                 <Picker.Item
+                  style={{ color: 'white' }}
                   label='Select an answer...'
                   value=''
                 />
                 {EnumForEachQuestion.get(index).map((value, index) => {
                   return (
                     <Picker.Item
+                      style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
                       key={index}
                       label={value}
                       value={value}
@@ -113,8 +115,8 @@ const PrimaryEnumQuestionnaire = ({ n, accessToken, navigation, name, questions,
   const renderSubmitButton = () => {
     return (
       <View>
-        <Text style={styles.textQuiz}>* Mandatory question</Text>
-        <TouchableOpacity style={styles.button} onPress={handleSubmitAnswer}>
+        <Text style={styles.mandatoryText}>* Mandatory question</Text>
+        <TouchableOpacity style={styles.buttonSubmit} onPress={handleSubmitAnswer}>
           <Text style={styles.text}>Submit</Text>
         </TouchableOpacity>
         <Text style={styles.textFailed}>{error}</Text>
@@ -151,35 +153,54 @@ const PrimaryEnumQuestionnaire = ({ n, accessToken, navigation, name, questions,
         </ScrollView>
       </Modal>
 
-      <View style={styles.row}>
+      <View style={styles.container1}>
+        <Image
+          source={logo}
+          style={styles.logo}
+        />
         <Text style={styles.textTitle}>{name}</Text>
+
         <Pressable
           style={styles.button}
           onPress={() => setModalVisible(true)}
         >
           <Text style={styles.textStyle}>See Instructions</Text>
         </Pressable>
+
+        <FlatList
+          data={result}
+          renderItem={renderQuestion}
+          keyExtractor={(item, index) => index}
+          nestedScrollEnabled
+          ListFooterComponent={renderSubmitButton}
+          removeClippedSubviews
+        />
       </View>
-      <FlatList
-        data={result}
-        renderItem={renderQuestion}
-        keyExtractor={(item, index) => index}
-        nestedScrollEnabled
-        ListFooterComponent={renderSubmitButton}
-        removeClippedSubviews={false}
-      />
 
     </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
+  container1: {
+    alignItems: 'center'
+  },
   container: {
     justifyContent: 'center',
-    marginBottom: 50,
-    marginHorizontal: 20
+    marginBottom: 35,
+    marginHorizontal: 20,
+    alignItems: 'center',
+    marginTop: 20
   },
   button: {
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FF5F50',
+    borderRadius: 5,
+    marginTop: 25
+  },
+  buttonSubmit: {
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
@@ -196,7 +217,9 @@ const styles = StyleSheet.create({
   textTitle: {
     color: 'white',
     fontWeight: 'bold',
-    textAlign: 'center'
+    textAlign: 'center',
+    alignContent: 'center',
+    fontSize: 30
   },
 
   textFailed: {
@@ -245,13 +268,25 @@ const styles = StyleSheet.create({
   },
 
   textQuiz: {
+    marginTop: 15,
     color: 'white',
-    textAlign: 'center'
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold'
   },
 
   modalText: {
     marginBottom: 15,
     textAlign: 'center'
+  },
+  mandatoryText: {
+    marginTop: 25,
+    color: 'white',
+    textAlign: 'left'
+  },
+  logo: {
+    height: 100,
+    width: 100
   }
 })
 

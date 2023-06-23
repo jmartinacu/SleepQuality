@@ -41,7 +41,7 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
     const regex = /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u
 
     setName(text)
-    if (regex.test(text)) {
+    if (regex.test(text) && text.split(' ').length > 1 && (text.split(' ')[1] !== '' && text.split(' ')[1] !== undefined)) {
       setCheckValidName(false)
     } else {
       setCheckValidName(true)
@@ -212,7 +212,6 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
         chronicDisorders: chronicDisorders === '' ? null : chronicDisorders.trim()
       }, token)
         .then(result => {
-          console.log(result)
           if (result.status === 200) {
             setStatus('')
             navigation.replace('TextAndButton', { text: 'User Data Successfully Updated', button: 'Go Home', direction: 'Home' })
@@ -228,9 +227,26 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
   }
 
   return (
-    <View style={styles.container}>
+    <View style={{
+      flex: 1,
+      justifyContent: 'center',
+      marginHorizontal: update ? 0 : 20,
+      marginBottom: 25,
+      backgroundColor: '#191970',
+      borderColor: 'white',
+      borderWidth: update ? 0.5 : 0,
+      borderRadius: 10
+    }}
+    >
 
-      <View style={styles.container}>
+      <View style={{
+        flex: 1,
+        justifyContent: 'center',
+        marginHorizontal: update ? 10 : 20,
+        marginBottom: 25,
+        backgroundColor: '#191970'
+      }}
+      >
 
         {!update &&
 
@@ -241,7 +257,7 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
               ? (
                 <View>
                   <View style={styles.wrapperInputWrong}>
-                    <Text style={styles.floatingLabel}>Name</Text>
+                    <Text style={styles.floatingLabel}>Name & LastName</Text>
                     <TextInput
                       style={styles.input}
                       value={name}
@@ -250,13 +266,13 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
                       maxLength={40}
                     />
                   </View>
-                  <Text style={styles.textFailed}>Name can not contain Numbers or Symbols</Text>
+                  <Text style={styles.textFailed}>You need to fill both Name and LastName. They can not contain Numbers or Symbols</Text>
                 </View>
                 )
               : (
                 <View>
                   <View style={styles.wrapperInput}>
-                    <Text style={styles.floatingLabel}>Name</Text>
+                    <Text style={styles.floatingLabel}>Name & LastName</Text>
                     <TextInput
                       style={styles.input}
                       value={name}
@@ -402,21 +418,22 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
           </View>}
 
         {/* HORIZONTAL LINE */}
-        <View
-          style={{
-            marginTop: 20,
-            borderBottomColor: 'white',
-            // borderBottomWidth: StyleSheet.hairlineWidth
-            borderBottomWidth: 5
-          }}
-        />
+        {!update &&
+          <View
+            style={{
+              marginTop: 20,
+              borderBottomColor: 'white',
+              // borderBottomWidth: StyleSheet.hairlineWidth
+              borderBottomWidth: 5
+            }}
+          />}
 
         <View style={styles.wrapperInputRow}>
 
           {/* INPUT HEIGHT */}
           {checkValidHeight
             ? (
-              <View style={styles.wrapperInputWrong}>
+              <View style={styles.wrapperInputWrongHalf}>
                 <Text style={styles.floatingLabel}>Height (cm)</Text>
                 <TextInput
                   style={styles.input}
@@ -431,7 +448,7 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
 
               )
             : (
-              <View style={styles.wrapperInput}>
+              <View style={styles.wrapperInputHalf}>
                 <Text style={styles.floatingLabel}>Height (cm)</Text>
                 <TextInput
                   style={styles.input}
@@ -448,7 +465,7 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
           {/* INPUT WEIGHT */}
           {checkValidWeight
             ? (
-              <View style={styles.wrapperInputWrong}>
+              <View style={styles.wrapperInputWrongHalf}>
                 <Text style={styles.floatingLabel}>Weight (kg)</Text>
                 <TextInput
                   style={styles.input}
@@ -462,7 +479,7 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
               </View>
               )
             : (
-              <View style={styles.wrapperInput}>
+              <View style={styles.wrapperInputHalf}>
                 <Text style={styles.floatingLabel}>Weight (kg)</Text>
                 <TextInput
                   style={styles.input}
@@ -548,14 +565,17 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
               mode='dropdown'
             >
               <Picker.Item
+                style={{ color: 'white' }}
                 label='Other'
                 value='NEUTER'
               />
               <Picker.Item
+                style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
                 label='Male'
                 value='MASCULINE'
               />
               <Picker.Item
+                style={{ color: 'white', backgroundColor: '#FF5F50', fontWeight: 'bold' }}
                 label='Female'
                 value='FEMININE'
               />
@@ -633,7 +653,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     marginHorizontal: 20,
-    marginBottom: 50
+    marginBottom: 25,
+    backgroundColor: '#191970'
   },
 
   wrapperInput: {
@@ -652,6 +673,25 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignItems: 'center',
     height: 50
+  },
+  wrapperInputHalf: {
+    borderWidth: 0.5,
+    borderRadius: 5,
+    borderColor: 'white',
+    marginTop: 10,
+    alignItems: 'center',
+    height: 50,
+    width: '40%'
+  },
+
+  wrapperInputWrongHalf: {
+    borderWidth: 0.5,
+    borderRadius: 5,
+    borderColor: 'red',
+    marginTop: 10,
+    alignItems: 'center',
+    height: 50,
+    width: '40%'
   },
 
   wrapperInputRow: {
@@ -726,7 +766,7 @@ const styles = StyleSheet.create({
   picker: {
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: '#191970',
+    borderColor: 'white',
     marginTop: 10
   },
   birthdate: {

@@ -1,16 +1,22 @@
 import { useEffect, useState } from 'react'
-import { View, StyleSheet, Image, TouchableOpacity, Text, TextInput, FlatList } from 'react-native'
-import { getQuestionnaires } from '../api/ApiQuestionnaries'
-import { getItemFromStorage } from '../utils/Utils'
+import { View, StyleSheet, TouchableOpacity, Text, TextInput, FlatList, Dimensions } from 'react-native'
+import { getAnswers, getConsensusMorning, getQuestionnaires } from '../api/ApiQuestionnaries'
+import { getItemFromStorage, handleAnswersToGraphicByNQuestion } from '../utils/Utils'
 import PreviewQuestionnaire from '../components/questionnaries/PreviewQuestionnarie'
 import { CSDN, CSDM, AIS, ESS, IRLS, ISI, PSQ, PSQI, SB } from '../assests/questionnarieLogo'
-import { userAddUserToDoctor, userCreateDoctor, userDoctorGetNewAccessToken, userGetNewAccessToken, userIsAdmin } from '../api/ApiUser'
+import { doctorGetPatients, userAddUserToDoctor, userCreateDoctor, userDoctorGetNewAccessToken, userGetNewAccessToken, userIsAdmin } from '../api/ApiUser'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import PreviewPatient from '../components/users/PreviewPatient'
+import { EmptyProffile } from '../assests/perfil'
+import { BarChart } from 'react-native-chart-kit'
+import { Table, TableWrapper, Row, Rows, Col } from 'react-native-table-component'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 const Home = ({ navigation }) => {
   const [questionnaires, setQuestionnaires] = useState([])
   const [patients, setPatients] = useState([])
+  const [answers, setAnswers] = useState([])
+  const [tableData, setTableData] = useState([])
 
   const [email, setEmail] = useState('')
   const [checkValidEmail, setCheckValidEmail] = useState(false)
@@ -34,6 +40,12 @@ const Home = ({ navigation }) => {
             if (result.status === 200) {
               setAccessToken(result.data.accessToken)
               AsyncStorage.setItem('accessToken', result.data.accessToken)
+              doctorGetPatients(result.data.accessToken)
+                .then(resultP => {
+                  if (resultP.status === 200) {
+                    setPatients(resultP.data)
+                  }
+                })
             } else {
               navigation.replace('TextAndButton', { text: 'Session Expired. Log in again', button: 'Go Login', direction: 'Login' })
             }
@@ -57,6 +69,33 @@ const Home = ({ navigation }) => {
                           setQuestionnaires(resultQ.data)
                         } else {
                           setError(true)
+                          console.log(resultQ.data.message)
+                        }
+                      })
+                      .catch(err => {
+                        setError(true)
+                        console.error(err)
+                      })
+                    getConsensusMorning(result.data.accessToken)
+                      .then(resultQ => {
+                        if (resultQ.status === 200) {
+                          setAnswers(resultQ.data)
+                          let data = [
+                            Array.from(handleAnswersToGraphicByNQuestion(resultQ.data, 0).values()),
+                            Array.from(handleAnswersToGraphicByNQuestion(resultQ.data, 5).values()),
+                            Array.from(handleAnswersToGraphicByNQuestion(resultQ.data, 9).values())
+                          ]
+
+                          data = [
+                            [data[0][0], data[1][0], data[2][0]],
+                            [data[0][1], data[1][1], data[2][1]],
+                            [data[0][2], data[1][2], data[2][2]],
+                            [data[0][3], data[1][3], data[2][3]],
+                            [data[0][4], data[1][4], data[2][4]],
+                            [data[0][5], data[1][5], data[2][5]],
+                            [data[0][6], data[1][6], data[2][6]]]
+                          setTableData(data)
+                        } else {
                           console.log(resultQ.data.message)
                         }
                       })
@@ -118,20 +157,31 @@ const Home = ({ navigation }) => {
     }
 
     return (
-      <PreviewQuestionnaire logo={logo} navigation={navigation} id={item.id} name={item.name} />
+      <PreviewQuestionnaire fill logo={logo} navigation={navigation} id={item.id} name={item.name} />
     )
   }
 
   const renderPatients = ({ index, item }) => {
+    let profPic = item.profPic
+    if (profPic === undefined) {
+      profPic = EmptyProffile
+    } else {
+      profPic = item.profPic
+    }
     return (
-      <Text>H</Text>
-      // <PreviewPatient profPic={item.profPic} navigation={navigation} id={item.id} name={item.name} />
+      <PreviewPatient profPic={profPic} navigation={navigation} id={item.id} name={item.name} email={item.email} />
     )
   }
 
-  const renderEmptyList = () => {
+  const renderEmptyPatientsList = () => {
     return (
-      <Text>Loading...</Text>
+      <Text style={styles.text}>You have no patients yet</Text>
+    )
+  }
+
+  const renderEmptyQuestionnaireList = () => {
+    return (
+      <Text style={styles.text}>You have no questionnaires to do yet</Text>
     )
   }
 
@@ -139,7 +189,7 @@ const Home = ({ navigation }) => {
     if (email !== '') {
       userCreateDoctor(accessToken, email)
         .then(result => {
-          if (result.status === 200) {
+          if (result.status === 201) {
             navigation.replace('TextAndButton', { text: `Doctor ${email} has been correctly approved`, button: 'Go Home', direction: 'Home' })
           } else if (result.status === 404) {
             setErrorCreateDoctor('User not found or already a doctor')
@@ -161,95 +211,159 @@ const Home = ({ navigation }) => {
     }
   }
 
+  const tableHead = ['', 'Get into bed', 'Final Awakening', 'Get out of bed']
+
   return (
     <View style={styles.tabBarStyle}>
 
+      {!isAdmin && isDoctor === 'false' && tableData !== [] &&
+        <View>
+          <View style={styles.container}>
+            <Table borderStyle={{ borderWidth: 1 }}>
+              <Row data={tableHead} flexArr={[1, 1, 1, 1]} style={styles.head} textStyle={styles.textTable} />
+              <TableWrapper style={styles.wrapper}>
+                <Col data={Array.from(handleAnswersToGraphicByNQuestion(answers, 0).keys())} style={styles.title} heightArr={[28, 28]} textStyle={styles.textTable} />
+                <Rows data={tableData} flexArr={[1, 1, 1]} style={styles.row} textStyle={styles.textTable} />
+              </TableWrapper>
+            </Table>
+            <Text style={styles.textHeaderFlatlist}>Fill In the Available Questionnaires:</Text>
+            <FlatList
+              data={questionnaires}
+              renderItem={renderQuestionnaires}
+              keyExtractor={(item, index) => index}
+              ListEmptyComponent={renderEmptyQuestionnaireList}
+            />
+          </View>
+          {/* <View>
+              <Text style={styles.textTitle}>Duration of Awakenings</Text>
+              <BarChart
+                data={{
+                  labels: Array.from(handleAnswersToGraphicByNQuestion(answers, 2).keys()),
+                  datasets: [
+                    {
+                      data: Array.from(handleAnswersToGraphicByNQuestion(answers, 2).values())
+                    }
+                  ],
+                  legend: ['Duration of Awakenings']
+                }}
+                width={Dimensions.get('window').width - 25} // from react-native
+                height={220}
+                yAxisSuffix=' min'
+                yAxisInterval={10} // optional, defaults to 1
+                chartConfig={{
+                  backgroundColor: '#e26a00',
+                  backgroundGradientFrom: '#fb8c00',
+                  backgroundGradientTo: '#ffa726',
+                  decimalPlaces: 0, // optional, defaults to 2dp
+                  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                  style: {
+                    borderRadius: 16
+                  },
+                  propsForDots: {
+                    r: '6',
+                    strokeWidth: '2',
+                    stroke: '#ffa726'
+                  }
+                }}
+                bezier
+                style={{
+                  marginVertical: 8,
+                  borderRadius: 16
+                }}
+              />
+            </View> */}
+        </View>}
       <View>
-        {(isAdmin || isDoctor === 'true') &&
-          <View>
-            {isAdmin && <Text>Introduce an email to make the user a doctor:</Text>}
-            {isDoctor === 'true' && <Text>Introduce an email to add the user to your patients list:</Text>}
-            {checkValidEmail
-              ? (
-                <View>
-                  <View style={styles.wrapperInputWrong}>
-                    <Text style={styles.floatingLabel}>Email</Text>
-                    <TextInput
-                      style={styles.input}
-                      inputMode='email'
-                      keyboardType='email-address'
-                      value={email}
-                      onChangeText={text => handleCheckEmail(text)}
-                      returnKeyType='done'
-                      maxLength={40}
-                    />
-                  </View>
-                  <Text style={styles.textFailed}>Wrong format email</Text>
-                </View>
-                )
-              : (
-                <View>
-                  <View style={styles.wrapperInput}>
-                    <Text style={styles.floatingLabel}>Email</Text>
-                    <TextInput
-                      style={styles.input}
-                      inputMode='email'
-                      keyboardType='email-address'
-                      value={email}
-                      onChangeText={text => handleCheckEmail(text)}
-                      returnKeyType='done'
-                      maxLength={40}
-                    />
-                  </View>
-                  <Text style={styles.textFailed}> </Text>
-                </View>
-                )}
-            {!checkValidEmail && email !== ''
-              ? (
-                <TouchableOpacity
-                  onPress={isDoctor === 'true' ? handleAddUserToDoctor : handleCreateDoctor}
-                  style={styles.button}
-                >
-                  {isDoctor === 'false' && <Text style={styles.textCreate}>Create Doctor</Text>}
-                  {isDoctor === 'true' && <Text style={styles.textCreate}>Add User to List of Patients</Text>}
+        <View>
+          <KeyboardAwareScrollView>
 
-                </TouchableOpacity>
-                )
-              : (
-                <TouchableOpacity
-                  onPress={handleCreateDoctor}
-                  style={styles.buttonDisable}
-                >
-                  {isDoctor === 'false' && <Text style={styles.textCreate}>Create Doctor</Text>}
-                  {isDoctor === 'true' && <Text style={styles.textCreate}>Add User to List of Patients</Text>}
-                </TouchableOpacity>
-                )}
-            <Text style={styles.textFailed}>{errorCreateDoctor}</Text>
-          </View>}
+            {(isAdmin || isDoctor === 'true') &&
+              <View>
+                {isAdmin && <Text style={styles.textTitle}>Admin</Text>}
+                {isAdmin && <Text style={styles.textHeaderFlatlist}>Introduce an email to make the user a doctor:</Text>}
+                {isDoctor === 'true' && <Text style={styles.textTitle}>Doctor</Text>}
+                {isDoctor === 'true' && <Text style={styles.textHeaderFlatlist}>Introduce an email to add the user to your patients list:</Text>}
+                {checkValidEmail
+                  ? (
+                    <View>
+                      <View style={styles.wrapperInputWrong}>
+                        <Text style={styles.floatingLabel}>Email</Text>
+                        <TextInput
+                          style={styles.input}
+                          inputMode='email'
+                          keyboardType='email-address'
+                          value={email}
+                          onChangeText={text => handleCheckEmail(text)}
+                          returnKeyType='done'
+                          maxLength={40}
+                        />
+                      </View>
+                      <Text style={styles.textFailed}>Wrong format email</Text>
+                    </View>
+                    )
+                  : (
+                    <View>
+                      <View style={styles.wrapperInput}>
+                        <Text style={styles.floatingLabel}>Email</Text>
+                        <TextInput
+                          style={styles.input}
+                          inputMode='email'
+                          keyboardType='email-address'
+                          value={email}
+                          onChangeText={text => handleCheckEmail(text)}
+                          returnKeyType='done'
+                          maxLength={40}
+                        />
+                      </View>
+                      <Text style={styles.textFailed}> </Text>
+                    </View>
+                    )}
+                {!checkValidEmail && email !== ''
+                  ? (
+                    <TouchableOpacity
+                      onPress={isDoctor === 'true' ? handleAddUserToDoctor : handleCreateDoctor}
+                      style={styles.button}
+                    >
+                      {isDoctor === 'false' && <Text style={styles.textCreate}>Create Doctor</Text>}
+                      {isDoctor === 'true' && <Text style={styles.textCreate}>Add User to List of Patients</Text>}
 
-        {isDoctor === 'true' &&
-          <FlatList
-            ListHeaderComponent={<Text>Patients List</Text>}
-            data={patients}
-            renderItem={renderPatients}
-            keyExtractor={(item, index) => index}
-            ListEmptyComponent={renderEmptyList}
-          />}
+                    </TouchableOpacity>
+                    )
+                  : (
+                    <TouchableOpacity
+                      onPress={handleCreateDoctor}
+                      style={styles.buttonDisable}
+                    >
+                      {isDoctor === 'false' && <Text style={styles.textCreate}>Create Doctor</Text>}
+                      {isDoctor === 'true' && <Text style={styles.textCreate}>Add User to List of Patients</Text>}
+                    </TouchableOpacity>
+                    )}
+                <Text style={styles.textFailed}>{errorCreateDoctor}</Text>
+              </View>}
+          </KeyboardAwareScrollView>
 
-        {!isAdmin && isDoctor === 'false' &&
-          <FlatList
-            data={questionnaires}
-            renderItem={renderQuestionnaires}
-            keyExtractor={(item, index) => index}
-            ListEmptyComponent={renderEmptyList}
-          />}
+          {isDoctor === 'true' &&
+            <View style={styles.container}>
+              <Text style={styles.textHeaderFlatlist2}>Patients List</Text>
+              <FlatList
+                data={patients}
+                renderItem={renderPatients}
+                keyExtractor={(item, index) => index}
+                ListEmptyComponent={renderEmptyPatientsList}
+              />
+            </View>}
+        </View>
       </View>
-
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  containerHome: {
+    flex: 1,
+    backgroundColor: '#191970'
+  },
   tabBarStyle: {
     flex: 1,
     alignItems: 'center',
@@ -325,7 +439,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: 'white',
-    fontWeight: '700'
+    textAlign: 'center'
   },
   textFailed: {
     alignSelf: 'flex-end',
@@ -333,6 +447,33 @@ const styles = StyleSheet.create({
   },
   activeButton: {
     color: 'white'
+  },
+  textTitle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 30
+  },
+  container: { flex: 1, padding: 16, paddingTop: 30, marginBottom: 30, width: Dimensions.get('window').width - 25 },
+  head: { height: 40, backgroundColor: '#FF7F50', borderTopRightRadius: 16, borderTopLeftRadius: 16 },
+  wrapper: { flexDirection: 'row' },
+  title: { flex: 1, backgroundColor: '#FF7F50' },
+  row: { height: 28 },
+  textTable: {
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: '700'
+  },
+  textHeaderFlatlist: {
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: '700',
+    paddingTop: 50
+  },
+  textHeaderFlatlist2: {
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: '700'
   }
 })
 

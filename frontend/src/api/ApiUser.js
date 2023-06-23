@@ -275,3 +275,72 @@ export const userAddUserToDoctor = async (token, email) => {
     return err.response
   }
 }
+
+export const doctorGetPatients = async (token) => {
+  try {
+    const result = await ApiManager('/doctors/users', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        Authorization: 'Bearer ' + token
+      }
+    })
+    return result
+  } catch (err) {
+    console.log(err.response)
+    return err.response
+  }
+}
+
+export const doctorGetPatientById = async (token, id) => {
+  try {
+    const result = await ApiManager(`/doctors/users/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        Authorization: 'Bearer ' + token
+      }
+    })
+    return result
+  } catch (err) {
+    console.log(err.response)
+    return err.response
+  }
+}
+
+export const doctorAssignQuestionnarieToUser = async (token, idUser, data) => {
+  try {
+    const result = await ApiManager(`/doctors/users/questionnaires/${idUser}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        Authorization: 'Bearer ' + token
+      },
+      data
+    })
+    return result
+  } catch (err) {
+    console.log(err.response)
+    return err.response
+  }
+}
+
+export const doctorGetAnswersOfUserByQuestionnarieId = async (token, idUser, idQuestionnarie) => {
+  try {
+    const result = await ApiManager(`/doctors/users/${idUser}/${idQuestionnarie}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        Authorization: 'Bearer ' + token
+      }
+    })
+    return result
+  } catch (err) {
+    console.log(err.response)
+    return err.response
+  }
+}

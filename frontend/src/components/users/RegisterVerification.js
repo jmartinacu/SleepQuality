@@ -7,13 +7,13 @@ const RegisterVerification = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text>
+      <Text style={styles.text}>
         We sent you a Verification Email
       </Text>
-      <Text>
+      <Text style={styles.text}>
         Check your email and verify your account
       </Text>
-      <Text>
+      <Text style={styles.text}>
         Are you already verified?
       </Text>
       <TouchableOpacity style={styles.button} onPress={handleVerification}>
@@ -38,9 +38,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 25
   },
-  text: {
+  textSend: {
     color: 'white',
     fontWeight: '700'
+  },
+  text: {
+    color: 'white',
+    fontWeight: '600'
   },
   textFailed: {
     alignSelf: 'flex-end',
