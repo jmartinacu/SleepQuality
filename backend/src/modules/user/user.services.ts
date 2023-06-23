@@ -374,8 +374,7 @@ async function saveCSV (
       case 'answers':
         if (typeof questionnaire !== 'undefined') {
           answers = await findUserQuestionnaireAnswer(userId, questionnaire)
-        }
-        answers = await findUserAnswers(userId)
+        } else answers = await findUserAnswers(userId)
         await saveAnswersCSV(answers, fileName)
         break
       case 'algorithms':

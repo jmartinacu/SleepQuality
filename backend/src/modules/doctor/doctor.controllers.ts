@@ -259,7 +259,6 @@ async function GetUserAnswersHandler (
     const { doctorId } = request.user as { doctorId: string }
     const { userId, questionnaireId } = request.params
     const { all } = request.query
-    console.log(all)
     let answer: Answer | Answer[] | null
     const user = await findUserUnique('id', userId)
     if (user === null) {
