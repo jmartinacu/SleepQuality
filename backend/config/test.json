@@ -1,4 +1,5 @@
 {
+  "nodeEnv": "",
   "port": 8080,
   "databaseUrl": "",
   "accessTokenKey": "",

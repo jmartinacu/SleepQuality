@@ -141,6 +141,9 @@ async function updateUserHandler (
   try {
     const { userId } = request.user as { userId: string }
     const data = request.body
+    if ('height' in data) {
+      data.height = (data.height as number) / 100
+    }
     await updateUser(userId, data)
     return await reply.send({ message: 'User updated' })
   } catch (error) {
@@ -297,7 +300,7 @@ async function forgotPasswordHandler (
     const html = htmlResetPasswordUser(passwordResetCode)
 
     await sendEmail({
-      from: 'test@example.com',
+      from: 'sleep.questionnaires@htwg-konstanz.de',
       to: user.email,
       html
     })

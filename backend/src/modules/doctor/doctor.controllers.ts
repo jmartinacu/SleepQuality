@@ -232,7 +232,7 @@ async function addDoctorToUserHandler (
     const html = htmlAddDoctor(user.id, doctorCode)
 
     await sendEmail({
-      from: 'test@example.com',
+      from: 'sleep.questionnaires@htwg-konstanz.de',
       to: user.email,
       html
     })
