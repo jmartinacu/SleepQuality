@@ -232,7 +232,7 @@ async function addDoctorToUserHandler (
     const html = htmlAddDoctor(user.id, doctorCode)
 
     await sendEmail({
-      from: 'test@example.com',
+      from: 'sleep.questionnaires@htwg-konstanz.de',
       to: user.email,
       html
     })
@@ -259,7 +259,6 @@ async function GetUserAnswersHandler (
     const { doctorId } = request.user as { doctorId: string }
     const { userId, questionnaireId } = request.params
     const { all } = request.query
-    console.log(all)
     let answer: Answer | Answer[] | null
     const user = await findUserUnique('id', userId)
     if (user === null) {

@@ -1,9 +1,9 @@
 {
+  "nodeEnv": "",
   "port": 8080,
   "databaseUrl": "",
   "accessTokenKey": "",
   "refreshTokenKey": "",
-  // NECESITO EL OUTGOING HOST
   "smpt": {
     "host": "",
     "port": 587,

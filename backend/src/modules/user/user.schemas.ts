@@ -428,6 +428,7 @@ const GetCSVDataSchema = {
   querystring: getCSVDataQueryStringSchema,
   response: {
     200: csvData,
+    404: errorResponseSchema,
     500: Type.Unknown()
   }
 }

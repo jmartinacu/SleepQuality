@@ -141,6 +141,9 @@ async function updateUserHandler (
   try {
     const { userId } = request.user as { userId: string }
     const data = request.body
+    if ('height' in data) {
+      data.height = (data.height as number) / 100
+    }
     await updateUser(userId, data)
     return await reply.send({ message: 'User updated' })
   } catch (error) {
@@ -297,7 +300,7 @@ async function forgotPasswordHandler (
     const html = htmlResetPasswordUser(passwordResetCode)
 
     await sendEmail({
-      from: 'test@example.com',
+      from: 'sleep.questionnaires@htwg-konstanz.de',
       to: user.email,
       html
     })
@@ -455,6 +458,12 @@ async function getCSVDataHandler (
   const fileName = `${userId}.csv`
   try {
     const { data, questionnaire } = request.query
+    if (typeof questionnaire !== 'undefined') {
+      const questionnaireDB = await findQuestionnaireUnique('name', questionnaire)
+      if (questionnaireDB === null) {
+        return await reply.code(404).send({ message: 'Questionnaire not found' })
+      }
+    }
     if (typeof data === 'undefined' || data === 'all') {
       await saveCSV(userId, fileName, 'all')
     } else if (data === 'algorithms') {
@@ -497,7 +506,6 @@ async function getQuestionnaireInformationHandler (
     const { userId } = request.user as { userId: string }
     const { id: questionnaireId } = request.params
     const { all, info } = request.query
-    console.log(all, info)
     let result: Answer |
     Answer[] |
     QuestionnaireAlgorithm |
@@ -526,7 +534,6 @@ async function getQuestionnaireInformationHandler (
       if (typeof all === 'undefined' || all) {
         const algorithms = await findQuestionnaireAlgorithmsOrderByCreatedAt(userId, questionnaireId)
         const answers = await findAnswers(questionnaireId, userId)
-        console.log({ algorithms, answers })
         result = {
           answers,
           algorithms
@@ -534,7 +541,6 @@ async function getQuestionnaireInformationHandler (
       } else {
         const answer = await findLastAnswer(questionnaireId, userId)
         const algorithm = await findLastQuestionnaireAlgorithms(userId, questionnaireId)
-        console.log({ answer, algorithm })
         if (answer === null && algorithm === null) {
           return await reply.send({ message: `The user ${userId} has never completed the questionnaire ${questionnaireId} ` })
         }
@@ -544,7 +550,6 @@ async function getQuestionnaireInformationHandler (
         }
       }
     }
-    console.log({ result })
     return await reply.send(result)
   } catch (error) {
     const processedError = errorCodeAndMessage(error)

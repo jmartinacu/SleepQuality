@@ -1,4 +1,5 @@
 {
+  "nodeEnv": "NODE_ENV",
   "accessTokenKey": "ACCESS_TOKEN_KEY",
   "refreshTokenKey": "REFRESH_TOKEN_KEY",
   "databaseUrl": "DATABASE_URL",
