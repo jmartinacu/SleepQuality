@@ -189,7 +189,7 @@ function htmlAddDoctor (userId: string, doctorCode: number): string {
   return `
     <div class="reset-user-password-card">
       <p>The code of the new doctor is: ${doctorCode}</p>
-      <a href="http://127.0.0.1:8080/api/users/doctors/${userId}/${doctorCode}">Click here to add doctor</a>
+      <a href="http://141.37.168.26/api/users/doctors/${userId}/${doctorCode}">Click here to add doctor</a>
     </div>
     <style>
       .reset-user-password-card {
