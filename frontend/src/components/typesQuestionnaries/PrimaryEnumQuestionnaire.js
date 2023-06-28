@@ -173,7 +173,8 @@ const PrimaryEnumQuestionnaire = ({ logo, n, accessToken, navigation, name, ques
           keyExtractor={(item, index) => index}
           nestedScrollEnabled
           ListFooterComponent={renderSubmitButton}
-          removeClippedSubviews
+          removeClippedSubviews={false}
+          keyboardDismissMode='none'
         />
       </View>
 

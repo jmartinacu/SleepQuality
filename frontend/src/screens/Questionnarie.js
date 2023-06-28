@@ -62,7 +62,7 @@ const Questionnarie = ({ navigation, route }) => {
           })
       }
     }
-  }, [accessToken, questions, isDoctor])
+  }, [accessToken, instructions, isDoctor])
 
   return (
 
@@ -73,7 +73,7 @@ const Questionnarie = ({ navigation, route }) => {
           )
         : (
           <View>
-            {questions === {}
+            {instructions === []
               ? (
                 <Text style={styles.errorMessage}>Loading...</Text>
                 )

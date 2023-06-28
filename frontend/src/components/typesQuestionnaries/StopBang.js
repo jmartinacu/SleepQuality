@@ -209,7 +209,8 @@ const StopBang = ({ n, logo, id, accessToken, navigation, name, questions, addit
           keyExtractor={(item, index) => index}
           nestedScrollEnabled
           ListFooterComponent={renderSubmitButton}
-          removeClippedSubviews
+          removeClippedSubviews={false}
+          keyboardDismissMode='none'
         />
       </View>
     </KeyboardAvoidingView>

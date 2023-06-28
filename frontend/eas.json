@@ -13,11 +13,6 @@
       "preview3": {
         "developmentClient": true
       },
-      "preview4": {
-        "ios": {
-          "buildType": "ipa"
-        }
-      },
       "production": {}
     }
   }

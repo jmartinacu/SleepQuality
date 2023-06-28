@@ -1,20 +1,16 @@
 import { useEffect, useState } from 'react'
-import { View, StyleSheet, Button, TouchableOpacity, Image, Text } from 'react-native'
-import { b64toBlob, getItemFromStorage } from '../utils/Utils'
-import { userAddProffilePic, userDoctorGetNewAccessToken, userGetDoctorData, userGetNewAccessToken, userGetProffilePic, userGetUserData } from '../api/ApiUser'
-import { EmptyProffile } from '../assests/perfil'
-import * as ImagePicker from 'expo-image-picker'
+import { View, StyleSheet, TouchableOpacity, Text, ScrollView } from 'react-native'
+import { getItemFromStorage } from '../utils/Utils'
+import { userDoctorGetNewAccessToken, userGetDoctorData, userGetNewAccessToken, userGetUserData } from '../api/ApiUser'
 import RegisterForm from '../components/users/RegisterForm'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { ScrollView } from 'react-native-gesture-handler'
 
 const Proffile = ({ navigation }) => {
   const [accessToken, setAccessToken] = useState(null)
   const [refreshToken, setRefreshToken] = useState(null)
   const [isDoctor, setIsDoctor] = useState(null)
 
-  const [image, setImage] = useState(EmptyProffile)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [height, setHeight] = useState('')
@@ -80,7 +76,7 @@ const Proffile = ({ navigation }) => {
           })
       }
     }
-  }, [accessToken, name, isDoctor])
+  }, [accessToken, name, isDoctor, gender])
 
   const handleLogOut = () => {
     navigation.replace('Login')
@@ -129,7 +125,7 @@ const Proffile = ({ navigation }) => {
     <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }}>
       <View style={styles.container1}>
 
-        {error || name === '' || isDoctor === null
+        {error || name === '' || isDoctor === null || height === ''
           ? (
             <Text style={{ color: 'white' }}>Loading...</Text>
             )
@@ -152,12 +148,14 @@ const Proffile = ({ navigation }) => {
                 </View>
               </View>
               {isDoctor === 'false' &&
-                <ScrollView>
+                <View style={{ height: 370 }}>
+                  <ScrollView>
 
-                  <RegisterForm
-                    navigation={navigation} update heightU={height} weightU={weight} genderU={gender} chronicDisordersU={chronicDisorders} token={accessToken}
-                  />
-                </ScrollView>}
+                    <RegisterForm
+                      navigation={navigation} update heightU={height} weightU={weight} genderU={gender} chronicDisordersU={chronicDisorders} token={accessToken}
+                    />
+                  </ScrollView>
+                </View>}
 
               <TouchableOpacity
                 style={styles.button}

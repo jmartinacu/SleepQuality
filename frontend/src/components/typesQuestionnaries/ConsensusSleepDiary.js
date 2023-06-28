@@ -177,8 +177,10 @@ const ConsensusSleepDiary = ({ logo, accessToken, navigation, name, questions, a
                     placeholder=''
                     value={answers[index]}
                     onChangeText={text => handleAddAnswer(text, index)}
-                    returnKeyType='done'
+                    returnKeyType='none'
                     maxLength={20}
+                    autoCorrect={false}
+                    keyboardType='visible-password'
                   />
                 </View>}
               {isText[index] && (name === 'Consensus Sleep Diary Morning' && (index === 0 || index === 5 || index === 9)) &&
@@ -197,8 +199,10 @@ const ConsensusSleepDiary = ({ logo, accessToken, navigation, name, questions, a
                         placeholder='00:00'
                         value={answers[index]}
                         onChangeText={text => handleAddAnswer(text, index)}
-                        returnKeyType='done'
+                        returnKeyType='none'
                         maxLength={5}
+                        autoCorrect={false}
+                        keyboardType='visible-password'
                       />
                     </View>}
                 </View>}
@@ -207,12 +211,13 @@ const ConsensusSleepDiary = ({ logo, accessToken, navigation, name, questions, a
                   <TextInput
                     style={styles.input}
                     inputMode='numeric'
-                    keyboardType='numeric'
                     placeholder=''
                     value={answers[index]}
                     onChangeText={text => handleAddAnswer(text, index)}
-                    returnKeyType='done'
+                    returnKeyType='none'
                     maxLength={3}
+                    autoCorrect={false}
+                    keyboardType='visible-password'
                   />
                 </View>}
               {isBoolean[index] &&
@@ -310,8 +315,10 @@ const ConsensusSleepDiary = ({ logo, accessToken, navigation, name, questions, a
           keyExtractor={(item, index) => index}
           nestedScrollEnabled
           ListFooterComponent={renderSubmitButton}
-          removeClippedSubviews
+          removeClippedSubviews={false}
+          keyboardDismissMode='none'
         />
+
       </View>
     </KeyboardAvoidingView>
 

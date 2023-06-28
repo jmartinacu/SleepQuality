@@ -182,8 +182,10 @@ const PittsburghSleepQualityIndex = ({ logo, accessToken, navigation, name, ques
                           placeholder=''
                           value={answers[index]}
                           onChangeText={text => handleAddAnswer(text, index)}
-                          returnKeyType='done'
+                          returnKeyType='none'
                           maxLength={20}
+                          autoCorrect={false}
+                          keyboardType='visible-password'
                         />
                       </View>}
 
@@ -196,7 +198,7 @@ const PittsburghSleepQualityIndex = ({ logo, accessToken, navigation, name, ques
                           placeholder=''
                           value={answers[index]}
                           onChangeText={text => handleAddAnswer(text, index)}
-                          returnKeyType='done'
+                          returnKeyType='none'
                           maxLength={3}
                         />
                       </View>}
@@ -285,8 +287,10 @@ const PittsburghSleepQualityIndex = ({ logo, accessToken, navigation, name, ques
                         placeholder=''
                         value={answers[index]}
                         onChangeText={text => handleAddAnswer(text, index)}
-                        returnKeyType='done'
+                        returnKeyType='none'
                         maxLength={20}
+                        autoCorrect={false}
+                        keyboardType='visible-password'
                       />
                     </View>}
                   {isText[index] && (index === 0 || index === 2) &&
@@ -305,8 +309,10 @@ const PittsburghSleepQualityIndex = ({ logo, accessToken, navigation, name, ques
                             placeholder='00:00'
                             value={answers[index]}
                             onChangeText={text => handleAddAnswer(text, index)}
-                            returnKeyType='done'
+                            returnKeyType='none'
                             maxLength={5}
+                            autoCorrect={false}
+                            keyboardType='visible-password'
                           />
                         </View>}
                     </View>}
@@ -315,12 +321,13 @@ const PittsburghSleepQualityIndex = ({ logo, accessToken, navigation, name, ques
                       <TextInput
                         style={styles.input}
                         inputMode='numeric'
-                        keyboardType='numeric'
+                        keyboardType='visible-password'
                         placeholder=''
                         value={answers[index]}
                         onChangeText={text => handleAddAnswer(text, index)}
-                        returnKeyType='done'
+                        returnKeyType='none'
                         maxLength={3}
+                        autoCorrect={false}
                       />
                     </View>}
                   {isBoolean[index] &&
@@ -420,7 +427,8 @@ const PittsburghSleepQualityIndex = ({ logo, accessToken, navigation, name, ques
           keyExtractor={(item, index) => index}
           nestedScrollEnabled
           ListFooterComponent={renderSubmitButton}
-          removeClippedSubviews
+          removeClippedSubviews={false}
+          keyboardDismissMode='none'
         />
       </View>
     </KeyboardAvoidingView>
