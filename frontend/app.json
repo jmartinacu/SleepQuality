@@ -1,20 +1,26 @@
 {
   "expo": {
-    
-      "plugins": [
-        [
-          "expo-image-picker",
-          {
-            "photosPermission": "The app accesses your photos to let you use them as profflie pictures."
-          }
-        ]
-      ],
-    
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you use them as profflie pictures."
+        }
+      ]
+    ],
     "scheme": "acme",
     "web": {
       "bundler": "metro"
     },
     "name": "frontend",
-    "slug": "frontend"
+    "slug": "frontend",
+    "extra": {
+      "eas": {
+        "projectId": "8ff64eae-a85e-4f27-89bb-4d23b85b127e"
+      }
+    },
+    "android": {
+      "package": "com.carloosbaquero.frontend"
+    }
   }
 }
