@@ -7,7 +7,7 @@
   "smpt": {
     "host": "",
     "port": 587,
-    "secure": true,
+    "secure": false,
     "auth": {
       "user": "",
       "pass": ""

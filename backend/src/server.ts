@@ -11,7 +11,6 @@ import type { JWT } from '@fastify/jwt'
 import fastifyCors from '@fastify/cors'
 import multer from 'fastify-multer'
 import type { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
-import config from 'config'
 import userRoutes from './modules/user/user.routes'
 import questionnaireRoutes from './modules/questionnaire/questionnaire.routes'
 import authPlugin from './plugins/auth/auth.plugin'
@@ -95,18 +94,7 @@ export const upload = multer({
 })
 
 const buildServer = (): FastifyInstance => {
-  const nodeEnv = config.get<string>('nodeEnv')
-  let serverOptions = {}
-  if (nodeEnv === 'production') {
-    serverOptions = {
-      http2: true,
-      https: {
-        key: '',
-        cert: ''
-      }
-    }
-  }
-  const server = Fastify(serverOptions)
+  const server = Fastify()
 
   void server.register(fastifyCors)
 
