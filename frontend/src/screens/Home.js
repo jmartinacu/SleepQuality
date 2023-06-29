@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { View, StyleSheet, TouchableOpacity, Text, TextInput, FlatList, Dimensions } from 'react-native'
+import { View, StyleSheet, TouchableOpacity, Text, TextInput, FlatList, Dimensions, Platform } from 'react-native'
 import { getAnswers, getConsensusMorning, getQuestionnaires } from '../api/ApiQuestionnaries'
 import { getItemFromStorage, handleAnswersToGraphicByNQuestion } from '../utils/Utils'
 import PreviewQuestionnaire from '../components/questionnaries/PreviewQuestionnarie'
@@ -343,8 +343,18 @@ const Home = ({ navigation }) => {
               </View>}
           </KeyboardAwareScrollView>
 
-          {isDoctor === 'true' &&
+          {isDoctor === 'true' && Platform.OS !== 'web' &&
             <View style={styles.container}>
+              <Text style={styles.textHeaderFlatlist2}>Patients List</Text>
+              <FlatList
+                data={patients}
+                renderItem={renderPatients}
+                keyExtractor={(item, index) => index}
+                ListEmptyComponent={renderEmptyPatientsList}
+              />
+            </View>}
+          {isDoctor === 'true' && Platform.OS === 'web' &&
+            <View>
               <Text style={styles.textHeaderFlatlist2}>Patients List</Text>
               <FlatList
                 data={patients}

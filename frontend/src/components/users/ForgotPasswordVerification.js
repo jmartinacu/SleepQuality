@@ -34,10 +34,10 @@ const ForgotPasswordVerification = ({ navigation }) => {
           }
         })
         .catch(err => {
-          console.error(err)
+          console.log(err)
         })
     } else {
-      console.err('Wrong Email Format')
+      console.log('Wrong Email Format')
     }
   }
 

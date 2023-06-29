@@ -148,14 +148,12 @@ const Proffile = ({ navigation }) => {
                 </View>
               </View>
               {isDoctor === 'false' &&
-                <View style={{ height: 370 }}>
-                  <ScrollView>
+                <ScrollView>
 
-                    <RegisterForm
-                      navigation={navigation} update heightU={height} weightU={weight} genderU={gender} chronicDisordersU={chronicDisorders} token={accessToken}
-                    />
-                  </ScrollView>
-                </View>}
+                  <RegisterForm
+                    navigation={navigation} update heightU={height} weightU={weight} genderU={gender} chronicDisordersU={chronicDisorders} token={accessToken}
+                  />
+                </ScrollView>}
 
               <TouchableOpacity
                 style={styles.button}

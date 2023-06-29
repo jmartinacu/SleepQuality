@@ -118,7 +118,7 @@ const PasswordChangeVerification = ({ navigation, email }) => {
           console.error(err)
         })
     } else {
-      console.err('Wrong Email Format')
+      console.log('Wrong Email Format')
     }
   }
 

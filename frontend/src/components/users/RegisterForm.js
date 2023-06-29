@@ -1,9 +1,8 @@
 import { Picker } from '@react-native-picker/picker'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, Platform, Button } from 'react-native'
 import { userRegister, userUpdateUserData } from '../../api/ApiUser'
 import { Eye, EyeActive } from '../../assests/eyes'
-import { Input } from 'react-native-elements'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { parseDateToString, parseWebDateToString } from '../../utils/Utils'
 
@@ -196,10 +195,10 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
         })
         .catch(err => {
           setStatus('Conection error. Please reload the website')
-          console.error(err)
+          console.log(err)
         })
     } else {
-      console.err(checkPassowrd)
+      console.log(checkPassowrd)
     }
   }
 
@@ -221,7 +220,7 @@ const RegisterForm = ({ navigation, update, heightU, weightU, genderU, chronicDi
         })
         .catch(err => {
           setStatus('Conection error. Please reload the website')
-          console.error(err)
+          console.log(err)
         })
     }
   }
