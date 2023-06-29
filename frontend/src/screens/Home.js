@@ -354,7 +354,7 @@ const Home = ({ navigation }) => {
               />
             </View>}
           {isDoctor === 'true' && Platform.OS === 'web' &&
-            <View>
+            <View style={{ marginTop: 30 }}>
               <Text style={styles.textHeaderFlatlist2}>Patients List</Text>
               <FlatList
                 data={patients}
