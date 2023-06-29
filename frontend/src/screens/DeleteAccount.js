@@ -1,5 +1,5 @@
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
-import { userDeleteAccount, userDoctorGetNewAccessToken, userGetNewAccessToken } from '../api/ApiUser'
+import { doctorDeleteAccount, userDeleteAccount, userDoctorGetNewAccessToken, userGetNewAccessToken } from '../api/ApiUser'
 
 import { Sheep } from '../assests/questionnarieLogo'
 import { useEffect, useState } from 'react'
@@ -41,12 +41,21 @@ const DeleteAccount = ({ navigation, route }) => {
   }, [accessToken, isDoctor])
 
   const handleDeleteAccount = () => {
-    userDeleteAccount(route.params.accessToken)
-      .then(result => {
-        if (result.status === 204) {
-          navigation.replace('Login')
-        }
-      })
+    if (isDoctor === 'false') {
+      userDeleteAccount(route.params.accessToken)
+        .then(result => {
+          if (result.status === 204) {
+            navigation.replace('Login')
+          }
+        })
+    } else if (isDoctor === 'true') {
+      doctorDeleteAccount(route.params.accessToken)
+        .then(result => {
+          if (result.status === 204) {
+            navigation.replace('Login')
+          }
+        })
+    }
   }
 
   const handleDeleteAccountDoctor = () => {
