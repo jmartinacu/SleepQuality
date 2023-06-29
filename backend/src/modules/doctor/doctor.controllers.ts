@@ -134,7 +134,7 @@ async function deleteDoctorHandler (
   reply: FastifyReplyTypebox<typeof DeleteDoctorAuthenticatedSchema>
 ): Promise<void> {
   try {
-    const { userId: doctorId } = request.user as { userId: string }
+    const { doctorId } = request.user as { doctorId: string }
     await deleteDoctor(doctorId)
     return await reply.code(204).send()
   } catch (error) {

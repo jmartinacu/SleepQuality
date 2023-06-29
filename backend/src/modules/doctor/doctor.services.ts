@@ -116,10 +116,10 @@ async function findUsersDoctor (
   return users
 }
 
-async function deleteDoctor (id: string): Promise<void> {
+async function deleteDoctor (doctorId: string): Promise<void> {
   await prisma.user.updateMany({
     where: {
-      doctorId: id
+      doctorId
     },
     data: {
       doctorId: null
@@ -127,7 +127,7 @@ async function deleteDoctor (id: string): Promise<void> {
   })
   await prisma.doctor.delete({
     where: {
-      id
+      id: doctorId
     }
   })
 }
