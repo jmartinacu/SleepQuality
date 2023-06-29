@@ -147,19 +147,26 @@ async function updateUsers (
 }
 
 async function deleteUser (id: string): Promise<void> {
-  const { profilePicture, answers } = await prisma.user.delete({
+  const { answers } = await prisma.user.findUnique({
     where: {
       id
     },
     include: {
       answers: true
     }
-  })
+  }) as User & {
+    answers: Answer[]
+  }
   await prisma.answer.deleteMany({
     where: {
       id: {
         in: answers.map(answer => answer.id)
       }
+    }
+  })
+  const { profilePicture } = await prisma.user.delete({
+    where: {
+      id
     }
   })
   if (profilePicture !== null) {
